@@ -21,7 +21,8 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, 'dist')
+      // Serve the project root so index.html is available without a build step
+      directory: __dirname
     },
     port: 8080
   }
