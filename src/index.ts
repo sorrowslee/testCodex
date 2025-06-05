@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const rows = 5;
   const cols = 7;
 
+  // spin configuration
+  const BASE_SPIN = 1500; // minimum spin time in ms for the first reel
+  const SPIN_INCREMENT = 500; // additional spin time for each subsequent reel
+  const SPIN_SPEED = 150; // symbol movement speed per frame
+  const BLUR_AMOUNT = 10; // blur intensity while spinning
+
   const symbols = [
     'bag', 'bear_big', 'bear_small', 'cave', 'claws',
     'rifle', 'rock', 'salmon', 'seal', 'snow'
@@ -63,9 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
     spinning = true;
     const spinTimes: number[] = [];
     const blurFilter = new PIXI.filters.BlurFilter();
-    blurFilter.blur = 5;
+    blurFilter.blur = BLUR_AMOUNT;
     for (let i = 0; i < cols; i++) {
-      spinTimes.push(i * 500); // stagger stop times
+      spinTimes.push(BASE_SPIN + i * SPIN_INCREMENT); // stagger stop times
     }
     reels.forEach((reel, idx) => {
       const start = Date.now();
@@ -74,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ticker.add(() => {
         const elapsed = Date.now() - start;
         reel.children.forEach(child => {
-          child.y += 50 * ticker.deltaTime;
+          child.y += SPIN_SPEED * ticker.deltaTime;
           if (child.y >= rows * reelHeight) {
             child.y -= rows * reelHeight;
           }
