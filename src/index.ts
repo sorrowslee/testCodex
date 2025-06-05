@@ -51,25 +51,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let spinning = false;
 
+  function alignReel(reel: PIXI.Container) {
+    reel.children.forEach((child, i) => {
+      const row = Math.floor(i / 2);
+      child.y = row * reelHeight;
+    });
+  }
+
   button.on('pointerdown', () => {
     if (spinning) return;
     spinning = true;
     const spinTimes: number[] = [];
+    const blurFilter = new PIXI.filters.BlurFilter();
+    blurFilter.blur = 5;
     for (let i = 0; i < cols; i++) {
       spinTimes.push(i * 500); // stagger stop times
     }
     reels.forEach((reel, idx) => {
       const start = Date.now();
+      reel.filters = [blurFilter];
       const ticker = new PIXI.Ticker();
       ticker.add(() => {
         const elapsed = Date.now() - start;
         reel.children.forEach(child => {
-          child.y += 20;
+          child.y += 50 * ticker.deltaTime;
           if (child.y >= rows * reelHeight) {
             child.y -= rows * reelHeight;
           }
         });
         if (elapsed > spinTimes[idx]) {
+          alignReel(reel);
+          reel.filters = [];
           ticker.destroy();
           if (idx === cols - 1) spinning = false;
         }
