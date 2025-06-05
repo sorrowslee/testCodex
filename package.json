@@ -1,0 +1,20 @@
+{
+  "name": "pixi-slot-machine",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "webpack && cp index.html dist/index.html",
+    "start": "webpack serve --open",
+    "test": "webpack"
+  },
+  "dependencies": {
+    "pixi.js": "5.3.0"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.5",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.0"
+  }
+}
