@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "webpack && cp index.html dist/index.html",
+    "build": "webpack && cp index.html dist/index.html && cp -r assets dist",
     "start": "webpack serve --open",
     "test": "webpack"
   },
