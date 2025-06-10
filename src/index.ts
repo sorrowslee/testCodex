@@ -188,14 +188,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const sym = reels[cell.c].children[cell.r * 2] as PIXI.Sprite;
         const border = reels[cell.c].children[cell.r * 2 + 1] as PIXI.Sprite;
         if (!hitSprites.includes(sym)) {
-          sym.scale.set(1.2);
-          border.scale.set(1.2);
           hitSprites.push(sym, border);
         }
       });
     });
 
+    const pulseTicker = new PIXI.Ticker();
+    pulseTicker.add(() => {
+      const t = Date.now();
+      const scale = 1 + 0.2 * (0.5 + 0.5 * Math.sin(t / 150));
+      hitSprites.forEach(s => s.scale.set(scale));
+    });
+    pulseTicker.start();
+
     setTimeout(() => {
+      pulseTicker.stop();
+      pulseTicker.destroy();
       hitSprites.forEach(s => s.scale.set(1));
       lineContainer.removeChildren();
       spinning = false;
