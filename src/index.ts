@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     reels.push(rc);
     for (let j = 0; j < rows; j++) {
       const symIndex = Math.floor(Math.random() * symbols.length);
-      const texture = PIXI.Texture.from(`assets/${symbols[symIndex]}.png`);
-      const border = PIXI.Sprite.from('assets/border.png');
+      const texture = PIXI.Texture.from(`assets/symbols/${symbols[symIndex]}.png`);
+      const border = PIXI.Sprite.from('assets/symbols/border.png');
       const symbol = new PIXI.Sprite(texture);
       symbol.y = j * reelHeight;
       border.y = symbol.y;
