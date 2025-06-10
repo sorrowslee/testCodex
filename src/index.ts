@@ -185,10 +185,12 @@ document.addEventListener('DOMContentLoaded', () => {
       lineContainer.addChild(body, jStart, jEnd);
 
       l.cells.forEach(cell => {
-        const spr = reels[cell.c].children[cell.r * 2] as PIXI.Sprite;
-        if (!hitSprites.includes(spr)) {
-          spr.scale.set(1.2);
-          hitSprites.push(spr);
+        const sym = reels[cell.c].children[cell.r * 2] as PIXI.Sprite;
+        const border = reels[cell.c].children[cell.r * 2 + 1] as PIXI.Sprite;
+        if (!hitSprites.includes(sym)) {
+          sym.scale.set(1.2);
+          border.scale.set(1.2);
+          hitSprites.push(sym, border);
         }
       });
     });
@@ -223,12 +225,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const ticker = new PIXI.Ticker();
       ticker.add(() => {
         const elapsed = Date.now() - start;
-        reel.children.forEach(child => {
-          child.y += SPIN_SPEED * ticker.deltaTime;
-          if (child.y >= rows * reelHeight + reelHeight / 2) {
-            child.y -= rows * reelHeight;
+        for (let i = 0; i < reel.children.length; i += 2) {
+          const sym = reel.children[i] as PIXI.Sprite;
+          const border = reel.children[i + 1] as PIXI.Sprite;
+          sym.y += SPIN_SPEED * ticker.deltaTime;
+          border.y = sym.y;
+          if (sym.y >= rows * reelHeight + reelHeight / 2) {
+            sym.y -= rows * reelHeight;
+            border.y = sym.y;
+            const symIndex = Math.floor(Math.random() * symbols.length);
+            sym.texture = PIXI.Texture.from(`assets/symbols/${symbols[symIndex]}.png`);
+            sym.name = symbols[symIndex];
           }
-        });
+        }
         if (elapsed > spinTimes[idx]) {
           alignReel(reel);
           reel.filters = [];
