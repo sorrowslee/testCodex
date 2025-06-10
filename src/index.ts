@@ -15,22 +15,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const cols = 7;
 
   // spin configuration
-  const BASE_SPIN = 1500; // minimum spin time in ms for the first reel
-  const SPIN_INCREMENT = 500; // additional spin time for each subsequent reel
-  const SPIN_SPEED = 150; // symbol movement speed per frame
-  const BLUR_AMOUNT = 10; // blur intensity while spinning
+  const BASE_SPIN = 1000; // minimum spin time in ms for the first reel
+  const SPIN_INCREMENT = 300; // additional spin time for each subsequent reel
+  const SPIN_SPEED = 300; // symbol movement speed per frame
+  const BLUR_AMOUNT = 30; // blur intensity while spinning
 
   const symbols = [
     'bag', 'bear_big', 'bear_small', 'cave', 'claws',
     'rifle', 'rock', 'salmon', 'seal', 'snow'
   ];
 
+  const reelContainer = new PIXI.Container();
+  app.stage.addChild(reelContainer);
+  const reelMask = new PIXI.Graphics();
+  reelMask.beginFill(0xffffff);
+  reelMask.drawRect(0, 0, cols * reelWidth, rows * reelHeight);
+  reelMask.endFill();
+  reelMask.visible = false;
+  app.stage.addChild(reelMask);
+  reelContainer.mask = reelMask;
+
   const reels: PIXI.Container[] = [];
 
   for (let i = 0; i < cols; i++) {
     const rc = new PIXI.Container();
     rc.x = i * reelWidth;
-    app.stage.addChild(rc);
+    reelContainer.addChild(rc);
     reels.push(rc);
     for (let j = 0; j < rows; j++) {
       const symIndex = Math.floor(Math.random() * symbols.length);
