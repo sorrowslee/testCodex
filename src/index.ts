@@ -37,7 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const texture = PIXI.Texture.from(`assets/symbols/${symbols[symIndex]}.png`);
       const border = PIXI.Sprite.from('assets/symbols/border.png');
       const symbol = new PIXI.Sprite(texture);
-      symbol.y = j * reelHeight;
+      symbol.name = symbols[symIndex];
+      symbol.anchor.set(0.5);
+      border.anchor.set(0.5);
+      symbol.x = reelWidth / 2;
+      symbol.y = j * reelHeight + reelHeight / 2;
+      border.x = reelWidth / 2;
       border.y = symbol.y;
       rc.addChild(symbol);
       rc.addChild(border);
@@ -56,11 +61,150 @@ document.addEventListener('DOMContentLoaded', () => {
   app.stage.addChild(button);
 
   let spinning = false;
+  const WIN_TIME = 3000;
+  const lineContainer = new PIXI.Container();
+  app.stage.addChild(lineContainer);
+
+  interface LineInfo {
+    start: { r: number; c: number };
+    end: { r: number; c: number };
+    cells: { r: number; c: number }[];
+  }
+
+  function gridState() {
+    const grid: { name: string; sprite: PIXI.Sprite }[][] = [];
+    for (let r = 0; r < rows; r++) {
+      grid[r] = [];
+      for (let c = 0; c < cols; c++) {
+        const sprite = reels[c].children[r * 2] as PIXI.Sprite;
+        grid[r][c] = { name: sprite.name || '', sprite };
+      }
+    }
+    return grid;
+  }
+
+  function findLines(): LineInfo[] {
+    const grid = gridState();
+    const lines: LineInfo[] = [];
+
+    // horizontal
+    for (let r = 0; r < rows; r++) {
+      let c = 0;
+      while (c < cols) {
+        const start = c;
+        const name = grid[r][c].name;
+        while (c + 1 < cols && grid[r][c + 1].name === name) c++;
+        const len = c - start + 1;
+        if (len >= 3) {
+          const cells = [] as { r: number; c: number }[];
+          for (let i = 0; i < len; i++) cells.push({ r, c: start + i });
+          lines.push({ start: { r, c: start }, end: { r, c }, cells });
+        }
+        c++;
+      }
+    }
+
+    // vertical
+    for (let c = 0; c < cols; c++) {
+      let r = 0;
+      while (r < rows) {
+        const start = r;
+        const name = grid[r][c].name;
+        while (r + 1 < rows && grid[r + 1][c].name === name) r++;
+        const len = r - start + 1;
+        if (len >= 3) {
+          const cells = [] as { r: number; c: number }[];
+          for (let i = 0; i < len; i++) cells.push({ r: start + i, c });
+          lines.push({ start: { r: start, c }, end: { r, c }, cells });
+        }
+        r++;
+      }
+    }
+
+    // diagonal down-right
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const name = grid[r][c].name;
+        if (!name) continue;
+        if (r > 0 && c > 0 && grid[r - 1][c - 1].name === name) continue;
+        let len = 1;
+        while (r + len < rows && c + len < cols && grid[r + len][c + len].name === name) len++;
+        if (len >= 3) {
+          const cells = [] as { r: number; c: number }[];
+          for (let i = 0; i < len; i++) cells.push({ r: r + i, c: c + i });
+          lines.push({ start: { r, c }, end: { r: r + len - 1, c: c + len - 1 }, cells });
+        }
+      }
+    }
+
+    // diagonal up-right
+    for (let r = rows - 1; r >= 0; r--) {
+      for (let c = 0; c < cols; c++) {
+        const name = grid[r][c].name;
+        if (!name) continue;
+        if (r < rows - 1 && c > 0 && grid[r + 1][c - 1].name === name) continue;
+        let len = 1;
+        while (r - len >= 0 && c + len < cols && grid[r - len][c + len].name === name) len++;
+        if (len >= 3) {
+          const cells = [] as { r: number; c: number }[];
+          for (let i = 0; i < len; i++) cells.push({ r: r - i, c: c + i });
+          lines.push({ start: { r, c }, end: { r: r - len + 1, c: c + len - 1 }, cells });
+        }
+      }
+    }
+
+    return lines;
+  }
+
+  function cellPos(r: number, c: number) {
+    return { x: c * reelWidth + reelWidth / 2, y: r * reelHeight + reelHeight / 2 };
+  }
+
+  function showWin(lines: LineInfo[]) {
+    const hitSprites: PIXI.Sprite[] = [];
+    lines.forEach(l => {
+      const sPos = cellPos(l.start.r, l.start.c);
+      const ePos = cellPos(l.end.r, l.end.c);
+
+      const jStart = PIXI.Sprite.from('assets/lines/line_joint.png');
+      const jEnd = PIXI.Sprite.from('assets/lines/line_joint.png');
+      jStart.anchor.set(0.5);
+      jEnd.anchor.set(0.5);
+      jStart.position.set(sPos.x, sPos.y);
+      jEnd.position.set(ePos.x, ePos.y);
+
+      const body = PIXI.Sprite.from('assets/lines/line_body.png');
+      body.anchor.set(0.5);
+      const dx = ePos.x - sPos.x;
+      const dy = ePos.y - sPos.y;
+      const length = Math.sqrt(dx * dx + dy * dy);
+      body.width = length;
+      body.position.set((sPos.x + ePos.x) / 2, (sPos.y + ePos.y) / 2);
+      body.rotation = Math.atan2(dy, dx);
+
+      lineContainer.addChild(body, jStart, jEnd);
+
+      l.cells.forEach(cell => {
+        const spr = reels[cell.c].children[cell.r * 2] as PIXI.Sprite;
+        if (!hitSprites.includes(spr)) {
+          spr.scale.set(1.2);
+          hitSprites.push(spr);
+        }
+      });
+    });
+
+    setTimeout(() => {
+      hitSprites.forEach(s => s.scale.set(1));
+      lineContainer.removeChildren();
+      spinning = false;
+    }, WIN_TIME);
+  }
 
   function alignReel(reel: PIXI.Container) {
     reel.children.forEach((child, i) => {
       const row = Math.floor(i / 2);
-      child.y = row * reelHeight;
+      child.y = row * reelHeight + reelHeight / 2;
+      child.x = reelWidth / 2;
     });
   }
 
@@ -81,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const elapsed = Date.now() - start;
         reel.children.forEach(child => {
           child.y += SPIN_SPEED * ticker.deltaTime;
-          if (child.y >= rows * reelHeight) {
+          if (child.y >= rows * reelHeight + reelHeight / 2) {
             child.y -= rows * reelHeight;
           }
         });
@@ -89,7 +233,14 @@ document.addEventListener('DOMContentLoaded', () => {
           alignReel(reel);
           reel.filters = [];
           ticker.destroy();
-          if (idx === cols - 1) spinning = false;
+          if (idx === cols - 1) {
+            const wins = findLines();
+            if (wins.length > 0) {
+              showWin(wins);
+            } else {
+              spinning = false;
+            }
+          }
         }
       });
       ticker.start();
