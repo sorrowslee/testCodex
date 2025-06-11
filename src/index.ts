@@ -44,6 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
   scoreText.x = (cols * reelWidth) / 2;
   scoreText.y = 20;
   app.stage.addChild(scoreText);
+
+  const hotSpinText = new PIXI.Text('', {
+    fill: 0xff0000,
+    fontSize: 48,
+    fontWeight: 'bold',
+    stroke: 0x333333,
+    strokeThickness: 6
+  });
+  hotSpinText.x = 20;
+  hotSpinText.y = 20;
+  hotSpinText.visible = false;
+  app.stage.addChild(hotSpinText);
   const reelMask = new PIXI.Graphics();
   reelMask.beginFill(0xffffff);
   reelMask.drawRect(0, 0, cols * reelWidth, rows * reelHeight);
@@ -340,18 +352,25 @@ document.addEventListener('DOMContentLoaded', () => {
   function startHotSpin() {
     inHotSpin = true;
     hotSpinsLeft = 3;
+    hotSpinText.visible = true;
+    hotSpinText.text = `Hot Spin!! ${hotSpinsLeft}`;
     button.interactive = false;
     button.alpha = 0.5;
     currentSymbols = hotSymbols;
     populateReels(currentSymbols);
     spin(() => {
       hotSpinsLeft--;
+      if (hotSpinsLeft > 0) {
+        hotSpinText.text = `Hot Spin!! ${hotSpinsLeft}`;
+      }
       checkHotSpin();
     });
   }
 
   function endHotSpin() {
     inHotSpin = false;
+    hotSpinText.visible = false;
+    hotSpinText.text = '';
     currentSymbols = normalSymbols;
     populateReels(currentSymbols);
     button.interactive = true;
@@ -364,6 +383,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hotSpinsLeft > 0) {
         spin(() => {
           hotSpinsLeft--;
+          if (hotSpinsLeft > 0) {
+            hotSpinText.text = `Hot Spin!! ${hotSpinsLeft}`;
+          }
           checkHotSpin();
         });
       } else {
