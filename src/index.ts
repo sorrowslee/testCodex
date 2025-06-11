@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = new PIXI.Application({
