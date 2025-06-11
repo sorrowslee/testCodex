@@ -2,18 +2,34 @@ import * as PIXI from 'pixi.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const SCORE_AREA_HEIGHT = 100;
+  const APP_WIDTH = 1882;
+  const APP_HEIGHT = 1075;
+  const GAME_WIDTH = 7 * 128;
+  const GAME_HEIGHT = 5 * 128 + 100 + SCORE_AREA_HEIGHT;
+
   const app = new PIXI.Application({
-    width: 7 * 128,
-    height: 5 * 128 + 100 + SCORE_AREA_HEIGHT,
-    backgroundColor: 0x1099bb
+    width: APP_WIDTH,
+    height: APP_HEIGHT,
+    backgroundColor: 0x000000
   });
 
   document.getElementById('game')?.appendChild(app.view);
+
+  const background = PIXI.Sprite.from('assets/bg/bg.png');
+  background.width = APP_WIDTH;
+  background.height = APP_HEIGHT;
+  app.stage.addChild(background);
+
+  const gameContainer = new PIXI.Container();
+  gameContainer.x = (APP_WIDTH - GAME_WIDTH) / 2;
+  gameContainer.y = (APP_HEIGHT - GAME_HEIGHT) / 2;
+  app.stage.addChild(gameContainer);
 
   const reelWidth = 128;
   const reelHeight = 128;
   const rows = 5;
   const cols = 7;
+  const REEL_SCALE = 0.9;
 
   // spin configuration
   const BASE_SPIN = 1000; // minimum spin time in ms for the first reel
@@ -30,7 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const reelContainer = new PIXI.Container();
   reelContainer.y = SCORE_AREA_HEIGHT;
-  app.stage.addChild(reelContainer);
+  reelContainer.scale.set(REEL_SCALE);
+  reelContainer.x = (GAME_WIDTH - cols * reelWidth * REEL_SCALE) / 2;
+  gameContainer.addChild(reelContainer);
 
   let score = 0;
   const scoreText = new PIXI.Text('Score: 0', {
@@ -43,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   scoreText.anchor.set(0.5, 0);
   scoreText.x = (cols * reelWidth) / 2;
   scoreText.y = 20;
-  app.stage.addChild(scoreText);
+  gameContainer.addChild(scoreText);
 
   const hotSpinText = new PIXI.Text('', {
     fill: 0xff0000,
@@ -55,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   hotSpinText.x = 20;
   hotSpinText.y = 20;
   hotSpinText.visible = false;
-  app.stage.addChild(hotSpinText);
+  gameContainer.addChild(hotSpinText);
   const reelMask = new PIXI.Graphics();
   reelMask.beginFill(0xffffff);
   reelMask.drawRect(0, 0, cols * reelWidth, rows * reelHeight);
@@ -110,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   button.buttonMode = true;
   button.x = (cols * reelWidth - button.width) / 2;
   button.y = rows * reelHeight + 20 + SCORE_AREA_HEIGHT;
-  app.stage.addChild(button);
+  gameContainer.addChild(button);
 
   let spinning = false;
   let inHotSpin = false;
@@ -119,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const WIN_TIME = 3000;
   const lineContainer = new PIXI.Container();
   lineContainer.y = SCORE_AREA_HEIGHT;
-  app.stage.addChild(lineContainer);
+  gameContainer.addChild(lineContainer);
 
   interface LineInfo {
     start: { r: number; c: number };
