@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js';
+import PIXI from 'pixi.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = new PIXI.Application({
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   app.stage.addChild(reelMask);
   reelContainer.mask = reelMask;
 
-  const reels: PIXI.Container[] = [];
+  const reels: any[] = [];
 
   for (let i = 0; i < cols; i++) {
     const rc = new PIXI.Container();
@@ -82,11 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function gridState() {
-    const grid: { name: string; sprite: PIXI.Sprite }[][] = [];
+    const grid: { name: string; sprite: any }[][] = [];
     for (let r = 0; r < rows; r++) {
       grid[r] = [];
       for (let c = 0; c < cols; c++) {
-        const sprite = reels[c].children[r * 2] as PIXI.Sprite;
+        const sprite = reels[c].children[r * 2] as any;
         grid[r][c] = { name: sprite.name || '', sprite };
       }
     }
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showWin(lines: LineInfo[]) {
-    const hitSprites: PIXI.Sprite[] = [];
+    const hitSprites: any[] = [];
     lines.forEach(l => {
       const sPos = cellPos(l.start.r, l.start.c);
       const ePos = cellPos(l.end.r, l.end.c);
@@ -195,8 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
       lineContainer.addChild(body, jStart, jEnd);
 
       l.cells.forEach(cell => {
-        const sym = reels[cell.c].children[cell.r * 2] as PIXI.Sprite;
-        const border = reels[cell.c].children[cell.r * 2 + 1] as PIXI.Sprite;
+        const sym = reels[cell.c].children[cell.r * 2] as any;
+        const border = reels[cell.c].children[cell.r * 2 + 1] as any;
         if (!hitSprites.includes(sym)) {
           hitSprites.push(sym, border);
         }
@@ -220,8 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, WIN_TIME);
   }
 
-  function alignReel(reel: PIXI.Container) {
-    reel.children.forEach((child, i) => {
+  function alignReel(reel: any) {
+    reel.children.forEach((child: any, i: number) => {
       const row = Math.floor(i / 2);
       child.y = row * reelHeight + reelHeight / 2;
       child.x = reelWidth / 2;
@@ -244,8 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
       ticker.add(() => {
         const elapsed = Date.now() - start;
         for (let i = 0; i < reel.children.length; i += 2) {
-          const sym = reel.children[i] as PIXI.Sprite;
-          const border = reel.children[i + 1] as PIXI.Sprite;
+          const sym = reel.children[i] as any;
+          const border = reel.children[i + 1] as any;
           sym.y += SPIN_SPEED * ticker.deltaTime;
           border.y = sym.y;
           if (sym.y >= rows * reelHeight + reelHeight / 2) {
