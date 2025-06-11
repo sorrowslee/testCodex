@@ -31,6 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const cols = 7;
   const REEL_SCALE = 0.9;
 
+  const HUNTER_SCALE = 0.5;
+  const HUNTER_POSITION = {
+    x: gameContainer.x + GAME_WIDTH + 20,
+    y: gameContainer.y + SCORE_AREA_HEIGHT
+  };
+
+  const hunterVideo = PIXI.Sprite.from('assets/animation/hunter.mp4');
+  const hunterSource = (hunterVideo.texture.baseTexture.resource as any).source as HTMLVideoElement;
+  hunterSource.loop = true;
+  hunterSource.play();
+  hunterVideo.scale.set(HUNTER_SCALE);
+  hunterVideo.position.set(HUNTER_POSITION.x, HUNTER_POSITION.y);
+  app.stage.addChild(hunterVideo);
+
   // spin configuration
   const BASE_SPIN = 1000; // minimum spin time in ms for the first reel
   const SPIN_INCREMENT = 300; // additional spin time for each subsequent reel
