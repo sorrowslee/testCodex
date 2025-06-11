@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let spinning = false;
   let inHotSpin = false;
   let hotSpinsLeft = 0;
+  let nextHotSpinScore = 100;
   const WIN_TIME = 3000;
   const lineContainer = new PIXI.Container();
   lineContainer.y = SCORE_AREA_HEIGHT;
@@ -355,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     populateReels(currentSymbols);
     button.interactive = true;
     button.alpha = 1;
+    nextHotSpinScore = Math.floor(score / 100) * 100 + 100;
   }
 
   function checkHotSpin() {
@@ -368,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
         endHotSpin();
       }
     } else {
-      if (score > 0 && score % 100 === 0) {
+      if (score >= nextHotSpinScore) {
         startHotSpin();
       }
     }
