@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const SCORE_AREA_HEIGHT = 100;
   const app = new PIXI.Application({
     width: 7 * 128,
-    height: 5 * 128 + 100,
+    height: 5 * 128 + 100 + SCORE_AREA_HEIGHT,
     backgroundColor: 0x1099bb
   });
 
@@ -26,16 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   const reelContainer = new PIXI.Container();
+  reelContainer.y = SCORE_AREA_HEIGHT;
   app.stage.addChild(reelContainer);
 
   let score = 0;
   const scoreText = new PIXI.Text('Score: 0', {
-    fill: 0xffffff,
-    fontSize: 24,
-    fontWeight: 'bold'
+    fill: 0xffe066,
+    fontSize: 48,
+    fontWeight: 'bold',
+    stroke: 0x333333,
+    strokeThickness: 6
   });
-  scoreText.x = 10;
-  scoreText.y = 10;
+  scoreText.anchor.set(0.5, 0);
+  scoreText.x = (cols * reelWidth) / 2;
+  scoreText.y = 20;
   app.stage.addChild(scoreText);
   const reelMask = new PIXI.Graphics();
   reelMask.beginFill(0xffffff);
@@ -76,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   button.interactive = true;
   button.buttonMode = true;
   button.x = (cols * reelWidth - button.width) / 2;
-  button.y = rows * reelHeight + 20;
+  button.y = rows * reelHeight + 20 + SCORE_AREA_HEIGHT;
   app.stage.addChild(button);
 
   let spinning = false;
@@ -179,6 +184,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return { x: c * reelWidth + reelWidth / 2, y: r * reelHeight + reelHeight / 2 };
   }
 
+  function animateScore() {
+    const start = Date.now();
+    const duration = 600;
+    const ticker = new PIXI.Ticker();
+    ticker.add(() => {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const scale = 1 + 0.5 * Math.sin(progress * Math.PI);
+      scoreText.scale.set(scale);
+      if (progress === 1) {
+        scoreText.scale.set(1);
+        ticker.stop();
+        ticker.destroy();
+      }
+    });
+    ticker.start();
+  }
+
   function showWin(lines: LineInfo[]) {
     const hitSprites: any[] = [];
     const uniqueCells = new Set<string>();
@@ -218,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gained > 0) {
       score += gained;
       scoreText.text = `Score: ${score}`;
+      animateScore();
     }
 
     const pulseTicker = new PIXI.Ticker();
