@@ -31,8 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   reelMask.beginFill(0xffffff);
   reelMask.drawRect(0, 0, cols * reelWidth, rows * reelHeight);
   reelMask.endFill();
-  reelMask.visible = false;
-  app.stage.addChild(reelMask);
+  reelContainer.addChild(reelMask);
   reelContainer.mask = reelMask;
 
   const reels: any[] = [];

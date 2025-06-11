@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "webpack && cp index.html dist/index.html && cp -r assets dist",
+    "build": "webpack && shx cp index.html dist/index.html && shx cp -r assets dist",
     "start": "webpack serve --open",
     "test": "webpack"
   },
@@ -11,6 +11,7 @@
     "pixi.js": "5.3.0"
   },
   "devDependencies": {
+    "shx": "^0.4.0",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.5",
     "webpack": "^5.88.2",
