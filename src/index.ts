@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let spinning = false;
   const WIN_TIME = 3000;
   const lineContainer = new PIXI.Container();
+  lineContainer.y = SCORE_AREA_HEIGHT;
   app.stage.addChild(lineContainer);
 
   interface LineInfo {
