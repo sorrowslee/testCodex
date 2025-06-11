@@ -119,14 +119,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const button = new PIXI.Text('SPIN', {
-    fill: 0xffffff,
+  const button = new PIXI.Container();
+  const btnBgWidth = 160;
+  const btnBgHeight = 60;
+  const buttonBg = new PIXI.Graphics();
+  buttonBg.beginFill(0xffe066);
+  buttonBg.lineStyle(2, 0xffffff);
+  buttonBg.drawRoundedRect(0, 0, btnBgWidth, btnBgHeight, 10);
+  buttonBg.endFill();
+  const buttonText = new PIXI.Text('SPIN', {
+    fill: 0x000000,
     fontSize: 36,
     fontWeight: 'bold'
   });
+  buttonText.anchor.set(0.5);
+  buttonText.position.set(btnBgWidth / 2, btnBgHeight / 2);
+  button.addChild(buttonBg);
+  button.addChild(buttonText);
   button.interactive = true;
   button.buttonMode = true;
-  button.x = (cols * reelWidth - button.width) / 2;
+  button.x = (cols * reelWidth - btnBgWidth) / 2;
   button.y = rows * reelHeight + 20 + SCORE_AREA_HEIGHT;
   gameContainer.addChild(button);
 
@@ -136,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let nextHotSpinScore = 100;
   const WIN_TIME = 3000;
   const lineContainer = new PIXI.Container();
-  lineContainer.y = SCORE_AREA_HEIGHT;
+  lineContainer.x = reelContainer.x;
+  lineContainer.y = reelContainer.y;
+  lineContainer.scale.set(REEL_SCALE);
   gameContainer.addChild(lineContainer);
 
   interface LineInfo {
