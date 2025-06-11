@@ -27,6 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const reelContainer = new PIXI.Container();
   app.stage.addChild(reelContainer);
+
+  let score = 0;
+  const scoreText = new PIXI.Text('Score: 0', {
+    fill: 0xffffff,
+    fontSize: 24,
+    fontWeight: 'bold'
+  });
+  scoreText.x = 10;
+  scoreText.y = 10;
+  app.stage.addChild(scoreText);
   const reelMask = new PIXI.Graphics();
   reelMask.beginFill(0xffffff);
   reelMask.drawRect(0, 0, cols * reelWidth, rows * reelHeight);
@@ -171,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showWin(lines: LineInfo[]) {
     const hitSprites: any[] = [];
+    const uniqueCells = new Set<string>();
     lines.forEach(l => {
       const sPos = cellPos(l.start.r, l.start.c);
       const ePos = cellPos(l.end.r, l.end.c);
@@ -199,8 +210,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hitSprites.includes(sym)) {
           hitSprites.push(sym, border);
         }
+        uniqueCells.add(`${cell.r}-${cell.c}`);
       });
     });
+
+    const gained = uniqueCells.size * 10;
+    if (gained > 0) {
+      score += gained;
+      scoreText.text = `Score: ${score}`;
+    }
 
     const pulseTicker = new PIXI.Ticker();
     pulseTicker.add(() => {
