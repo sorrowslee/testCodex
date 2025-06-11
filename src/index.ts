@@ -21,10 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const SPIN_SPEED = 300; // symbol movement speed per frame
   const BLUR_AMOUNT = 30; // blur intensity while spinning
 
-  const symbols = [
+  const normalSymbols = [
     'bag', 'bear_big', 'bear_small', 'cave', 'claws',
     'rifle', 'rock', 'salmon', 'seal', 'snow'
   ];
+  const hotSymbols = normalSymbols.slice(0, 5);
+  let currentSymbols = normalSymbols;
 
   const reelContainer = new PIXI.Container();
   reelContainer.y = SCORE_AREA_HEIGHT;
@@ -51,17 +53,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const reels: any[] = [];
 
+  function populateReels(symbolSet: string[]) {
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < rows; r++) {
+        const idx = Math.floor(Math.random() * symbolSet.length);
+        const sym = reels[c].children[r * 2] as any;
+        const border = reels[c].children[r * 2 + 1] as any;
+        sym.texture = PIXI.Texture.from(`assets/symbols/${symbolSet[idx]}.png`);
+        sym.name = symbolSet[idx];
+        sym.y = r * reelHeight + reelHeight / 2;
+        border.y = sym.y;
+      }
+    }
+  }
+
   for (let i = 0; i < cols; i++) {
     const rc = new PIXI.Container();
     rc.x = i * reelWidth;
     reelContainer.addChild(rc);
     reels.push(rc);
     for (let j = 0; j < rows; j++) {
-      const symIndex = Math.floor(Math.random() * symbols.length);
-      const texture = PIXI.Texture.from(`assets/symbols/${symbols[symIndex]}.png`);
+      const symIndex = Math.floor(Math.random() * currentSymbols.length);
+      const texture = PIXI.Texture.from(`assets/symbols/${currentSymbols[symIndex]}.png`);
       const border = PIXI.Sprite.from('assets/symbols/border.png');
       const symbol = new PIXI.Sprite(texture);
-      symbol.name = symbols[symIndex];
+      symbol.name = currentSymbols[symIndex];
       symbol.anchor.set(0.5);
       border.anchor.set(0.5);
       symbol.x = reelWidth / 2;
@@ -85,6 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
   app.stage.addChild(button);
 
   let spinning = false;
+  let inHotSpin = false;
+  let hotSpinsLeft = 0;
   const WIN_TIME = 3000;
   const lineContainer = new PIXI.Container();
   lineContainer.y = SCORE_AREA_HEIGHT;
@@ -203,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ticker.start();
   }
 
-  function showWin(lines: LineInfo[]) {
+  function showWin(lines: LineInfo[], onDone: () => void) {
     const hitSprites: any[] = [];
     const uniqueCells = new Set<string>();
     lines.forEach(l => {
@@ -259,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hitSprites.forEach(s => s.scale.set(1));
       lineContainer.removeChildren();
       spinning = false;
+      onDone();
     }, WIN_TIME);
   }
 
@@ -270,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  button.on('pointerdown', () => {
+  function spin(onComplete: () => void) {
     if (spinning) return;
     spinning = true;
     const spinTimes: number[] = [];
@@ -293,9 +312,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (sym.y >= rows * reelHeight + reelHeight / 2) {
             sym.y -= rows * reelHeight;
             border.y = sym.y;
-            const symIndex = Math.floor(Math.random() * symbols.length);
-            sym.texture = PIXI.Texture.from(`assets/symbols/${symbols[symIndex]}.png`);
-            sym.name = symbols[symIndex];
+            const symIndex = Math.floor(Math.random() * currentSymbols.length);
+            sym.texture = PIXI.Texture.from(`assets/symbols/${currentSymbols[symIndex]}.png`);
+            sym.name = currentSymbols[symIndex];
           }
         }
         if (elapsed > spinTimes[idx]) {
@@ -305,14 +324,59 @@ document.addEventListener('DOMContentLoaded', () => {
           if (idx === cols - 1) {
             const wins = findLines();
             if (wins.length > 0) {
-              showWin(wins);
+              showWin(wins, onComplete);
             } else {
               spinning = false;
+              onComplete();
             }
           }
         }
       });
       ticker.start();
+    });
+  }
+
+  function startHotSpin() {
+    inHotSpin = true;
+    hotSpinsLeft = 3;
+    button.interactive = false;
+    button.alpha = 0.5;
+    currentSymbols = hotSymbols;
+    populateReels(currentSymbols);
+    spin(() => {
+      hotSpinsLeft--;
+      checkHotSpin();
+    });
+  }
+
+  function endHotSpin() {
+    inHotSpin = false;
+    currentSymbols = normalSymbols;
+    populateReels(currentSymbols);
+    button.interactive = true;
+    button.alpha = 1;
+  }
+
+  function checkHotSpin() {
+    if (inHotSpin) {
+      if (hotSpinsLeft > 0) {
+        spin(() => {
+          hotSpinsLeft--;
+          checkHotSpin();
+        });
+      } else {
+        endHotSpin();
+      }
+    } else {
+      if (score > 0 && score % 100 === 0) {
+        startHotSpin();
+      }
+    }
+  }
+
+  button.on('pointerdown', () => {
+    spin(() => {
+      checkHotSpin();
     });
   });
 });
