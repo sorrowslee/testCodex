@@ -71,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
   hunter.x = gameContainer.x + GAME_WIDTH + HUNTER_X_OFFSET;
   hunter.y = gameContainer.y + SCORE_AREA_HEIGHT + HUNTER_Y_OFFSET +
     (rows * reelHeight) / 2;
-  hunter.play();
+  // show the hunter but keep it on the first frame by default
+  hunter.gotoAndStop(0);
   app.stage.addChild(hunter);
 
   let score = 0;
@@ -406,6 +407,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function startHotSpin() {
+    // start hunter animation when entering Hot Spin mode
+    hunter.play();
     inHotSpin = true;
     hotSpinsLeft = 3;
     hotSpinText.visible = true;
@@ -424,6 +427,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function endHotSpin() {
+    // stop hunter animation and reset to the first frame
+    hunter.gotoAndStop(0);
     inHotSpin = false;
     hotSpinText.visible = false;
     hotSpinText.text = '';
