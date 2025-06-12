@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const GAME_WIDTH = 7 * 128;
   const GAME_HEIGHT = 5 * 128 + 100 + SCORE_AREA_HEIGHT;
 
+  // hunter animation parameters for easy adjustment
+  const HUNTER_SCALE = 0.6;
+  const HUNTER_X_OFFSET = 50;
+  const HUNTER_Y_OFFSET = SCORE_AREA_HEIGHT;
+
   const app = new PIXI.Application({
     width: APP_WIDTH,
     height: APP_HEIGHT,
@@ -49,6 +54,25 @@ document.addEventListener('DOMContentLoaded', () => {
   reelContainer.scale.set(REEL_SCALE);
   reelContainer.x = (GAME_WIDTH - cols * reelWidth * REEL_SCALE) / 2;
   gameContainer.addChild(reelContainer);
+
+  // create hunter animation
+  const hunterFrames: PIXI.Texture[] = [];
+  for (let i = 1; i <= 51; i++) {
+    const num = i.toString().padStart(3, '0');
+    hunterFrames.push(
+      PIXI.Texture.from(`assets/animation/hunter/hunter_${num}.jpg`)
+    );
+  }
+  const hunter = new PIXI.AnimatedSprite(hunterFrames);
+  hunter.animationSpeed = 0.1667; // 0.1s per frame
+  hunter.loop = true;
+  hunter.anchor.set(0.5);
+  hunter.scale.set(HUNTER_SCALE);
+  hunter.x = gameContainer.x + GAME_WIDTH + HUNTER_X_OFFSET;
+  hunter.y = gameContainer.y + SCORE_AREA_HEIGHT + HUNTER_Y_OFFSET +
+    (rows * reelHeight) / 2;
+  hunter.play();
+  app.stage.addChild(hunter);
 
   let score = 0;
   const scoreText = new PIXI.Text('Score: 0', {
