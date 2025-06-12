@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'bag', 'bear_big', 'bear_small', 'cave', 'claws',
     'rifle', 'rock', 'salmon', 'seal', 'snow'
   ];
-  const hotSymbols = normalSymbols.slice(0, 5);
+  const hotSymbols = normalSymbols.slice(0, 3);
   let currentSymbols = normalSymbols;
 
   const reelContainer = new PIXI.Container();
