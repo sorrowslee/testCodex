@@ -8,9 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const GAME_HEIGHT = 5 * 128 + 100 + SCORE_AREA_HEIGHT;
 
   // hunter animation parameters for easy adjustment
-  const HUNTER_SCALE = 0.6;
-  const HUNTER_X_OFFSET = 50;
-  const HUNTER_Y_OFFSET = SCORE_AREA_HEIGHT;
+  const HUNTER_SCALE = 1;
+  const HUNTER_X_OFFSET = 250;
+  const HUNTER_Y_OFFSET = SCORE_AREA_HEIGHT + 190;
 
   const app = new PIXI.Application({
     width: APP_WIDTH,
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   for (let i = 1; i <= 51; i++) {
     const num = i.toString().padStart(3, '0');
     hunterFrames.push(
-      PIXI.Texture.from(`assets/animation/hunter/hunter_${num}.jpg`)
+      PIXI.Texture.from(`assets/animation/hunter/hunter_${num}.png`)
     );
   }
   const hunter = new PIXI.AnimatedSprite(hunterFrames);
