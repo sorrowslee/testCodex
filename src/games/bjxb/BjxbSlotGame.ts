@@ -8,10 +8,10 @@ export class BjxbSlotGame extends BaseSlotGame {
   private inHotSpin = false;
   private hotSpinsLeft = 0;
   private nextHotSpinScore = 100;
-  private normalSymbols = [
-    'bag', 'bear_big', 'bear_small', 'cave', 'claws',
-    'rifle', 'rock', 'salmon', 'seal', 'snow'
-  ];
+  // Symbols are referenced by number strings (e.g. '001')
+  private normalSymbols = Array.from({ length: AssetPaths.bjxb.symbolCount }, (_, i) =>
+    (i + 1).toString().padStart(3, '0')
+  );
   private hotSymbols = this.normalSymbols.slice(0, 3);
 
   protected getBackgroundPath(): string {
@@ -30,10 +30,9 @@ export class BjxbSlotGame extends BaseSlotGame {
     const HUNTER_Y_OFFSET = this.SCORE_AREA_HEIGHT + 190;
 
     const hunterFrames: PIXI.Texture[] = [];
-    for (let i = 1; i <= 51; i++) {
-      const num = i.toString().padStart(3, '0');
+    for (let i = 1; i <= AssetPaths.bjxb.animations.hunter; i++) {
       hunterFrames.push(
-        PIXI.Texture.from(`${AssetPaths.bjxb.animation.hunter}hunter_${num}.png`)
+        PIXI.Texture.from(AssetPaths.bjxb.animationFrame('hunter', i))
       );
     }
     this.hunter = new PIXI.AnimatedSprite(hunterFrames);

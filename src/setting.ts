@@ -1,18 +1,37 @@
-// Centralized asset path definitions.  Each game should have its paths grouped
-// under its own key so additional games can be added easily.
-export const AssetPaths = {
-  bjxb: {
-    bg: 'assets/bjxb/bg/bg.png',
-    symbols: 'assets/bjxb/symbols/',
-    border: 'assets/bjxb/symbols/border.png',
+export interface GameAssetConfig {
+  symbolCount: number;
+  // animation type to frame count
+  animations: Record<string, number>;
+  bg: string;
+  border: string;
+  lines: { joint: string; body: string };
+  symbol: (index: number) => string;
+  animationFrame: (type: string, index: number) => string;
+}
+
+function createGameConfig(name: string, symbolCount: number, animations: Record<string, number>): GameAssetConfig {
+  return {
+    symbolCount,
+    animations,
+    bg: `assets/${name}/bg/${name}_bg.png`,
+    border: `assets/${name}/symbols/${name}_border.png`,
     lines: {
-      joint: 'assets/bjxb/lines/line_joint.png',
-      body: 'assets/bjxb/lines/line_body.png'
+      joint: `assets/${name}/lines/${name}_line_joint.png`,
+      body: `assets/${name}/lines/${name}_line_body.png`
     },
-    animation: {
-      hunter: 'assets/bjxb/animation/hunter/'
+    symbol: (index: number) => {
+      const num = String(index).padStart(3, '0');
+      return `assets/${name}/symbols/${name}_${num}.png`;
+    },
+    animationFrame: (type: string, index: number) => {
+      const num = String(index).padStart(3, '0');
+      return `assets/${name}/animation/${name}_${type}_${num}.png`;
     }
-  },
+  };
+}
+
+export const AssetPaths = {
+  bjxb: createGameConfig('bjxb', 10, { hunter: 51 }),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
