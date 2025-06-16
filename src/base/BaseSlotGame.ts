@@ -89,10 +89,13 @@ export abstract class BaseSlotGame {
       this.reels.push(rc);
       for (let j = 0; j < this.rows; j++) {
         const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
-        const texture = PIXI.Texture.from(`${AssetPaths.bjxb.symbols}${this.currentSymbols[symIndex]}.png`);
+        const symbolName = this.currentSymbols[symIndex];
+        const texture = PIXI.Texture.from(
+          AssetPaths.bjxb.symbol(Number(symbolName))
+        );
         const border = PIXI.Sprite.from(AssetPaths.bjxb.border);
         const symbol = new PIXI.Sprite(texture);
-        symbol.name = this.currentSymbols[symIndex];
+        symbol.name = symbolName;
         symbol.anchor.set(0.5);
         border.anchor.set(0.5);
         symbol.x = this.reelWidth / 2;
@@ -150,7 +153,9 @@ export abstract class BaseSlotGame {
         const idx = Math.floor(Math.random() * symbolSet.length);
         const sym = this.reels[c].children[r * 2] as any;
         const border = this.reels[c].children[r * 2 + 1] as any;
-        sym.texture = PIXI.Texture.from(`${AssetPaths.bjxb.symbols}${symbolSet[idx]}.png`);
+        sym.texture = PIXI.Texture.from(
+          AssetPaths.bjxb.symbol(Number(symbolSet[idx]))
+        );
         sym.name = symbolSet[idx];
         sym.y = r * this.reelHeight + this.reelHeight / 2;
         border.y = sym.y;
@@ -359,8 +364,11 @@ export abstract class BaseSlotGame {
             sym.y -= this.rows * this.reelHeight;
             border.y = sym.y;
             const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
-            sym.texture = PIXI.Texture.from(`${AssetPaths.bjxb.symbols}${this.currentSymbols[symIndex]}.png`);
-            sym.name = this.currentSymbols[symIndex];
+            const symbolName = this.currentSymbols[symIndex];
+            sym.texture = PIXI.Texture.from(
+              AssetPaths.bjxb.symbol(Number(symbolName))
+            );
+            sym.name = symbolName;
           }
         }
         if (elapsed > spinTimes[idx]) {
