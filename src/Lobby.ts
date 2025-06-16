@@ -58,11 +58,11 @@ export class Lobby {
     let dragging = false;
     let startY = 0;
     this.scrollContainer.interactive = true;
-    this.scrollContainer.on('pointerdown', e => {
+    this.scrollContainer.on('pointerdown', (e:any) => {
       dragging = true;
       startY = e.data.global.y - this.scrollContainer.y;
     });
-    this.scrollContainer.on('pointermove', e => {
+    this.scrollContainer.on('pointermove', (e:any) => {
       if (dragging) {
         this.scrollContainer.y = e.data.global.y - startY;
       }
