@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js';
-import { AssetPaths } from '../setting';
+import { AssetPaths, DefaultGameSettings, GameRuleSettings } from '../setting';
 
 export abstract class BaseSlotGame {
+  constructor(protected gameSettings: GameRuleSettings = DefaultGameSettings) {}
+
   protected app!: PIXI.Application;
   protected gameContainer!: PIXI.Container;
   protected reelContainer!: PIXI.Container;
@@ -194,69 +196,73 @@ export abstract class BaseSlotGame {
   protected findLines() {
     const grid = this.gridState();
     const lines: any[] = [];
+    const minLen = this.gameSettings.minMatch;
+    const dirs = this.gameSettings.lineDirections;
 
-    // horizontal
-    for (let r = 0; r < this.rows; r++) {
-      let c = 0;
-      while (c < this.cols) {
-        const start = c;
-        const name = grid[r][c].name;
-        while (c + 1 < this.cols && grid[r][c + 1].name === name) c++;
-        const len = c - start + 1;
-        if (len >= 3) {
-          const cells = [] as { r: number; c: number }[];
-          for (let i = 0; i < len; i++) cells.push({ r, c: start + i });
-          lines.push({ start: { r, c: start }, end: { r, c }, cells });
+    if (dirs.horizontal) {
+      for (let r = 0; r < this.rows; r++) {
+        let c = 0;
+        while (c < this.cols) {
+          const start = c;
+          const name = grid[r][c].name;
+          while (c + 1 < this.cols && grid[r][c + 1].name === name) c++;
+          const len = c - start + 1;
+          if (len >= minLen) {
+            const cells = [] as { r: number; c: number }[];
+            for (let i = 0; i < len; i++) cells.push({ r, c: start + i });
+            lines.push({ start: { r, c: start }, end: { r, c }, cells });
+          }
+          c++;
         }
-        c++;
       }
     }
 
-    // vertical
-    for (let c = 0; c < this.cols; c++) {
-      let r = 0;
-      while (r < this.rows) {
-        const start = r;
-        const name = grid[r][c].name;
-        while (r + 1 < this.rows && grid[r + 1][c].name === name) r++;
-        const len = r - start + 1;
-        if (len >= 3) {
-          const cells = [] as { r: number; c: number }[];
-          for (let i = 0; i < len; i++) cells.push({ r: start + i, c });
-          lines.push({ start: { r: start, c }, end: { r, c }, cells });
-        }
-        r++;
-      }
-    }
-
-    // diagonal down-right
-    for (let r = 0; r < this.rows; r++) {
+    if (dirs.vertical) {
       for (let c = 0; c < this.cols; c++) {
-        const name = grid[r][c].name;
-        if (!name) continue;
-        if (r > 0 && c > 0 && grid[r - 1][c - 1].name === name) continue;
-        let len = 1;
-        while (r + len < this.rows && c + len < this.cols && grid[r + len][c + len].name === name) len++;
-        if (len >= 3) {
-          const cells = [] as { r: number; c: number }[];
-          for (let i = 0; i < len; i++) cells.push({ r: r + i, c: c + i });
-          lines.push({ start: { r, c }, end: { r: r + len - 1, c: c + len - 1 }, cells });
+        let r = 0;
+        while (r < this.rows) {
+          const start = r;
+          const name = grid[r][c].name;
+          while (r + 1 < this.rows && grid[r + 1][c].name === name) r++;
+          const len = r - start + 1;
+          if (len >= minLen) {
+            const cells = [] as { r: number; c: number }[];
+            for (let i = 0; i < len; i++) cells.push({ r: start + i, c });
+            lines.push({ start: { r: start, c }, end: { r, c }, cells });
+          }
+          r++;
         }
       }
     }
 
-    // diagonal up-right
-    for (let r = this.rows - 1; r >= 0; r--) {
-      for (let c = 0; c < this.cols; c++) {
-        const name = grid[r][c].name;
-        if (!name) continue;
-        if (r < this.rows - 1 && c > 0 && grid[r + 1][c - 1].name === name) continue;
-        let len = 1;
-        while (r - len >= 0 && c + len < this.cols && grid[r - len][c + len].name === name) len++;
-        if (len >= 3) {
-          const cells = [] as { r: number; c: number }[];
-          for (let i = 0; i < len; i++) cells.push({ r: r - i, c: c + i });
-          lines.push({ start: { r, c }, end: { r: r - len + 1, c: c + len - 1 }, cells });
+    if (dirs.diagonal) {
+      for (let r = 0; r < this.rows; r++) {
+        for (let c = 0; c < this.cols; c++) {
+          const name = grid[r][c].name;
+          if (!name) continue;
+          if (r > 0 && c > 0 && grid[r - 1][c - 1].name === name) continue;
+          let len = 1;
+          while (r + len < this.rows && c + len < this.cols && grid[r + len][c + len].name === name) len++;
+          if (len >= minLen) {
+            const cells = [] as { r: number; c: number }[];
+            for (let i = 0; i < len; i++) cells.push({ r: r + i, c: c + i });
+            lines.push({ start: { r, c }, end: { r: r + len - 1, c: c + len - 1 }, cells });
+          }
+        }
+      }
+
+      for (let r = this.rows - 1; r >= 0; r--) {
+        for (let c = 0; c < this.cols; c++) {
+          const name = grid[r][c].name;
+          if (!name) continue;
+          if (r < this.rows - 1 && c > 0 && grid[r + 1][c - 1].name === name) continue;
+          let len = 1;
+          while (r - len >= 0 && c + len < this.cols && grid[r - len][c + len].name === name) len++;
+          if (len >= minLen) {
+            const cells = [] as { r: number; c: number }[];
+            for (let i = 0; i < len; i++) cells.push({ r: r - i, c: c + i });
+            lines.push({ start: { r, c }, end: { r: r - len + 1, c: c + len - 1 }, cells });
+          }
         }
       }
     }
@@ -323,7 +329,7 @@ export abstract class BaseSlotGame {
       });
     });
 
-    const gained = uniqueCells.size * 10;
+    const gained = uniqueCells.size * this.gameSettings.scorePerBlock;
     if (gained > 0) {
       this.score += gained;
       this.scoreText.text = `Score: ${this.score}`;

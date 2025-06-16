@@ -9,6 +9,23 @@ export interface GameAssetConfig {
   animationFrame: (type: string, index: number) => string;
 }
 
+export interface GameRuleSettings {
+  /** Allowed line directions for scoring */
+  lineDirections: {
+    horizontal: boolean;
+    vertical: boolean;
+    diagonal: boolean;
+  };
+  /** Minimum number of consecutive symbols to score */
+  minMatch: number;
+  /** Score gained per matched symbol */
+  scorePerBlock: number;
+  /** Score multiple required to trigger Hot Spin */
+  hotSpinThresholdMultiple: number;
+  /** Number of symbol types during Hot Spin */
+  hotSpinSymbolTypeCount: number;
+}
+
 function createGameConfig(name: string, symbolCount: number, animations: Record<string, number>): GameAssetConfig {
   return {
     symbolCount,
@@ -38,3 +55,11 @@ export const AssetPaths = {
     bjxb: 'assets/lobby/lobby_icons/bjxb.png'
   }
 } as const;
+
+export const DefaultGameSettings: GameRuleSettings = {
+  lineDirections: { horizontal: true, vertical: true, diagonal: true },
+  minMatch: 3,
+  scorePerBlock: 10,
+  hotSpinThresholdMultiple: 100,
+  hotSpinSymbolTypeCount: 3
+};
