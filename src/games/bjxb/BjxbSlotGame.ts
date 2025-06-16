@@ -1,18 +1,21 @@
 import * as PIXI from 'pixi.js';
 import { BaseSlotGame } from '../../base/BaseSlotGame';
-import { AssetPaths } from '../../setting';
+import { AssetPaths, DefaultGameSettings, GameRuleSettings } from '../../setting';
 
 export class BjxbSlotGame extends BaseSlotGame {
+  constructor(settings: GameRuleSettings = DefaultGameSettings) {
+    super(settings);
+  }
   private hunter!: PIXI.AnimatedSprite;
   private hotSpinText!: PIXI.Text;
   private inHotSpin = false;
   private hotSpinsLeft = 0;
-  private nextHotSpinScore = 100;
+  private nextHotSpinScore = this.gameSettings.hotSpinThresholdMultiple;
   // Symbols are referenced by number strings (e.g. '001')
   private normalSymbols = Array.from({ length: AssetPaths.bjxb.symbolCount }, (_, i) =>
     (i + 1).toString().padStart(3, '0')
   );
-  private hotSymbols = this.normalSymbols.slice(0, 3);
+  private hotSymbols = this.normalSymbols.slice(0, this.gameSettings.hotSpinSymbolTypeCount);
 
   protected getBackgroundPath(): string {
     return AssetPaths.bjxb.bg;
@@ -91,7 +94,10 @@ export class BjxbSlotGame extends BaseSlotGame {
     this.populateReels(this.currentSymbols);
     this.button.interactive = true;
     this.button.alpha = 1;
-    this.nextHotSpinScore = Math.floor(this.score / 100) * 100 + 100;
+    this.nextHotSpinScore =
+      Math.floor(this.score / this.gameSettings.hotSpinThresholdMultiple) *
+        this.gameSettings.hotSpinThresholdMultiple +
+      this.gameSettings.hotSpinThresholdMultiple;
   }
 
   private checkHotSpin() {
