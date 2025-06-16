@@ -98,6 +98,17 @@ export class Lobby {
       icon.on('pointerup', () => { if (!moved) this.onGameSelected(entry.id); });
       this.scrollContainer.addChild(icon);
 
+      // 建立一個帶圓角的圖形遮罩
+      const mask = new PIXI.Graphics();
+      mask.beginFill(0xffffff);
+      mask.drawRoundedRect(0, 0, icon.width, icon.height, 20); // 20 是圓角半徑
+      mask.endFill();
+      // 位置與 icon 對齊
+      mask.x = icon.x - icon.width / 2;
+      mask.y = icon.y - icon.height / 2;
+      this.scrollContainer.addChild(mask);
+      icon.mask = mask;
+
       const labelStyle = new PIXI.TextStyle({
         fill: 0xffffff,
         fontSize: 36,
