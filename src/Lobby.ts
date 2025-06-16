@@ -1,6 +1,18 @@
 import * as PIXI from 'pixi.js';
 import { AssetPaths } from './setting';
 
+// layout parameters for easy adjustments
+const SCROLL_MARGIN = 150;          // horizontal margin for the scroll view
+const SCROLL_Y = 200;               // vertical position of the scroll view
+const VIEW_HEIGHT_OFFSET = 400;     // height = renderer.height - VIEW_HEIGHT_OFFSET
+
+const ICON_COLUMNS = 2;             // how many icons per row
+const ICON_SIZE = 170;              // width/height of each icon
+const FIRST_ICON_Y_OFFSET = 20;     // offset for the first icon's y position
+const ICON_ROW_EXTRA = 60;          // extra space between icon rows
+const FIRST_ICON_X_RATIO = 0.5;     // starting x position as a ratio of column width
+const ICON_X_DIFF_MULTIPLIER = 1;   // spacing multiplier between icons horizontally
+
 export class Lobby {
   private app!: PIXI.Application;
   private scrollContainer!: PIXI.Container;
@@ -22,13 +34,12 @@ export class Lobby {
     bg.height = this.app.renderer.height;
     this.app.stage.addChild(bg);
 
-    const margin = 150;
-    const panelWidth = this.app.renderer.width - margin * 2;
-    this.viewHeight = this.app.renderer.height - 400;
+    const panelWidth = this.app.renderer.width - SCROLL_MARGIN * 2;
+    this.viewHeight = this.app.renderer.height - VIEW_HEIGHT_OFFSET;
 
     const panel = new PIXI.Container();
-    panel.x = margin;
-    panel.y = 200;
+    panel.x = SCROLL_MARGIN;
+    panel.y = SCROLL_Y;
     this.app.stage.addChild(panel);
 
     const bgPanel = new PIXI.Graphics();
@@ -65,10 +76,12 @@ export class Lobby {
       { id: 'bjxb', name: '雪山尋寶', icon: AssetPaths.lobby.bjxb }
     ];
 
-    const columns = 2;
-    const iconSize = 170;
+    const columns = ICON_COLUMNS;
+    const iconSize = ICON_SIZE;
     const colWidth = panelWidth / columns;
-    const rowHeight = iconSize + 60;
+    const rowHeight = iconSize + ICON_ROW_EXTRA;
+
+    const firstIconX = colWidth * FIRST_ICON_X_RATIO;
 
     entries.forEach((entry, idx) => {
       const row = Math.floor(idx / columns);
@@ -78,8 +91,8 @@ export class Lobby {
       icon.anchor.set(0.5);
       icon.width = iconSize;
       icon.height = iconSize;
-      icon.x = colWidth * col + colWidth / 2;
-      icon.y = row * rowHeight + iconSize / 2 + 20;
+      icon.x = firstIconX + col * colWidth * ICON_X_DIFF_MULTIPLIER;
+      icon.y = row * rowHeight + iconSize / 2 + FIRST_ICON_Y_OFFSET;
       icon.interactive = true;
       icon.buttonMode = true;
       icon.on('pointerup', () => { if (!moved) this.onGameSelected(entry.id); });
@@ -104,7 +117,7 @@ export class Lobby {
     });
 
     const rows = Math.ceil(entries.length / columns);
-    const contentHeight = rows * rowHeight + 20;
+    const contentHeight = rows * rowHeight + FIRST_ICON_Y_OFFSET;
 
     // simple vertical dragging for scrollContainer with click detection
     const minY = Math.min(this.viewHeight - contentHeight, 0);
