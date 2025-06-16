@@ -14,7 +14,8 @@ export const AssetPaths = {
     }
   },
   lobby: {
-    backBtn: 'assets/lobby_icon/backBtn.png',
-    bjxb: 'assets/lobby_icon/bjxb.png'
+    bg: 'assets/lobby/lobby_bg.png',
+    backBtn: 'assets/lobby/backBtn.png',
+    bjxb: 'assets/lobby/lobby_icons/bjxb.png'
   }
 } as const;

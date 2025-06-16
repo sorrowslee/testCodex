@@ -16,17 +16,13 @@ export class Lobby {
     const container = typeof containerId === 'string' ? document.getElementById(containerId)! : containerId;
     container.appendChild(this.app.view);
 
-    const title = new PIXI.Text('Lobby', {
-      fill: 0xffffff,
-      fontSize: 48,
-      fontWeight: 'bold'
-    });
-    title.anchor.set(0.5);
-    title.position.set(this.app.renderer.width / 2, 60);
-    this.app.stage.addChild(title);
+    const bg = PIXI.Sprite.from(AssetPaths.lobby.bg);
+    bg.width = this.app.renderer.width;
+    bg.height = this.app.renderer.height;
+    this.app.stage.addChild(bg);
 
     this.scrollContainer = new PIXI.Container();
-    this.scrollContainer.x = this.app.renderer.width / 2;
+    this.scrollContainer.x = 0;
     this.scrollContainer.y = 150;
     this.app.stage.addChild(this.scrollContainer);
 
@@ -34,20 +30,31 @@ export class Lobby {
       { id: 'bjxb', name: '雪山尋寶', icon: AssetPaths.lobby.bjxb }
     ];
 
-    const itemSpacing = 220;
+    const itemSpacing = 250;
+    const leftX = this.app.renderer.width * 0.25;
+    const rightX = this.app.renderer.width * 0.75;
     entries.forEach((entry, idx) => {
       const yPos = idx * itemSpacing;
       const icon = PIXI.Sprite.from(entry.icon);
       icon.anchor.set(0.5);
+      icon.x = idx % 2 === 0 ? leftX : rightX;
       icon.y = yPos;
       icon.interactive = true;
       icon.buttonMode = true;
       icon.on('pointertap', () => this.onGameSelected(entry.id));
       this.scrollContainer.addChild(icon);
 
-      const label = new PIXI.Text(entry.name, { fill: 0xffffff, fontSize: 36 });
+      const labelStyle = new PIXI.TextStyle({
+        fill: 0xffffff,
+        fontSize: 48,
+        fontWeight: 'bold',
+        align: 'center'
+      });
+      const label = new PIXI.Text(entry.name, labelStyle);
       label.anchor.set(0.5, 0);
-      label.position.set(0, yPos + icon.height / 2 + 10);
+      label.x = icon.x;
+      label.y = yPos + icon.height / 2 + 10;
+      label.width = icon.width;
       label.interactive = true;
       label.buttonMode = true;
       label.on('pointertap', () => this.onGameSelected(entry.id));
