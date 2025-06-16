@@ -12,5 +12,9 @@ export const AssetPaths = {
     animation: {
       hunter: 'assets/bjxb/animation/hunter/'
     }
+  },
+  lobby: {
+    backBtn: 'assets/lobby_icon/backBtn.png',
+    bjxb: 'assets/lobby_icon/bjxb.png'
   }
 } as const;

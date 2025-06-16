@@ -384,5 +384,19 @@ export abstract class BaseSlotGame {
       ticker.start();
     });
   }
+
+  public destroy(): void {
+    if (this.app) {
+      const parent = this.app.view.parentNode;
+      if (parent) {
+        parent.removeChild(this.app.view);
+      }
+      this.app.destroy(true, { children: true, texture: true, baseTexture: true });
+    }
+  }
+
+  public get appInstance(): PIXI.Application {
+    return this.app;
+  }
 }
 
