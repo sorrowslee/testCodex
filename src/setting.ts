@@ -25,7 +25,7 @@ function createGameConfig(name: string, symbolCount: number, animations: Record<
     },
     animationFrame: (type: string, index: number) => {
       const num = String(index).padStart(3, '0');
-      return `assets/${name}/animation/${name}_${type}_${num}.png`;
+      return `assets/${name}/animation/${type}/${name}_${type}_${num}.png`;
     }
   };
 }
