@@ -23,16 +23,24 @@ export class Lobby {
 
     this.scrollContainer = new PIXI.Container();
     this.scrollContainer.x = 0;
-    this.scrollContainer.y = 150;
+    // position the scroll container a bit lower so icons are not flush with the top
+    this.scrollContainer.y = 250;
+
     this.app.stage.addChild(this.scrollContainer);
+
+    // variables used for drag and click detection
+    let dragging = false;
+    let moved = false;
+    let startY = 0;
 
     const entries = [
       { id: 'bjxb', name: '雪山尋寶', icon: AssetPaths.lobby.bjxb }
     ];
 
     const itemSpacing = 250;
-    const leftX = this.app.renderer.width * 0.25;
-    const rightX = this.app.renderer.width * 0.75;
+    // place entries slightly left/right of center
+    const leftX = this.app.renderer.width * 0.4;
+    const rightX = this.app.renderer.width * 0.6;
     entries.forEach((entry, idx) => {
       const yPos = idx * itemSpacing;
       const icon = PIXI.Sprite.from(entry.icon);
@@ -41,7 +49,7 @@ export class Lobby {
       icon.y = yPos;
       icon.interactive = true;
       icon.buttonMode = true;
-      icon.on('pointertap', () => this.onGameSelected(entry.id));
+      icon.on('pointerup', () => { if (!moved) this.onGameSelected(entry.id); });
       this.scrollContainer.addChild(icon);
 
       const labelStyle = new PIXI.TextStyle({
@@ -54,27 +62,31 @@ export class Lobby {
       label.anchor.set(0.5, 0);
       label.x = icon.x;
       label.y = yPos + icon.height / 2 + 10;
-      label.width = icon.width;
       label.interactive = true;
       label.buttonMode = true;
-      label.on('pointertap', () => this.onGameSelected(entry.id));
+      label.on('pointerup', () => { if (!moved) this.onGameSelected(entry.id); });
       this.scrollContainer.addChild(label);
     });
 
-    // simple vertical dragging for scrollContainer
-    let dragging = false;
-    let startY = 0;
+    // simple vertical dragging for scrollContainer with click detection
     this.scrollContainer.interactive = true;
-    this.scrollContainer.on('pointerdown', (e:any) => {
+    this.scrollContainer.on('pointerdown', (e: any) => {
       dragging = true;
+      moved = false;
       startY = e.data.global.y - this.scrollContainer.y;
     });
-    this.scrollContainer.on('pointermove', (e:any) => {
+    this.scrollContainer.on('pointermove', (e: any) => {
       if (dragging) {
-        this.scrollContainer.y = e.data.global.y - startY;
+        const newY = e.data.global.y - startY;
+        if (Math.abs(newY - this.scrollContainer.y) > 5) {
+          moved = true;
+        }
+        this.scrollContainer.y = newY;
       }
     });
-    const stopDragging = () => { dragging = false; };
+    const stopDragging = () => {
+      dragging = false;
+    };
     this.scrollContainer.on('pointerup', stopDragging);
     this.scrollContainer.on('pointerupoutside', stopDragging);
   }
