@@ -11,6 +11,22 @@ export abstract class BaseSlotGame {
   protected scoreText!: PIXI.Text;
   protected button!: PIXI.Container;
 
+  private activeTickers: PIXI.Ticker[] = [];
+  private activeTimeouts: number[] = [];
+
+  private registerTicker(t: PIXI.Ticker) {
+    this.activeTickers.push(t);
+  }
+
+  private unregisterTicker(t: PIXI.Ticker) {
+    const idx = this.activeTickers.indexOf(t);
+    if (idx !== -1) this.activeTickers.splice(idx, 1);
+  }
+
+  private registerTimeout(id: number) {
+    this.activeTimeouts.push(id);
+  }
+
   // dimensions and reel config
   protected SCORE_AREA_HEIGHT = 100;
   protected APP_WIDTH = 1882;
@@ -256,6 +272,7 @@ export abstract class BaseSlotGame {
     const start = Date.now();
     const duration = 600;
     const ticker = new PIXI.Ticker();
+    this.registerTicker(ticker);
     ticker.add(() => {
       const elapsed = Date.now() - start;
       const progress = Math.min(elapsed / duration, 1);
@@ -265,6 +282,7 @@ export abstract class BaseSlotGame {
         this.scoreText.scale.set(1);
         ticker.stop();
         ticker.destroy();
+        this.unregisterTicker(ticker);
       }
     });
     ticker.start();
@@ -313,6 +331,7 @@ export abstract class BaseSlotGame {
     }
 
     const pulseTicker = new PIXI.Ticker();
+    this.registerTicker(pulseTicker);
     pulseTicker.add(() => {
       const t = Date.now();
       const scale = 1 + 0.2 * (0.5 + 0.5 * Math.sin(t / 150));
@@ -320,14 +339,16 @@ export abstract class BaseSlotGame {
     });
     pulseTicker.start();
 
-    setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       pulseTicker.stop();
       pulseTicker.destroy();
+      this.unregisterTicker(pulseTicker);
       hitSprites.forEach(s => s.scale.set(1));
       this.lineContainer.removeChildren();
       this.onSpinEnd();
       onDone();
     }, this.WIN_TIME);
+    this.registerTimeout(timeoutId);
   }
 
   protected alignReel(reel: PIXI.Container) {
@@ -353,6 +374,7 @@ export abstract class BaseSlotGame {
       const start = Date.now();
       reel.filters = [blurFilter];
       const ticker = new PIXI.Ticker();
+      this.registerTicker(ticker);
       ticker.add(() => {
         const elapsed = Date.now() - start;
         for (let i = 0; i < reel.children.length; i += 2) {
@@ -375,6 +397,7 @@ export abstract class BaseSlotGame {
           this.alignReel(reel);
           reel.filters = [];
           ticker.destroy();
+          this.unregisterTicker(ticker);
           if (idx === this.cols - 1) {
             const wins = this.findLines();
             if (wins.length > 0) {
@@ -394,6 +417,10 @@ export abstract class BaseSlotGame {
   }
 
   public destroy(): void {
+    this.activeTimeouts.forEach(id => clearTimeout(id));
+    this.activeTimeouts = [];
+    this.activeTickers.forEach(t => t.destroy());
+    this.activeTickers = [];
     if (this.app) {
       const parent = this.app.view.parentNode;
       if (parent) {
