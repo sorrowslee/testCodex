@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { AssetPaths } from '../setting';
 
 export abstract class BaseSlotGame {
   protected app!: PIXI.Application;
@@ -88,8 +89,8 @@ export abstract class BaseSlotGame {
       this.reels.push(rc);
       for (let j = 0; j < this.rows; j++) {
         const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
-        const texture = PIXI.Texture.from(`assets/symbols/${this.currentSymbols[symIndex]}.png`);
-        const border = PIXI.Sprite.from('assets/symbols/border.png');
+        const texture = PIXI.Texture.from(`${AssetPaths.bjxb.symbols}${this.currentSymbols[symIndex]}.png`);
+        const border = PIXI.Sprite.from(AssetPaths.bjxb.border);
         const symbol = new PIXI.Sprite(texture);
         symbol.name = this.currentSymbols[symIndex];
         symbol.anchor.set(0.5);
@@ -149,7 +150,7 @@ export abstract class BaseSlotGame {
         const idx = Math.floor(Math.random() * symbolSet.length);
         const sym = this.reels[c].children[r * 2] as any;
         const border = this.reels[c].children[r * 2 + 1] as any;
-        sym.texture = PIXI.Texture.from(`assets/symbols/${symbolSet[idx]}.png`);
+        sym.texture = PIXI.Texture.from(`${AssetPaths.bjxb.symbols}${symbolSet[idx]}.png`);
         sym.name = symbolSet[idx];
         sym.y = r * this.reelHeight + this.reelHeight / 2;
         border.y = sym.y;
@@ -271,14 +272,14 @@ export abstract class BaseSlotGame {
       const sPos = this.cellPos(l.start.r, l.start.c);
       const ePos = this.cellPos(l.end.r, l.end.c);
 
-      const jStart = PIXI.Sprite.from('assets/lines/line_joint.png');
-      const jEnd = PIXI.Sprite.from('assets/lines/line_joint.png');
+      const jStart = PIXI.Sprite.from(AssetPaths.bjxb.lines.joint);
+      const jEnd = PIXI.Sprite.from(AssetPaths.bjxb.lines.joint);
       jStart.anchor.set(0.5);
       jEnd.anchor.set(0.5);
       jStart.position.set(sPos.x, sPos.y);
       jEnd.position.set(ePos.x, ePos.y);
 
-      const body = PIXI.Sprite.from('assets/lines/line_body.png');
+      const body = PIXI.Sprite.from(AssetPaths.bjxb.lines.body);
       body.anchor.set(0.5);
       const dx = ePos.x - sPos.x;
       const dy = ePos.y - sPos.y;
@@ -358,7 +359,7 @@ export abstract class BaseSlotGame {
             sym.y -= this.rows * this.reelHeight;
             border.y = sym.y;
             const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
-            sym.texture = PIXI.Texture.from(`assets/symbols/${this.currentSymbols[symIndex]}.png`);
+            sym.texture = PIXI.Texture.from(`${AssetPaths.bjxb.symbols}${this.currentSymbols[symIndex]}.png`);
             sym.name = this.currentSymbols[symIndex];
           }
         }
