@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { BaseSlotGame } from '../../base/BaseSlotGame';
+import { AssetPaths } from '../../setting';
 
 export class BjxbSlotGame extends BaseSlotGame {
   private hunter!: PIXI.AnimatedSprite;
@@ -14,7 +15,7 @@ export class BjxbSlotGame extends BaseSlotGame {
   private hotSymbols = this.normalSymbols.slice(0, 3);
 
   protected getBackgroundPath(): string {
-    return 'assets/bg/bg.png';
+    return AssetPaths.bjxb.bg;
   }
 
   protected getInitialSymbols(): string[] {
@@ -32,7 +33,7 @@ export class BjxbSlotGame extends BaseSlotGame {
     for (let i = 1; i <= 51; i++) {
       const num = i.toString().padStart(3, '0');
       hunterFrames.push(
-        PIXI.Texture.from(`assets/animation/hunter/hunter_${num}.png`)
+        PIXI.Texture.from(`${AssetPaths.bjxb.animation.hunter}hunter_${num}.png`)
       );
     }
     this.hunter = new PIXI.AnimatedSprite(hunterFrames);
