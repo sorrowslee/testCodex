@@ -35,8 +35,9 @@ export class Lobby {
     bgPanel.beginFill(0x000000, 0.5);
     bgPanel.drawRoundedRect(0, 0, panelWidth, this.viewHeight, 20);
     bgPanel.endFill();
-    if (PIXI.filters && PIXI.filters.DropShadowFilter) {
-      bgPanel.filters = [new PIXI.filters.DropShadowFilter({
+    const DSF = (PIXI.filters as any).DropShadowFilter;
+    if (DSF) {
+      bgPanel.filters = [new DSF({
         distance: 4,
         blur: 4,
         alpha: 0.7,
