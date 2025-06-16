@@ -2,15 +2,15 @@ import * as PIXI from 'pixi.js';
 import { AssetPaths } from './setting';
 
 // layout parameters for easy adjustments
-const SCROLL_MARGIN = 150;          // horizontal margin for the scroll view
-const SCROLL_Y = 200;               // vertical position of the scroll view
-const VIEW_HEIGHT_OFFSET = 400;     // height = renderer.height - VIEW_HEIGHT_OFFSET
+const SCROLL_MARGIN = 400;          // horizontal margin for the scroll view
+const SCROLL_Y = 0;               // vertical position of the scroll view
+const VIEW_HEIGHT_OFFSET = 0;     // height = renderer.height - VIEW_HEIGHT_OFFSET
 
 const ICON_COLUMNS = 2;             // how many icons per row
-const ICON_SIZE = 170;              // width/height of each icon
-const FIRST_ICON_Y_OFFSET = 20;     // offset for the first icon's y position
+const ICON_SIZE = 300;              // width/height of each icon
+const FIRST_ICON_Y_OFFSET = 50;     // offset for the first icon's y position
 const ICON_ROW_EXTRA = 60;          // extra space between icon rows
-const FIRST_ICON_X_RATIO = 0.5;     // starting x position as a ratio of column width
+const FIRST_ICON_X_RATIO = 0.6;     // starting x position as a ratio of column width
 const ICON_X_DIFF_MULTIPLIER = 1;   // spacing multiplier between icons horizontally
 
 export class Lobby {
