@@ -24,6 +24,14 @@ export interface GameRuleSettings {
   hotSpinThresholdMultiple: number;
   /** Number of symbol types during Hot Spin */
   hotSpinSymbolTypeCount: number;
+  /** Number of columns (reels) */
+  cols: number;
+  /** Number of rows per reel */
+  rows: number;
+  /** Width of each block (symbol) in pixels */
+  blockWidth: number;
+  /** Height of each block (symbol) in pixels */
+  blockHeight: number;
 }
 
 function createGameConfig(name: string, symbolCount: number, animations: Record<string, number>): GameAssetConfig {
@@ -61,5 +69,9 @@ export const DefaultGameSettings: GameRuleSettings = {
   minMatch: 3,
   scorePerBlock: 10,
   hotSpinThresholdMultiple: 100,
-  hotSpinSymbolTypeCount: 3
+  hotSpinSymbolTypeCount: 3,
+  cols: 7,
+  rows: 5,
+  blockWidth: 128,
+  blockHeight: 128
 };

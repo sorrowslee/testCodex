@@ -2,7 +2,12 @@ import * as PIXI from 'pixi.js';
 import { AssetPaths, DefaultGameSettings, GameRuleSettings } from '../setting';
 
 export abstract class BaseSlotGame {
-  constructor(protected gameSettings: GameRuleSettings = DefaultGameSettings) {}
+  constructor(protected gameSettings: GameRuleSettings = DefaultGameSettings) {
+    this.rows = gameSettings.rows;
+    this.cols = gameSettings.cols;
+    this.reelWidth = gameSettings.blockWidth;
+    this.reelHeight = gameSettings.blockHeight;
+  }
 
   protected app!: PIXI.Application;
   protected gameContainer!: PIXI.Container;
@@ -33,10 +38,10 @@ export abstract class BaseSlotGame {
   protected SCORE_AREA_HEIGHT = 100;
   protected APP_WIDTH = 1882;
   protected APP_HEIGHT = 1075;
-  protected reelWidth = 128;
-  protected reelHeight = 128;
-  protected rows = 5;
-  protected cols = 7;
+  protected reelWidth!: number;
+  protected reelHeight!: number;
+  protected rows!: number;
+  protected cols!: number;
   protected REEL_SCALE = 0.9;
 
   // spin configuration
