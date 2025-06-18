@@ -1,7 +1,7 @@
 export interface GameAssetConfig {
   symbolCount: number;
   // animation type to frame count
-  animations: Record<string, number>;
+  animations?: Record<string, number>;
   bg: string;
   border: string;
   lines: { joint: string; body: string };
@@ -34,7 +34,7 @@ export interface GameRuleSettings {
   blockHeight: number;
 }
 
-function createGameConfig(name: string, symbolCount: number, animations: Record<string, number>): GameAssetConfig {
+function createGameConfig(name: string, symbolCount: number, animations?: Record<string, number>): GameAssetConfig {
   return {
     symbolCount,
     animations,
@@ -57,7 +57,7 @@ function createGameConfig(name: string, symbolCount: number, animations: Record<
 
 export const AssetPaths = {
   bjxb: createGameConfig('bjxb', 10, { hunter: 51 }),
-  ffp: createGameConfig('ffp', 6, { hunter: 51 }),
+  ffp: createGameConfig('ffp', 6),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
