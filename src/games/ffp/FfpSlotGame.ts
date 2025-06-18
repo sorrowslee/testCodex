@@ -1,10 +1,10 @@
 import * as PIXI from 'pixi.js';
 import { BaseSlotGame } from '../../base/BaseSlotGame';
-import { AssetPaths, DefaultGameSettings, GameRuleSettings } from '../../setting';
+import { AssetPaths, GameRuleSettings, FfpGameSettings } from '../../setting';
 
-export class BjxbSlotGame extends BaseSlotGame {
-  constructor(settings: GameRuleSettings = DefaultGameSettings) {
-    super(settings, AssetPaths.bjxb);
+export class FfpSlotGame extends BaseSlotGame {
+  constructor(settings: GameRuleSettings = FfpGameSettings) {
+    super(settings, AssetPaths.ffp);
   }
   private hunter!: PIXI.AnimatedSprite;
   private hotSpinText!: PIXI.Text;
@@ -12,13 +12,13 @@ export class BjxbSlotGame extends BaseSlotGame {
   private hotSpinsLeft = 0;
   private nextHotSpinScore = this.gameSettings.hotSpinThresholdMultiple;
   // Symbols are referenced by number strings (e.g. '001')
-  private normalSymbols = Array.from({ length: AssetPaths.bjxb.symbolCount }, (_, i) =>
+  private normalSymbols = Array.from({ length: AssetPaths.ffp.symbolCount }, (_, i) =>
     (i + 1).toString().padStart(3, '0')
   );
   private hotSymbols = this.normalSymbols.slice(0, this.gameSettings.hotSpinSymbolTypeCount);
 
   protected getBackgroundPath(): string {
-    return AssetPaths.bjxb.bg;
+    return AssetPaths.ffp.bg;
   }
 
   protected getInitialSymbols(): string[] {
@@ -33,9 +33,9 @@ export class BjxbSlotGame extends BaseSlotGame {
     const HUNTER_Y_OFFSET = this.SCORE_AREA_HEIGHT + 190;
 
     const hunterFrames: PIXI.Texture[] = [];
-    for (let i = 1; i <= AssetPaths.bjxb.animations.hunter; i++) {
+    for (let i = 1; i <= AssetPaths.ffp.animations.hunter; i++) {
       hunterFrames.push(
-        PIXI.Texture.from(AssetPaths.bjxb.animationFrame('hunter', i))
+        PIXI.Texture.from(AssetPaths.ffp.animationFrame('hunter', i))
       );
     }
     this.hunter = new PIXI.AnimatedSprite(hunterFrames);
