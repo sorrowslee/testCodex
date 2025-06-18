@@ -6,7 +6,7 @@ export class BjxbSlotGame extends BaseSlotGame {
   constructor(settings: GameRuleSettings = DefaultGameSettings) {
     super(settings, AssetPaths.bjxb);
   }
-  private hunter!: PIXI.AnimatedSprite;
+  private hunter?: PIXI.AnimatedSprite;
   private hotSpinText!: PIXI.Text;
   private inHotSpin = false;
   private hotSpinsLeft = 0;
@@ -32,22 +32,25 @@ export class BjxbSlotGame extends BaseSlotGame {
     const HUNTER_X_OFFSET = 250;
     const HUNTER_Y_OFFSET = this.SCORE_AREA_HEIGHT + 190;
 
-    const hunterFrames: PIXI.Texture[] = [];
-    for (let i = 1; i <= AssetPaths.bjxb.animations.hunter; i++) {
-      hunterFrames.push(
-        PIXI.Texture.from(AssetPaths.bjxb.animationFrame('hunter', i))
-      );
+    if (this.assets.animations?.hunter) {
+      const hunterFrames: PIXI.Texture[] = [];
+      for (let i = 1; i <= this.assets.animations.hunter; i++) {
+        hunterFrames.push(
+          PIXI.Texture.from(this.assets.animationFrame('hunter', i))
+        );
+      }
+      this.hunter = new PIXI.AnimatedSprite(hunterFrames);
+      this.hunter.animationSpeed = 0.1667;
+      this.hunter.loop = true;
+      this.hunter.anchor.set(0.5);
+      this.hunter.scale.set(HUNTER_SCALE);
+      this.hunter.x = this.gameContainer.x + GAME_WIDTH + HUNTER_X_OFFSET;
+      this.hunter.y =
+        this.gameContainer.y + this.SCORE_AREA_HEIGHT + HUNTER_Y_OFFSET +
+        (this.rows * this.reelHeight) / 2;
+      this.hunter.gotoAndStop(0);
+      this.app.stage.addChild(this.hunter);
     }
-    this.hunter = new PIXI.AnimatedSprite(hunterFrames);
-    this.hunter.animationSpeed = 0.1667;
-    this.hunter.loop = true;
-    this.hunter.anchor.set(0.5);
-    this.hunter.scale.set(HUNTER_SCALE);
-    this.hunter.x = this.gameContainer.x + GAME_WIDTH + HUNTER_X_OFFSET;
-    this.hunter.y = this.gameContainer.y + this.SCORE_AREA_HEIGHT + HUNTER_Y_OFFSET +
-      (this.rows * this.reelHeight) / 2;
-    this.hunter.gotoAndStop(0);
-    this.app.stage.addChild(this.hunter);
 
     this.hotSpinText = new PIXI.Text('', {
       fill: 0xff0000,
@@ -67,7 +70,9 @@ export class BjxbSlotGame extends BaseSlotGame {
   }
 
   private startHotSpin() {
-    this.hunter.play();
+    if (this.hunter) {
+      this.hunter.play();
+    }
     this.inHotSpin = true;
     this.hotSpinsLeft = 3;
     this.hotSpinText.visible = true;
@@ -86,7 +91,9 @@ export class BjxbSlotGame extends BaseSlotGame {
   }
 
   private endHotSpin() {
-    this.hunter.gotoAndStop(0);
+    if (this.hunter) {
+      this.hunter.gotoAndStop(0);
+    }
     this.inHotSpin = false;
     this.hotSpinText.visible = false;
     this.hotSpinText.text = '';
