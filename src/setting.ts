@@ -57,10 +57,12 @@ function createGameConfig(name: string, symbolCount: number, animations: Record<
 
 export const AssetPaths = {
   bjxb: createGameConfig('bjxb', 10, { hunter: 51 }),
+  ffp: createGameConfig('ffp', 6, { hunter: 51 }),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
-    bjxb: 'assets/lobby/lobby_icons/bjxb.png'
+    bjxb: 'assets/lobby/lobby_icons/bjxb.png',
+    ffp: 'assets/lobby/lobby_icons/ffp.png'
   }
 } as const;
 
@@ -74,4 +76,12 @@ export const DefaultGameSettings: GameRuleSettings = {
   rows: 5,
   blockWidth: 128,
   blockHeight: 128
+};
+
+export const FfpGameSettings: GameRuleSettings = {
+  ...DefaultGameSettings,
+  cols: 5,
+  rows: 5,
+  blockWidth: 128,
+  blockHeight: 90
 };

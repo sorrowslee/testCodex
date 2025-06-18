@@ -1,8 +1,11 @@
 import * as PIXI from 'pixi.js';
-import { AssetPaths, DefaultGameSettings, GameRuleSettings } from '../setting';
+import { AssetPaths, DefaultGameSettings, GameRuleSettings, GameAssetConfig } from '../setting';
 
 export abstract class BaseSlotGame {
-  constructor(protected gameSettings: GameRuleSettings = DefaultGameSettings) {
+  constructor(
+    protected gameSettings: GameRuleSettings = DefaultGameSettings,
+    protected assets: GameAssetConfig = AssetPaths.bjxb
+  ) {
     this.rows = gameSettings.rows;
     this.cols = gameSettings.cols;
     this.reelWidth = gameSettings.blockWidth;
@@ -114,9 +117,9 @@ export abstract class BaseSlotGame {
         const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
         const symbolName = this.currentSymbols[symIndex];
         const texture = PIXI.Texture.from(
-          AssetPaths.bjxb.symbol(Number(symbolName))
+          this.assets.symbol(Number(symbolName))
         );
-        const border = PIXI.Sprite.from(AssetPaths.bjxb.border);
+        const border = PIXI.Sprite.from(this.assets.border);
         const symbol = new PIXI.Sprite(texture);
         symbol.name = symbolName;
         symbol.anchor.set(0.5);
@@ -177,7 +180,7 @@ export abstract class BaseSlotGame {
         const sym = this.reels[c].children[r * 2] as any;
         const border = this.reels[c].children[r * 2 + 1] as any;
         sym.texture = PIXI.Texture.from(
-          AssetPaths.bjxb.symbol(Number(symbolSet[idx]))
+          this.assets.symbol(Number(symbolSet[idx]))
         );
         sym.name = symbolSet[idx];
         sym.y = r * this.reelHeight + this.reelHeight / 2;
@@ -306,14 +309,14 @@ export abstract class BaseSlotGame {
       const sPos = this.cellPos(l.start.r, l.start.c);
       const ePos = this.cellPos(l.end.r, l.end.c);
 
-      const jStart = PIXI.Sprite.from(AssetPaths.bjxb.lines.joint);
-      const jEnd = PIXI.Sprite.from(AssetPaths.bjxb.lines.joint);
+      const jStart = PIXI.Sprite.from(this.assets.lines.joint);
+      const jEnd = PIXI.Sprite.from(this.assets.lines.joint);
       jStart.anchor.set(0.5);
       jEnd.anchor.set(0.5);
       jStart.position.set(sPos.x, sPos.y);
       jEnd.position.set(ePos.x, ePos.y);
 
-      const body = PIXI.Sprite.from(AssetPaths.bjxb.lines.body);
+      const body = PIXI.Sprite.from(this.assets.lines.body);
       body.anchor.set(0.5);
       const dx = ePos.x - sPos.x;
       const dy = ePos.y - sPos.y;
@@ -399,7 +402,7 @@ export abstract class BaseSlotGame {
             const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
             const symbolName = this.currentSymbols[symIndex];
             sym.texture = PIXI.Texture.from(
-              AssetPaths.bjxb.symbol(Number(symbolName))
+              this.assets.symbol(Number(symbolName))
             );
             sym.name = symbolName;
           }

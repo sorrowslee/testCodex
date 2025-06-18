@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { BjxbSlotGame } from './games/bjxb/BjxbSlotGame';
+import { FfpSlotGame } from './games/ffp/FfpSlotGame';
 import { Lobby } from './Lobby';
 import { AssetPaths } from './setting';
 
@@ -17,6 +18,11 @@ class SceneManager {
     this.cleanup();
     if (id === 'bjxb') {
       const game = new BjxbSlotGame();
+      this.current = game;
+      game.start('game');
+      this.addBackButton(game.appInstance);
+    } else if (id === 'ffp') {
+      const game = new FfpSlotGame();
       this.current = game;
       game.start('game');
       this.addBackButton(game.appInstance);
