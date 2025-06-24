@@ -83,149 +83,181 @@ export abstract class BaseSlotGame {
     const bgCodeMatch = /assets\/(.*?)\//.exec(this.assets.bg);
     const gameCode = bgCodeMatch ? bgCodeMatch[1] : '';
 
-    let midBg: PIXI.Sprite | null = null;
+    const finishInit = (midBg: PIXI.Sprite | null) => {
+      if (this.gameSettings.mapShip) {
+        this.mapShip = new BaseMapShip(this.app, gameCode);
+        this.mapShip.init().then(() => {
+          if (!this.gameSettings.singleBackground && midBg) {
+            this.mapShip!.setPosition(0, midBg.y - this.mapShip!.height);
+          }
+        });
+      }
+
+      this.gameContainer = new PIXI.Container();
+      this.gameContainer.x = (this.APP_WIDTH - GAME_WIDTH) / 2;
+      this.gameContainer.y = (this.APP_HEIGHT - GAME_HEIGHT) / 2;
+      this.app.stage.addChild(this.gameContainer);
+
+      this.reelContainer = new PIXI.Container();
+      let scale = this.REEL_SCALE;
+      if (this.gameSettings.reelWidth) {
+        scale = this.gameSettings.reelWidth / (this.cols * this.reelWidth);
+      }
+      if (this.gameSettings.reelHeight) {
+        const hScale =
+          this.gameSettings.reelHeight / (this.rows * this.reelHeight);
+        scale = Math.min(scale, hScale);
+      }
+      this.REEL_SCALE = scale;
+      this.reelContainer.scale.set(this.REEL_SCALE);
+
+      let defaultX =
+        (GAME_WIDTH - this.cols * this.reelWidth * this.REEL_SCALE) / 2;
+      let defaultY = this.SCORE_AREA_HEIGHT;
+      if (!this.gameSettings.singleBackground && midBg) {
+        const midX = midBg.x - this.gameContainer.x;
+        const midY = midBg.y - this.gameContainer.y;
+        defaultX =
+          midX +
+          (midBg.width - this.cols * this.reelWidth * this.REEL_SCALE) / 2;
+        defaultY =
+          midY +
+          (midBg.height - this.rows * this.reelHeight * this.REEL_SCALE) / 2;
+      }
+      this.reelContainer.x =
+        this.gameSettings.reelX !== undefined
+          ? this.gameSettings.reelX
+          : defaultX;
+      this.reelContainer.y =
+        this.gameSettings.reelY !== undefined
+          ? this.gameSettings.reelY
+          : defaultY;
+      this.gameContainer.addChild(this.reelContainer);
+
+      // score display
+      this.scoreText = new PIXI.Text('Score: 0', {
+        fill: 0xffe066,
+        fontSize: 48,
+        fontWeight: 'bold',
+        stroke: 0x333333,
+        strokeThickness: 6
+      });
+      this.scoreText.anchor.set(0.5, 0);
+      this.scoreText.x = (this.cols * this.reelWidth) / 2;
+      this.scoreText.y = 20;
+      this.gameContainer.addChild(this.scoreText);
+
+      const reelMask = new PIXI.Graphics();
+      reelMask.beginFill(0xffffff);
+      reelMask.drawRect(
+        0,
+        0,
+        this.cols * this.reelWidth,
+        this.rows * this.reelHeight
+      );
+      reelMask.endFill();
+      this.reelContainer.addChild(reelMask);
+      this.reelContainer.mask = reelMask;
+
+      for (let i = 0; i < this.cols; i++) {
+        const rc = new PIXI.Container();
+        rc.x = i * this.reelWidth;
+        this.reelContainer.addChild(rc);
+        this.reels.push(rc);
+        for (let j = 0; j < this.rows; j++) {
+          const symIndex = Math.floor(
+            Math.random() * this.currentSymbols.length
+          );
+          const symbolName = this.currentSymbols[symIndex];
+          const texture = PIXI.Texture.from(
+            this.assets.symbol(Number(symbolName))
+          );
+          const symbol = new PIXI.Sprite(texture);
+          symbol.name = symbolName;
+          symbol.anchor.set(0.5);
+          symbol.x = this.reelWidth / 2;
+          symbol.y = j * this.reelHeight + this.reelHeight / 2;
+          rc.addChild(symbol);
+          if (this.hasBorder && this.assets.border) {
+            const border = PIXI.Sprite.from(this.assets.border);
+            border.anchor.set(0.5);
+            border.x = this.reelWidth / 2;
+            border.y = symbol.y;
+            rc.addChild(border);
+          }
+        }
+      }
+
+      this.button = new PIXI.Container();
+      const btnBgWidth = 160;
+      const btnBgHeight = 60;
+      const buttonBg = new PIXI.Graphics();
+      buttonBg.beginFill(0xffe066);
+      buttonBg.lineStyle(2, 0xffffff);
+      buttonBg.drawRoundedRect(0, 0, btnBgWidth, btnBgHeight, 10);
+      buttonBg.endFill();
+      const buttonText = new PIXI.Text('SPIN', {
+        fill: 0x000000,
+        fontSize: 36,
+        fontWeight: 'bold'
+      });
+      buttonText.anchor.set(0.5);
+      buttonText.position.set(btnBgWidth / 2, btnBgHeight / 2);
+      this.button.addChild(buttonBg);
+      this.button.addChild(buttonText);
+      this.button.interactive = true;
+      this.button.buttonMode = true;
+      this.button.x = (this.cols * this.reelWidth - btnBgWidth) / 2;
+      this.button.y = this.rows * this.reelHeight + 20 + this.SCORE_AREA_HEIGHT;
+      this.gameContainer.addChild(this.button);
+
+      this.lineContainer = new PIXI.Container();
+      this.lineContainer.x = this.reelContainer.x;
+      this.lineContainer.y = this.reelContainer.y;
+      this.lineContainer.scale.set(this.REEL_SCALE);
+      this.gameContainer.addChild(this.lineContainer);
+
+      this.button.on('pointerdown', () => {
+        this.spin(() => {
+          this.onSpinEnd();
+        });
+      });
+    };
+
     if (this.gameSettings.singleBackground) {
       const background = PIXI.Sprite.from(this.getBackgroundPath());
       background.width = this.APP_WIDTH;
       background.height = this.APP_HEIGHT;
       this.app.stage.addChild(background);
+      finishInit(null);
     } else {
       const top = PIXI.Sprite.from(this.assets.bgTop);
       const mid = PIXI.Sprite.from(this.assets.bgMid);
       const bottom = PIXI.Sprite.from(this.assets.bgBottom);
-      const scale = this.APP_WIDTH / top.texture.width;
-      [top, mid, bottom].forEach(s => {
-        s.scale.set(scale);
-        s.x = 0;
-      });
-      top.y = 0;
-      mid.y = top.height;
-      bottom.y = mid.y + mid.height;
-      this.app.stage.addChild(top);
-      this.app.stage.addChild(mid);
-      this.app.stage.addChild(bottom);
-      midBg = mid;
-    }
 
-    if (this.gameSettings.mapShip) {
-      this.mapShip = new BaseMapShip(this.app, gameCode);
-      this.mapShip.init().then(() => {
-        if (!this.gameSettings.singleBackground && midBg) {
-          this.mapShip!.setPosition(0, midBg.y - this.mapShip!.height);
-        }
-      });
-    }
+      const layout = () => {
+        const scale = this.APP_WIDTH / top.texture.width;
+        [top, mid, bottom].forEach(s => {
+          s.scale.set(scale);
+          s.x = 0;
+        });
+        top.y = 0;
+        mid.y = top.height;
+        bottom.y = mid.y + mid.height;
+        this.app.stage.addChild(top);
+        this.app.stage.addChild(mid);
+        this.app.stage.addChild(bottom);
+        finishInit(mid);
+      };
 
-    this.gameContainer = new PIXI.Container();
-    this.gameContainer.x = (this.APP_WIDTH - GAME_WIDTH) / 2;
-    this.gameContainer.y = (this.APP_HEIGHT - GAME_HEIGHT) / 2;
-    this.app.stage.addChild(this.gameContainer);
-
-    this.reelContainer = new PIXI.Container();
-    let scale = this.REEL_SCALE;
-    if (this.gameSettings.reelWidth) {
-      scale = this.gameSettings.reelWidth / (this.cols * this.reelWidth);
-    }
-    if (this.gameSettings.reelHeight) {
-      const hScale = this.gameSettings.reelHeight / (this.rows * this.reelHeight);
-      scale = Math.min(scale, hScale);
-    }
-    this.REEL_SCALE = scale;
-    this.reelContainer.scale.set(this.REEL_SCALE);
-
-    let defaultX = (GAME_WIDTH - this.cols * this.reelWidth * this.REEL_SCALE) / 2;
-    let defaultY = this.SCORE_AREA_HEIGHT;
-    if (!this.gameSettings.singleBackground && midBg) {
-      const midX = midBg.x - this.gameContainer.x;
-      const midY = midBg.y - this.gameContainer.y;
-      defaultX = midX + (midBg.width - this.cols * this.reelWidth * this.REEL_SCALE) / 2;
-      defaultY = midY + (midBg.height - this.rows * this.reelHeight * this.REEL_SCALE) / 2;
-    }
-    this.reelContainer.x = this.gameSettings.reelX !== undefined ? this.gameSettings.reelX : defaultX;
-    this.reelContainer.y = this.gameSettings.reelY !== undefined ? this.gameSettings.reelY : defaultY;
-    this.gameContainer.addChild(this.reelContainer);
-
-    // score display
-    this.scoreText = new PIXI.Text('Score: 0', {
-      fill: 0xffe066,
-      fontSize: 48,
-      fontWeight: 'bold',
-      stroke: 0x333333,
-      strokeThickness: 6
-    });
-    this.scoreText.anchor.set(0.5, 0);
-    this.scoreText.x = (this.cols * this.reelWidth) / 2;
-    this.scoreText.y = 20;
-    this.gameContainer.addChild(this.scoreText);
-
-    const reelMask = new PIXI.Graphics();
-    reelMask.beginFill(0xffffff);
-    reelMask.drawRect(0, 0, this.cols * this.reelWidth, this.rows * this.reelHeight);
-    reelMask.endFill();
-    this.reelContainer.addChild(reelMask);
-    this.reelContainer.mask = reelMask;
-
-    for (let i = 0; i < this.cols; i++) {
-      const rc = new PIXI.Container();
-      rc.x = i * this.reelWidth;
-      this.reelContainer.addChild(rc);
-      this.reels.push(rc);
-      for (let j = 0; j < this.rows; j++) {
-        const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
-        const symbolName = this.currentSymbols[symIndex];
-        const texture = PIXI.Texture.from(
-          this.assets.symbol(Number(symbolName))
-        );
-        const symbol = new PIXI.Sprite(texture);
-        symbol.name = symbolName;
-        symbol.anchor.set(0.5);
-        symbol.x = this.reelWidth / 2;
-        symbol.y = j * this.reelHeight + this.reelHeight / 2;
-        rc.addChild(symbol);
-        if (this.hasBorder && this.assets.border) {
-          const border = PIXI.Sprite.from(this.assets.border);
-          border.anchor.set(0.5);
-          border.x = this.reelWidth / 2;
-          border.y = symbol.y;
-          rc.addChild(border);
-        }
+      if (top.texture.baseTexture.valid) {
+        layout();
+      } else {
+        top.texture.baseTexture.once('loaded', layout);
       }
     }
 
-    this.button = new PIXI.Container();
-    const btnBgWidth = 160;
-    const btnBgHeight = 60;
-    const buttonBg = new PIXI.Graphics();
-    buttonBg.beginFill(0xffe066);
-    buttonBg.lineStyle(2, 0xffffff);
-    buttonBg.drawRoundedRect(0, 0, btnBgWidth, btnBgHeight, 10);
-    buttonBg.endFill();
-    const buttonText = new PIXI.Text('SPIN', {
-      fill: 0x000000,
-      fontSize: 36,
-      fontWeight: 'bold'
-    });
-    buttonText.anchor.set(0.5);
-    buttonText.position.set(btnBgWidth / 2, btnBgHeight / 2);
-    this.button.addChild(buttonBg);
-    this.button.addChild(buttonText);
-    this.button.interactive = true;
-    this.button.buttonMode = true;
-    this.button.x = (this.cols * this.reelWidth - btnBgWidth) / 2;
-    this.button.y = this.rows * this.reelHeight + 20 + this.SCORE_AREA_HEIGHT;
-    this.gameContainer.addChild(this.button);
-
-    this.lineContainer = new PIXI.Container();
-    this.lineContainer.x = this.reelContainer.x;
-    this.lineContainer.y = this.reelContainer.y;
-    this.lineContainer.scale.set(this.REEL_SCALE);
-    this.gameContainer.addChild(this.lineContainer);
-
-    this.button.on('pointerdown', () => {
-      this.spin(() => {
-        this.onSpinEnd();
-      });
-    });
+    // old code removed; logic moved to finishInit
   }
 
   protected onSpinEnd(): void {
