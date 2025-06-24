@@ -1,9 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { BaseSlotGame } from '../../base/BaseSlotGame';
-import { AssetPaths, DefaultGameSettings, GameRuleSettings } from '../../setting';
+import { AssetPaths, BjxbGameSettings, GameRuleSettings } from '../../setting';
 
 export class BjxbSlotGame extends BaseSlotGame {
-  constructor(settings: GameRuleSettings = DefaultGameSettings) {
+  constructor(settings: GameRuleSettings = BjxbGameSettings) {
     super(settings, AssetPaths.bjxb);
   }
   private hunter?: PIXI.AnimatedSprite;

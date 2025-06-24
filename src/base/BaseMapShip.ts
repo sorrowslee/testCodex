@@ -46,6 +46,15 @@ export class BaseMapShip {
     this.app.stage.addChild(this.container);
   }
 
+  public setPosition(x: number, y: number): void {
+    this.container.x = x;
+    this.container.y = y;
+  }
+
+  public get height(): number {
+    return this.container.height;
+  }
+
   public moveToNext(): void {
     if (this.current + 1 >= this.routes.length) return;
     this.current++;
