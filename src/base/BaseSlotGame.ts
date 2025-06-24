@@ -43,8 +43,8 @@ export abstract class BaseSlotGame {
 
   // dimensions and reel config
   protected SCORE_AREA_HEIGHT = 100;
-  protected APP_WIDTH = 1882;
-  protected APP_HEIGHT = 1075;
+  protected APP_WIDTH = 1900;
+  protected APP_HEIGHT = 1300;
   protected reelWidth!: number;
   protected reelHeight!: number;
   protected rows!: number;
@@ -228,23 +228,44 @@ export abstract class BaseSlotGame {
 
     if (this.gameSettings.singleBackground) {
       const background = PIXI.Sprite.from(this.getBackgroundPath());
-      background.width = this.APP_WIDTH;
-      background.height = this.APP_HEIGHT;
-      this.app.stage.addChild(background);
-      finishInit(null);
+      const doLayout = () => {
+        const scale = Math.min(
+          this.APP_WIDTH / background.texture.width,
+          this.APP_HEIGHT / background.texture.height,
+          1
+        );
+        background.anchor.set(0.5);
+        background.scale.set(scale);
+        background.x = this.APP_WIDTH / 2;
+        background.y = this.APP_HEIGHT / 2;
+        this.app.stage.addChild(background);
+        finishInit(null);
+      };
+      if (background.texture.baseTexture.valid) {
+        doLayout();
+      } else {
+        background.texture.baseTexture.once('loaded', doLayout);
+      }
     } else {
       const top = PIXI.Sprite.from(this.assets.bgTop);
       const mid = PIXI.Sprite.from(this.assets.bgMid);
       const bottom = PIXI.Sprite.from(this.assets.bgBottom);
 
       const layout = () => {
-        const scale = Math.min(this.APP_WIDTH / top.texture.width, 1);
+        const totalHeight =
+          top.texture.height + mid.texture.height + bottom.texture.height;
+        const scale = Math.min(
+          this.APP_WIDTH / top.texture.width,
+          this.APP_HEIGHT / totalHeight,
+          1
+        );
         [top, mid, bottom].forEach(s => {
           s.scale.set(scale);
           s.x = (this.APP_WIDTH - top.texture.width * scale) / 2;
         });
-        top.y = 0;
-        mid.y = top.height;
+        const offsetY = (this.APP_HEIGHT - totalHeight * scale) / 2;
+        top.y = offsetY;
+        mid.y = top.y + top.height;
         bottom.y = mid.y + mid.height;
         this.app.stage.addChild(top);
         this.app.stage.addChild(mid);
@@ -252,11 +273,22 @@ export abstract class BaseSlotGame {
         finishInit(mid);
       };
 
-      if (top.texture.baseTexture.valid) {
-        layout();
-      } else {
-        top.texture.baseTexture.once('loaded', layout);
-      }
+      const checkLoaded = () => {
+        if (
+          top.texture.baseTexture.valid &&
+          mid.texture.baseTexture.valid &&
+          bottom.texture.baseTexture.valid
+        ) {
+          layout();
+        }
+      };
+      if (!top.texture.baseTexture.valid)
+        top.texture.baseTexture.once('loaded', checkLoaded);
+      if (!mid.texture.baseTexture.valid)
+        mid.texture.baseTexture.once('loaded', checkLoaded);
+      if (!bottom.texture.baseTexture.valid)
+        bottom.texture.baseTexture.once('loaded', checkLoaded);
+      checkLoaded();
     }
 
     // old code removed; logic moved to finishInit
