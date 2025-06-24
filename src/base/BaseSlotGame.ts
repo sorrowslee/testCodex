@@ -238,10 +238,10 @@ export abstract class BaseSlotGame {
       const bottom = PIXI.Sprite.from(this.assets.bgBottom);
 
       const layout = () => {
-        const scale = this.APP_WIDTH / top.texture.width;
+        const scale = Math.min(this.APP_WIDTH / top.texture.width, 1);
         [top, mid, bottom].forEach(s => {
           s.scale.set(scale);
-          s.x = 0;
+          s.x = (this.APP_WIDTH - top.texture.width * scale) / 2;
         });
         top.y = 0;
         mid.y = top.height;
