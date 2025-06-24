@@ -3,6 +3,10 @@ export interface GameAssetConfig {
   // animation type to frame count
   animations?: Record<string, number>;
   bg: string;
+  /** Background pieces when singleBackground is false */
+  bgTop: string;
+  bgMid: string;
+  bgBottom: string;
   /** Optional border image path */
   border?: string;
   lines: { joint: string; body: string };
@@ -35,6 +39,16 @@ export interface GameRuleSettings {
   blockHeight: number;
   /** Enable map ship feature */
   mapShip: boolean;
+  /** Use a single background image instead of top/mid/bottom pieces */
+  singleBackground: boolean;
+  /** Custom reel container X position */
+  reelX?: number;
+  /** Custom reel container Y position */
+  reelY?: number;
+  /** Custom reel container width */
+  reelWidth?: number;
+  /** Custom reel container height */
+  reelHeight?: number;
 }
 
 function createGameConfig(
@@ -47,6 +61,9 @@ function createGameConfig(
     symbolCount,
     animations,
     bg: `assets/${name}/bg/${name}_bg.png`,
+    bgTop: `assets/${name}/bg/${name}_bg_top.jpg`,
+    bgMid: `assets/${name}/bg/${name}_bg_mid.png`,
+    bgBottom: `assets/${name}/bg/${name}_bg_bottom.jpg`,
     lines: {
       joint: `assets/${name}/lines/${name}_line_joint.png`,
       body: `assets/${name}/lines/${name}_line_body.png`
@@ -91,7 +108,13 @@ export const DefaultGameSettings: GameRuleSettings = {
   rows: 5,
   blockWidth: 128,
   blockHeight: 128,
-  mapShip: false
+  mapShip: false,
+  singleBackground: false
+};
+
+export const BjxbGameSettings: GameRuleSettings = {
+  ...DefaultGameSettings,
+  singleBackground: true
 };
 
 export const FfpGameSettings: GameRuleSettings = {
@@ -100,7 +123,8 @@ export const FfpGameSettings: GameRuleSettings = {
   rows: 5,
   blockWidth: 128,
   blockHeight: 90,
-  mapShip: true
+  mapShip: true,
+  singleBackground: true
 };
 
 export const AlpszmGameSettings: GameRuleSettings = {
@@ -109,5 +133,6 @@ export const AlpszmGameSettings: GameRuleSettings = {
   rows: 3,
   blockWidth: 120,
   blockHeight: 140,
-  mapShip: true
+  mapShip: true,
+  singleBackground: true
 };

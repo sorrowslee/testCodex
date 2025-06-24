@@ -80,16 +80,40 @@ export abstract class BaseSlotGame {
     const container = typeof containerId === 'string' ? document.getElementById(containerId)! : containerId;
     container.appendChild(this.app.view);
 
-    const background = PIXI.Sprite.from(this.getBackgroundPath());
-    background.width = this.APP_WIDTH;
-    background.height = this.APP_HEIGHT;
-    this.app.stage.addChild(background);
+    const bgCodeMatch = /assets\/(.*?)\//.exec(this.assets.bg);
+    const gameCode = bgCodeMatch ? bgCodeMatch[1] : '';
+
+    let midBg: PIXI.Sprite | null = null;
+    if (this.gameSettings.singleBackground) {
+      const background = PIXI.Sprite.from(this.getBackgroundPath());
+      background.width = this.APP_WIDTH;
+      background.height = this.APP_HEIGHT;
+      this.app.stage.addChild(background);
+    } else {
+      const top = PIXI.Sprite.from(this.assets.bgTop);
+      const mid = PIXI.Sprite.from(this.assets.bgMid);
+      const bottom = PIXI.Sprite.from(this.assets.bgBottom);
+      const scale = this.APP_WIDTH / top.texture.width;
+      [top, mid, bottom].forEach(s => {
+        s.scale.set(scale);
+        s.x = 0;
+      });
+      top.y = 0;
+      mid.y = top.height;
+      bottom.y = mid.y + mid.height;
+      this.app.stage.addChild(top);
+      this.app.stage.addChild(mid);
+      this.app.stage.addChild(bottom);
+      midBg = mid;
+    }
 
     if (this.gameSettings.mapShip) {
-      const m = /assets\/(.*?)\//.exec(this.assets.bg);
-      const code = m ? m[1] : '';
-      this.mapShip = new BaseMapShip(this.app, code);
-      this.mapShip.init();
+      this.mapShip = new BaseMapShip(this.app, gameCode);
+      this.mapShip.init().then(() => {
+        if (!this.gameSettings.singleBackground && midBg) {
+          this.mapShip!.setPosition(0, midBg.y - this.mapShip!.height);
+        }
+      });
     }
 
     this.gameContainer = new PIXI.Container();
@@ -98,9 +122,27 @@ export abstract class BaseSlotGame {
     this.app.stage.addChild(this.gameContainer);
 
     this.reelContainer = new PIXI.Container();
-    this.reelContainer.y = this.SCORE_AREA_HEIGHT;
+    let scale = this.REEL_SCALE;
+    if (this.gameSettings.reelWidth) {
+      scale = this.gameSettings.reelWidth / (this.cols * this.reelWidth);
+    }
+    if (this.gameSettings.reelHeight) {
+      const hScale = this.gameSettings.reelHeight / (this.rows * this.reelHeight);
+      scale = Math.min(scale, hScale);
+    }
+    this.REEL_SCALE = scale;
     this.reelContainer.scale.set(this.REEL_SCALE);
-    this.reelContainer.x = (GAME_WIDTH - this.cols * this.reelWidth * this.REEL_SCALE) / 2;
+
+    let defaultX = (GAME_WIDTH - this.cols * this.reelWidth * this.REEL_SCALE) / 2;
+    let defaultY = this.SCORE_AREA_HEIGHT;
+    if (!this.gameSettings.singleBackground && midBg) {
+      const midX = midBg.x - this.gameContainer.x;
+      const midY = midBg.y - this.gameContainer.y;
+      defaultX = midX + (midBg.width - this.cols * this.reelWidth * this.REEL_SCALE) / 2;
+      defaultY = midY + (midBg.height - this.rows * this.reelHeight * this.REEL_SCALE) / 2;
+    }
+    this.reelContainer.x = this.gameSettings.reelX !== undefined ? this.gameSettings.reelX : defaultX;
+    this.reelContainer.y = this.gameSettings.reelY !== undefined ? this.gameSettings.reelY : defaultY;
     this.gameContainer.addChild(this.reelContainer);
 
     // score display
