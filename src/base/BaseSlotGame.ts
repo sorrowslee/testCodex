@@ -94,7 +94,9 @@ export abstract class BaseSlotGame {
         this.mapShip = new BaseMapShip(this.app, gameCode);
         this.mapShip.init().then(() => {
           if (!this.gameSettings.singleBackground && midBg) {
-            this.mapShip!.setPosition(0, midBg.y - this.mapShip!.height);
+            const x =
+              midBg.x + (midBg.width - this.mapShip!.width) / 2;
+            this.mapShip!.setPosition(x, midBg.y - this.mapShip!.height);
           }
         });
       }

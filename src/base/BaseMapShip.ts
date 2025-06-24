@@ -55,6 +55,10 @@ export class BaseMapShip {
     return this.container.height;
   }
 
+  public get width(): number {
+    return this.container.width;
+  }
+
   public moveToNext(): void {
     if (this.current + 1 >= this.routes.length) return;
     this.current++;
