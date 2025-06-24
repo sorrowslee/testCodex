@@ -71,11 +71,13 @@ function createGameConfig(
 export const AssetPaths = {
   bjxb: createGameConfig('bjxb', 10, { hunter: 51 }, true),
   ffp: createGameConfig('ffp', 6, undefined, false),
+  alpszm: createGameConfig('alpszm', 13, undefined, false),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
     bjxb: 'assets/lobby/lobby_icons/bjxb.png',
-    ffp: 'assets/lobby/lobby_icons/ffp.png'
+    ffp: 'assets/lobby/lobby_icons/ffp.png',
+    alpszm: 'assets/lobby/lobby_icons/alpszm.png'
   }
 } as const;
 
@@ -98,5 +100,14 @@ export const FfpGameSettings: GameRuleSettings = {
   rows: 5,
   blockWidth: 128,
   blockHeight: 90,
+  mapShip: true
+};
+
+export const AlpszmGameSettings: GameRuleSettings = {
+  ...DefaultGameSettings,
+  cols: 5,
+  rows: 3,
+  blockWidth: 120,
+  blockHeight: 140,
   mapShip: true
 };
