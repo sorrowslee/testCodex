@@ -24,7 +24,7 @@ export class BaseMapShip {
     const battleTex = PIXI.Texture.from(`${base}battle.png`);
     for (let i = 1; i < this.routes.length - 1; i++) {
       const b = new PIXI.Sprite(battleTex);
-      b.anchor.set(0.5);
+      b.anchor.set(0, 0.5);
       b.x = this.routes[i].x;
       b.y = this.routes[i].y;
       this.battles.push(b);
@@ -32,13 +32,13 @@ export class BaseMapShip {
     }
 
     this.winner = PIXI.Sprite.from(`${base}winner.png`);
-    this.winner.anchor.set(0.5);
+    this.winner.anchor.set(0, 0.1);
     this.winner.x = this.routes[this.routes.length - 1].x;
     this.winner.y = this.routes[this.routes.length - 1].y;
     this.container.addChild(this.winner);
 
     this.flag = PIXI.Sprite.from(`${base}flag.png`);
-    this.flag.anchor.set(0.5);
+    this.flag.anchor.set(0.5, 0.8);
     this.flag.x = this.routes[0].x;
     this.flag.y = this.routes[0].y;
     this.container.addChild(this.flag);
