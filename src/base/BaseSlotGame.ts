@@ -238,7 +238,8 @@ export abstract class BaseSlotGame {
         background.scale.set(scale);
         background.x = this.APP_WIDTH / 2;
         background.y = this.APP_HEIGHT / 2;
-        this.app.stage.addChild(background);
+        // place background behind all game elements
+        this.app.stage.addChildAt(background, 0);
         finishInit(null);
       };
       if (background.texture.baseTexture.valid) {
@@ -267,9 +268,10 @@ export abstract class BaseSlotGame {
         top.y = offsetY;
         mid.y = top.y + top.height;
         bottom.y = mid.y + mid.height;
-        this.app.stage.addChild(top);
-        this.app.stage.addChild(mid);
-        this.app.stage.addChild(bottom);
+        // add backgrounds behind game container
+        this.app.stage.addChildAt(top, 0);
+        this.app.stage.addChildAt(mid, 1);
+        this.app.stage.addChildAt(bottom, 2);
         finishInit(mid);
       };
 

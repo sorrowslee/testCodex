@@ -40,7 +40,8 @@ export class Lobby {
       bg.scale.set(scale);
       bg.x = this.app.renderer.width / 2;
       bg.y = this.app.renderer.height / 2;
-      this.app.stage.addChild(bg);
+      // ensure background stays behind scroll view
+      this.app.stage.addChildAt(bg, 0);
     };
     if (bg.texture.baseTexture.valid) {
       layoutBg();
