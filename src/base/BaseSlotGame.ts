@@ -80,6 +80,12 @@ export abstract class BaseSlotGame {
     const container = typeof containerId === 'string' ? document.getElementById(containerId)! : containerId;
     container.appendChild(this.app.view);
 
+    // ensure game container exists before subclasses run additional setup
+    this.gameContainer = new PIXI.Container();
+    this.gameContainer.x = (this.APP_WIDTH - GAME_WIDTH) / 2;
+    this.gameContainer.y = (this.APP_HEIGHT - GAME_HEIGHT) / 2;
+    this.app.stage.addChild(this.gameContainer);
+
     const bgCodeMatch = /assets\/(.*?)\//.exec(this.assets.bg);
     const gameCode = bgCodeMatch ? bgCodeMatch[1] : '';
 
@@ -93,10 +99,6 @@ export abstract class BaseSlotGame {
         });
       }
 
-      this.gameContainer = new PIXI.Container();
-      this.gameContainer.x = (this.APP_WIDTH - GAME_WIDTH) / 2;
-      this.gameContainer.y = (this.APP_HEIGHT - GAME_HEIGHT) / 2;
-      this.app.stage.addChild(this.gameContainer);
 
       this.reelContainer = new PIXI.Container();
       let scale = this.REEL_SCALE;
