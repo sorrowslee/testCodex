@@ -68,7 +68,7 @@ function createGameConfig(
 
 export const AssetPaths = {
   bjxb: createGameConfig('bjxb', 10, { hunter: 51 }, true),
-  ffp: createGameConfig('ffp', 6, undefined, true),
+  ffp: createGameConfig('ffp', 6, undefined, false),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
