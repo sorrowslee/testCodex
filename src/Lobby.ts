@@ -22,17 +22,31 @@ export class Lobby {
 
   public start(containerId: string = 'game'): void {
     this.app = new PIXI.Application({
-      width: 1882,
-      height: 1075,
+      width: 1900,
+      height: 1300,
       backgroundColor: 0x000000
     });
     const container = typeof containerId === 'string' ? document.getElementById(containerId)! : containerId;
     container.appendChild(this.app.view);
 
     const bg = PIXI.Sprite.from(AssetPaths.lobby.bg);
-    bg.width = this.app.renderer.width;
-    bg.height = this.app.renderer.height;
-    this.app.stage.addChild(bg);
+    const layoutBg = () => {
+      const scale = Math.min(
+        this.app.renderer.width / bg.texture.width,
+        this.app.renderer.height / bg.texture.height,
+        1
+      );
+      bg.anchor.set(0.5);
+      bg.scale.set(scale);
+      bg.x = this.app.renderer.width / 2;
+      bg.y = this.app.renderer.height / 2;
+      this.app.stage.addChild(bg);
+    };
+    if (bg.texture.baseTexture.valid) {
+      layoutBg();
+    } else {
+      bg.texture.baseTexture.once('loaded', layoutBg);
+    }
 
     const panelWidth = this.app.renderer.width - SCROLL_MARGIN * 2;
     this.viewHeight = this.app.renderer.height - VIEW_HEIGHT_OFFSET;
