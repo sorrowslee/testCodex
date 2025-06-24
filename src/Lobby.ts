@@ -9,7 +9,7 @@ const VIEW_HEIGHT_OFFSET = 0;     // height = renderer.height - VIEW_HEIGHT_OFFS
 const ICON_COLUMNS = 2;             // how many icons per row
 const ICON_SIZE = 300;              // width/height of each icon
 const FIRST_ICON_Y_OFFSET = 50;     // offset for the first icon's y position
-const ICON_ROW_EXTRA = 60;          // extra space between icon rows
+const ICON_ROW_EXTRA = 140;          // extra space between icon rows
 const FIRST_ICON_X_RATIO = 0.6;     // starting x position as a ratio of column width
 const ICON_X_DIFF_MULTIPLIER = 0.8;   // spacing multiplier between icons horizontally
 

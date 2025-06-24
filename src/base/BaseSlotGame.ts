@@ -96,7 +96,7 @@ export abstract class BaseSlotGame {
           if (!this.gameSettings.singleBackground && midBg) {
             const x =
               midBg.x + (midBg.width - this.mapShip!.width) / 2;
-            this.mapShip!.setPosition(x, midBg.y - this.mapShip!.height);
+            this.mapShip!.setPosition(midBg.x, midBg.y - this.mapShip!.height);
           }
         });
       }

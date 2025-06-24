@@ -123,7 +123,7 @@ export const FfpGameSettings: GameRuleSettings = {
   rows: 5,
   blockWidth: 128,
   blockHeight: 90,
-  mapShip: true,
+  mapShip: false,
   singleBackground: true
 };
 
