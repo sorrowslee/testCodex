@@ -10,6 +10,8 @@ export abstract class BaseSlotGame {
     this.cols = gameSettings.cols;
     this.reelWidth = gameSettings.blockWidth;
     this.reelHeight = gameSettings.blockHeight;
+    this.hasBorder = !!assets.border;
+    this.childPerCell = this.hasBorder ? 2 : 1;
   }
 
   protected app!: PIXI.Application;
@@ -53,6 +55,10 @@ export abstract class BaseSlotGame {
   protected SPIN_SPEED = 300;
   protected BLUR_AMOUNT = 30;
   protected WIN_TIME = 3000;
+
+  // border configuration
+  protected hasBorder = false;
+  protected childPerCell = 1;
 
   protected currentSymbols: string[] = [];
 
@@ -119,17 +125,19 @@ export abstract class BaseSlotGame {
         const texture = PIXI.Texture.from(
           this.assets.symbol(Number(symbolName))
         );
-        const border = PIXI.Sprite.from(this.assets.border);
         const symbol = new PIXI.Sprite(texture);
         symbol.name = symbolName;
         symbol.anchor.set(0.5);
-        border.anchor.set(0.5);
         symbol.x = this.reelWidth / 2;
         symbol.y = j * this.reelHeight + this.reelHeight / 2;
-        border.x = this.reelWidth / 2;
-        border.y = symbol.y;
         rc.addChild(symbol);
-        rc.addChild(border);
+        if (this.hasBorder && this.assets.border) {
+          const border = PIXI.Sprite.from(this.assets.border);
+          border.anchor.set(0.5);
+          border.x = this.reelWidth / 2;
+          border.y = symbol.y;
+          rc.addChild(border);
+        }
       }
     }
 
@@ -177,14 +185,16 @@ export abstract class BaseSlotGame {
     for (let c = 0; c < this.cols; c++) {
       for (let r = 0; r < this.rows; r++) {
         const idx = Math.floor(Math.random() * symbolSet.length);
-        const sym = this.reels[c].children[r * 2] as any;
-        const border = this.reels[c].children[r * 2 + 1] as any;
+        const sym = this.reels[c].children[r * this.childPerCell] as any;
+        const border = this.hasBorder
+          ? (this.reels[c].children[r * this.childPerCell + 1] as any)
+          : null;
         sym.texture = PIXI.Texture.from(
           this.assets.symbol(Number(symbolSet[idx]))
         );
         sym.name = symbolSet[idx];
         sym.y = r * this.reelHeight + this.reelHeight / 2;
-        border.y = sym.y;
+        if (border) border.y = sym.y;
       }
     }
   }
@@ -194,7 +204,7 @@ export abstract class BaseSlotGame {
     for (let r = 0; r < this.rows; r++) {
       grid[r] = [];
       for (let c = 0; c < this.cols; c++) {
-        const sprite = this.reels[c].children[r * 2] as any;
+        const sprite = this.reels[c].children[r * this.childPerCell] as any;
         grid[r][c] = { name: sprite.name || '', sprite };
       }
     }
@@ -328,10 +338,15 @@ export abstract class BaseSlotGame {
       this.lineContainer.addChild(body, jStart, jEnd);
 
       l.cells.forEach((cell: any) => {
-        const sym = this.reels[cell.c].children[cell.r * 2] as any;
-        const border = this.reels[cell.c].children[cell.r * 2 + 1] as any;
+        const sym = this.reels[cell.c].children[
+          cell.r * this.childPerCell
+        ] as any;
+        const border = this.hasBorder
+          ? (this.reels[cell.c].children[cell.r * this.childPerCell + 1] as any)
+          : null;
         if (!hitSprites.includes(sym)) {
-          hitSprites.push(sym, border);
+          hitSprites.push(sym);
+          if (border) hitSprites.push(border);
         }
         uniqueCells.add(`${cell.r}-${cell.c}`);
       });
@@ -367,7 +382,7 @@ export abstract class BaseSlotGame {
 
   protected alignReel(reel: PIXI.Container) {
     reel.children.forEach((child: any, i: number) => {
-      const row = Math.floor(i / 2);
+      const row = Math.floor(i / this.childPerCell);
       child.y = row * this.reelHeight + this.reelHeight / 2;
       child.x = this.reelWidth / 2;
     });
@@ -391,15 +406,17 @@ export abstract class BaseSlotGame {
       this.registerTicker(ticker);
       ticker.add(() => {
         const elapsed = Date.now() - start;
-        for (let i = 0; i < reel.children.length; i += 2) {
+        for (let i = 0; i < reel.children.length; i += this.childPerCell) {
           const sym = reel.children[i] as any;
-          const border = reel.children[i + 1] as any;
+          const border = this.hasBorder ? (reel.children[i + 1] as any) : null;
           sym.y += this.SPIN_SPEED * ticker.deltaTime;
-          border.y = sym.y;
+          if (border) border.y = sym.y;
           if (sym.y >= this.rows * this.reelHeight + this.reelHeight / 2) {
             sym.y -= this.rows * this.reelHeight;
-            border.y = sym.y;
-            const symIndex = Math.floor(Math.random() * this.currentSymbols.length);
+            if (border) border.y = sym.y;
+            const symIndex = Math.floor(
+              Math.random() * this.currentSymbols.length
+            );
             const symbolName = this.currentSymbols[symIndex];
             sym.texture = PIXI.Texture.from(
               this.assets.symbol(Number(symbolName))

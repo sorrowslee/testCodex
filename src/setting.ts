@@ -3,7 +3,8 @@ export interface GameAssetConfig {
   // animation type to frame count
   animations?: Record<string, number>;
   bg: string;
-  border: string;
+  /** Optional border image path */
+  border?: string;
   lines: { joint: string; body: string };
   symbol: (index: number) => string;
   animationFrame: (type: string, index: number) => string;
@@ -34,12 +35,16 @@ export interface GameRuleSettings {
   blockHeight: number;
 }
 
-function createGameConfig(name: string, symbolCount: number, animations?: Record<string, number>): GameAssetConfig {
-  return {
+function createGameConfig(
+  name: string,
+  symbolCount: number,
+  animations?: Record<string, number>,
+  hasBorder: boolean = false
+): GameAssetConfig {
+  const config: GameAssetConfig = {
     symbolCount,
     animations,
     bg: `assets/${name}/bg/${name}_bg.png`,
-    border: `assets/${name}/symbols/${name}_border.png`,
     lines: {
       joint: `assets/${name}/lines/${name}_line_joint.png`,
       body: `assets/${name}/lines/${name}_line_body.png`
@@ -53,11 +58,17 @@ function createGameConfig(name: string, symbolCount: number, animations?: Record
       return `assets/${name}/animation/${type}/${name}_${type}_${num}.png`;
     }
   };
+
+  if (hasBorder) {
+    config.border = `assets/${name}/symbols/${name}_border.png`;
+  }
+
+  return config;
 }
 
 export const AssetPaths = {
-  bjxb: createGameConfig('bjxb', 10, { hunter: 51 }),
-  ffp: createGameConfig('ffp', 6),
+  bjxb: createGameConfig('bjxb', 10, { hunter: 51 }, true),
+  ffp: createGameConfig('ffp', 6, undefined, true),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
