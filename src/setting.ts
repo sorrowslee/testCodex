@@ -33,6 +33,8 @@ export interface GameRuleSettings {
   blockWidth: number;
   /** Height of each block (symbol) in pixels */
   blockHeight: number;
+  /** Enable map ship feature */
+  mapShip: boolean;
 }
 
 function createGameConfig(
@@ -86,7 +88,8 @@ export const DefaultGameSettings: GameRuleSettings = {
   cols: 7,
   rows: 5,
   blockWidth: 128,
-  blockHeight: 128
+  blockHeight: 128,
+  mapShip: false
 };
 
 export const FfpGameSettings: GameRuleSettings = {
@@ -94,5 +97,6 @@ export const FfpGameSettings: GameRuleSettings = {
   cols: 5,
   rows: 5,
   blockWidth: 128,
-  blockHeight: 90
+  blockHeight: 90,
+  mapShip: true
 };
