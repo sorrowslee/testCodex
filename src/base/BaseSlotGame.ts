@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { AssetPaths, DefaultGameSettings, GameRuleSettings, GameAssetConfig } from '../setting';
+import { BaseMapShip } from './BaseMapShip';
 
 export abstract class BaseSlotGame {
   constructor(
@@ -22,6 +23,7 @@ export abstract class BaseSlotGame {
   protected score = 0;
   protected scoreText!: PIXI.Text;
   protected button!: PIXI.Container;
+  protected mapShip?: BaseMapShip;
 
   private activeTickers: PIXI.Ticker[] = [];
   private activeTimeouts: number[] = [];
@@ -82,6 +84,13 @@ export abstract class BaseSlotGame {
     background.width = this.APP_WIDTH;
     background.height = this.APP_HEIGHT;
     this.app.stage.addChild(background);
+
+    if (this.gameSettings.mapShip) {
+      const m = /assets\/(.*?)\//.exec(this.assets.bg);
+      const code = m ? m[1] : '';
+      this.mapShip = new BaseMapShip(this.app, code);
+      this.mapShip.init();
+    }
 
     this.gameContainer = new PIXI.Container();
     this.gameContainer.x = (this.APP_WIDTH - GAME_WIDTH) / 2;
@@ -452,6 +461,10 @@ export abstract class BaseSlotGame {
     this.activeTimeouts = [];
     this.activeTickers.forEach(t => t.destroy());
     this.activeTickers = [];
+    if (this.mapShip) {
+      this.mapShip.destroy();
+      this.mapShip = undefined;
+    }
     if (this.app) {
       const parent = this.app.view.parentNode;
       if (parent) {
