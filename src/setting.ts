@@ -143,5 +143,9 @@ export const AlpszmGameSettings: GameRuleSettings = {
   blockWidth: 120,
   blockHeight: 140,
   mapShip: true,
-  singleBackground: false
+  singleBackground: false,
+  colSpacing: 36,
+  rowSpacing: 32,
+  blockScale: 1.2,
+  reelY:190,
 };
