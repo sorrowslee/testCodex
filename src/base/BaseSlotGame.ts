@@ -688,9 +688,11 @@ export abstract class BaseSlotGame {
           }
         });
         ticker.start();
+        }
+        );
       }, idx * this.START_DELAY);
       this.registerTimeout(timeoutId);
-    })});
+    });
   }
 
   public destroy(): void {
