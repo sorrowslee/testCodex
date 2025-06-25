@@ -40,7 +40,7 @@ export class BaseMapShip {
     this.container.addChild(this.winner);
 
     this.flag = PIXI.Sprite.from(`${base}flag.png`);
-    this.flag.anchor.set(0.5, 0.8);
+    this.flag.anchor.set(0, 0.5);
     this.flag.x = this.routes[0].x;
     this.flag.y = this.routes[0].y;
     this.container.addChild(this.flag);
