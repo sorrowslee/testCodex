@@ -101,7 +101,7 @@ export abstract class BaseSlotGame {
     const bgCodeMatch = /assets\/(.*?)\//.exec(this.assets.bg);
     const gameCode = bgCodeMatch ? bgCodeMatch[1] : '';
 
-    const finishInit = (midBg: PIXI.Sprite | null) => {
+    const finishInit = (topBg: PIXI.Sprite | null, midBg: PIXI.Sprite | null, bottomBg: PIXI.Sprite | null) => {
       if (this.gameSettings.mapShip) {
         this.mapShip = new BaseMapShip(this.app, gameCode);
         this.mapShip.init().then(() => {
@@ -204,7 +204,7 @@ export abstract class BaseSlotGame {
         }
       }
 
-      if (this.gameSettings.spinButton) {
+      if (this.gameSettings.spinButton && bottomBg) {
         const btn = new SpinButton(gameCode, () => {
           this.spin(() => {
             if (btn) btn.reset();
@@ -212,8 +212,8 @@ export abstract class BaseSlotGame {
           });
         });
         const layoutBtn = () => {
-          btn.x = (REEL_LAYOUT_WIDTH - btn.width) / 2;
-          btn.y = REEL_LAYOUT_HEIGHT + 20 + this.SCORE_AREA_HEIGHT;
+          btn.x = bottomBg.width / 2 + 18;//(REEL_LAYOUT_WIDTH - btn.width) / 2;
+          btn.y = bottomBg.y - bottomBg.height / 2 + 10;//REEL_LAYOUT_HEIGHT + 20 + this.SCORE_AREA_HEIGHT;
         };
         btn.on('loaded', layoutBtn);
         if (btn.width > 0) layoutBtn();
@@ -270,7 +270,7 @@ export abstract class BaseSlotGame {
         background.y = this.APP_HEIGHT / 2;
         // place background behind all game elements
         this.app.stage.addChildAt(background, 0);
-        finishInit(null);
+        finishInit(null, null, null);
       };
       if (background.texture.baseTexture.valid) {
         doLayout();
@@ -302,7 +302,7 @@ export abstract class BaseSlotGame {
         this.app.stage.addChildAt(top, 0);
         this.app.stage.addChildAt(mid, 1);
         this.app.stage.addChildAt(bottom, 2);
-        finishInit(mid);
+        finishInit(top, mid, bottom);
       };
 
       const checkLoaded = () => {

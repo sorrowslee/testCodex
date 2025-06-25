@@ -16,6 +16,7 @@ export class SpinButton extends PIXI.Container {
     this.stopIcon = PIXI.Sprite.from(`${prefix}Btn_Spin_Stop.png`);
     [this.base, this.spinIcon, this.stopIcon].forEach(s => {
       s.anchor.set(0.5);
+      s.scale.set(1.1);
     });
     this.stopIcon.visible = false;
     this.addChild(this.base);
