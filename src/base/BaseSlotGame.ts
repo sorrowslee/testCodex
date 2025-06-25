@@ -65,7 +65,7 @@ export abstract class BaseSlotGame {
   protected SPIN_SPEED = 300;
   protected BLUR_AMOUNT = 30;
   protected WIN_TIME = 3000;
-  protected START_DELAY = 100;
+  protected START_DELAY = 300;
   protected START_OFFSET_Y = -30;
   protected SPIN_DIRECTION: 'down' | 'up' = 'down';
 
