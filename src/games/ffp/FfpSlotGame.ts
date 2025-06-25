@@ -66,10 +66,16 @@ export class FfpSlotGame extends BaseSlotGame {
   }
 
   protected onSpinEnd(): void {
-    this.checkHotSpin();
+    if (this.mapShipEndTriggered) {
+      this.mapShipEndTriggered = false;
+      this.startHotSpin();
+    } else {
+      this.checkHotSpin();
+    }
   }
 
-  private startHotSpin() {
+
+  protected startHotSpin() {
     if (this.hunter) {
       this.hunter.play();
     }
@@ -105,6 +111,9 @@ export class FfpSlotGame extends BaseSlotGame {
       Math.floor(this.score / this.gameSettings.hotSpinThresholdMultiple) *
         this.gameSettings.hotSpinThresholdMultiple +
       this.gameSettings.hotSpinThresholdMultiple;
+    if (this.mapShip) {
+      this.mapShip.reset();
+    }
   }
 
   private checkHotSpin() {
