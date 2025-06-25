@@ -37,6 +37,12 @@ export interface GameRuleSettings {
   blockWidth: number;
   /** Height of each block (symbol) in pixels */
   blockHeight: number;
+  /** Horizontal spacing between columns in pixels */
+  colSpacing: number;
+  /** Vertical spacing between rows in pixels */
+  rowSpacing: number;
+  /** Scale factor for each block */
+  blockScale: number;
   /** Enable map ship feature */
   mapShip: boolean;
   /** Use a single background image instead of top/mid/bottom pieces */
@@ -108,6 +114,9 @@ export const DefaultGameSettings: GameRuleSettings = {
   rows: 5,
   blockWidth: 128,
   blockHeight: 128,
+  colSpacing: 0,
+  rowSpacing: 0,
+  blockScale: 1,
   mapShip: false,
   singleBackground: false
 };
