@@ -107,6 +107,9 @@ export class FfpSlotGame extends BaseSlotGame {
     this.populateReels(this.currentSymbols);
     this.button.interactive = true;
     this.button.alpha = 1;
+    if ((this.button as any).reset) {
+      (this.button as any).reset();
+    }
     this.nextHotSpinScore =
       Math.floor(this.score / this.gameSettings.hotSpinThresholdMultiple) *
         this.gameSettings.hotSpinThresholdMultiple +
