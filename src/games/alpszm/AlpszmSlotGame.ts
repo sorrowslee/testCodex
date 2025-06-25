@@ -107,8 +107,9 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.populateReels(this.currentSymbols);
     this.button.interactive = true;
     this.button.alpha = 1;
-    if (this.button.reset) {
-      (this.button as any).reset();
+    const btn = this.button as any;
+    if (typeof btn.reset === 'function') {
+      btn.reset();
     }
     this.nextHotSpinScore =
       Math.floor(this.score / this.gameSettings.hotSpinThresholdMultiple) *
