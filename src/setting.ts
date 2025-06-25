@@ -47,6 +47,8 @@ export interface GameRuleSettings {
   mapShip: boolean;
   /** Use a single background image instead of top/mid/bottom pieces */
   singleBackground: boolean;
+  /** Use animated image spin button */
+  spinButton: boolean;
   /** Custom reel container X position */
   reelX?: number;
   /** Custom reel container Y position */
@@ -118,7 +120,8 @@ export const DefaultGameSettings: GameRuleSettings = {
   rowSpacing: 0,
   blockScale: 1,
   mapShip: false,
-  singleBackground: false
+  singleBackground: false,
+  spinButton: false
 };
 
 export const BjxbGameSettings: GameRuleSettings = {
@@ -148,4 +151,5 @@ export const AlpszmGameSettings: GameRuleSettings = {
   rowSpacing: 32,
   blockScale: 1.2,
   reelY:190,
+  spinButton: true
 };

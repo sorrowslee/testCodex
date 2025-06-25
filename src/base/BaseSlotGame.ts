@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { AssetPaths, DefaultGameSettings, GameRuleSettings, GameAssetConfig } from '../setting';
 import { BaseMapShip } from './BaseMapShip';
+import { SpinButton } from './SpinButton';
 
 export abstract class BaseSlotGame {
   constructor(
@@ -203,40 +204,56 @@ export abstract class BaseSlotGame {
         }
       }
 
-      this.button = new PIXI.Container();
-      const btnBgWidth = 160;
-      const btnBgHeight = 60;
-      const buttonBg = new PIXI.Graphics();
-      buttonBg.beginFill(0xffe066);
-      buttonBg.lineStyle(2, 0xffffff);
-      buttonBg.drawRoundedRect(0, 0, btnBgWidth, btnBgHeight, 10);
-      buttonBg.endFill();
-      const buttonText = new PIXI.Text('SPIN', {
-        fill: 0x000000,
-        fontSize: 36,
-        fontWeight: 'bold'
-      });
-      buttonText.anchor.set(0.5);
-      buttonText.position.set(btnBgWidth / 2, btnBgHeight / 2);
-      this.button.addChild(buttonBg);
-      this.button.addChild(buttonText);
-      this.button.interactive = true;
-      this.button.buttonMode = true;
-      this.button.x = (REEL_LAYOUT_WIDTH - btnBgWidth) / 2;
-      this.button.y = REEL_LAYOUT_HEIGHT + 20 + this.SCORE_AREA_HEIGHT;
-      this.gameContainer.addChild(this.button);
+      if (this.gameSettings.spinButton) {
+        const btn = new SpinButton(gameCode, () => {
+          this.spin(() => {
+            if (btn) btn.reset();
+            this.onSpinEnd();
+          });
+        });
+        const layoutBtn = () => {
+          btn.x = (REEL_LAYOUT_WIDTH - btn.width) / 2;
+          btn.y = REEL_LAYOUT_HEIGHT + 20 + this.SCORE_AREA_HEIGHT;
+        };
+        btn.on('loaded', layoutBtn);
+        if (btn.width > 0) layoutBtn();
+        this.button = btn;
+        this.gameContainer.addChild(btn);
+      } else {
+        this.button = new PIXI.Container();
+        const btnBgWidth = 160;
+        const btnBgHeight = 60;
+        const buttonBg = new PIXI.Graphics();
+        buttonBg.beginFill(0xffe066);
+        buttonBg.lineStyle(2, 0xffffff);
+        buttonBg.drawRoundedRect(0, 0, btnBgWidth, btnBgHeight, 10);
+        buttonBg.endFill();
+        const buttonText = new PIXI.Text('SPIN', {
+          fill: 0x000000,
+          fontSize: 36,
+          fontWeight: 'bold'
+        });
+        buttonText.anchor.set(0.5);
+        buttonText.position.set(btnBgWidth / 2, btnBgHeight / 2);
+        this.button.addChild(buttonBg);
+        this.button.addChild(buttonText);
+        this.button.interactive = true;
+        this.button.buttonMode = true;
+        this.button.x = (REEL_LAYOUT_WIDTH - btnBgWidth) / 2;
+        this.button.y = REEL_LAYOUT_HEIGHT + 20 + this.SCORE_AREA_HEIGHT;
+        this.gameContainer.addChild(this.button);
+        this.button.on('pointerdown', () => {
+          this.spin(() => {
+            this.onSpinEnd();
+          });
+        });
+      }
 
       this.lineContainer = new PIXI.Container();
       this.lineContainer.x = this.reelContainer.x;
       this.lineContainer.y = this.reelContainer.y;
       this.lineContainer.scale.set(this.REEL_SCALE);
       this.gameContainer.addChild(this.lineContainer);
-
-      this.button.on('pointerdown', () => {
-        this.spin(() => {
-          this.onSpinEnd();
-        });
-      });
     };
 
     if (this.gameSettings.singleBackground) {
