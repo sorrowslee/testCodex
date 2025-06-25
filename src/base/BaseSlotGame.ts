@@ -67,6 +67,10 @@ export abstract class BaseSlotGame {
   protected WIN_TIME = 3000;
   protected START_DELAY = 300;
   protected START_OFFSET_Y = -30;
+  protected START_ANIM_DURATION = 200;
+  protected END_BOUNCE_OFFSET = 30;
+  protected END_ANIM_DURATION = 200;
+  protected END_SINK_DURATION = 100;
   protected SPIN_DIRECTION: 'down' | 'up' = 'down';
 
   // border configuration
@@ -556,6 +560,32 @@ export abstract class BaseSlotGame {
     });
   }
 
+  protected animateReelOffset(
+    reel: PIXI.Container,
+    offset: number,
+    duration: number,
+    onDone: () => void
+  ) {
+    const startPos = reel.children.map((c: any) => c.y);
+    const ticker = new PIXI.Ticker();
+    const start = Date.now();
+    this.registerTicker(ticker);
+    ticker.add(() => {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      reel.children.forEach((c: any, i: number) => {
+        c.y = startPos[i] + offset * progress;
+      });
+      if (progress === 1) {
+        ticker.stop();
+        ticker.destroy();
+        this.unregisterTicker(ticker);
+        onDone();
+      }
+    });
+    ticker.start();
+  }
+
   protected spinning = false;
 
   protected spin(onComplete: () => void) {
@@ -570,17 +600,16 @@ export abstract class BaseSlotGame {
         const blur = new PIXI.filters.BlurFilter();
         blur.blur = this.BLUR_AMOUNT;
         reel.filters = [blur];
-        for (let i = 0; i < reel.children.length; i += this.childPerCell) {
-          const sym = reel.children[i] as any;
-          const border = this.hasBorder ? (reel.children[i + 1] as any) : null;
-          sym.y += this.START_OFFSET_Y;
-          if (border) border.y += this.START_OFFSET_Y;
-        }
-        const start = Date.now();
-        const ticker = new PIXI.Ticker();
-        this.registerTicker(ticker);
-        ticker.add(() => {
-          const elapsed = Date.now() - start;
+        this.animateReelOffset(
+          reel,
+          this.START_OFFSET_Y,
+          this.START_ANIM_DURATION,
+          () => {
+            const start = Date.now();
+            const ticker = new PIXI.Ticker();
+            this.registerTicker(ticker);
+            ticker.add(() => {
+              const elapsed = Date.now() - start;
           for (let i = 0; i < reel.children.length; i += this.childPerCell) {
             const sym = reel.children[i] as any;
             const border = this.hasBorder ? (reel.children[i + 1] as any) : null;
@@ -622,22 +651,40 @@ export abstract class BaseSlotGame {
             }
           }
           if (elapsed > spinTimes[idx]) {
-            this.alignReel(reel);
-            reel.filters = [];
+            ticker.stop();
             ticker.destroy();
             this.unregisterTicker(ticker);
-            if (idx === this.cols - 1) {
-              const wins = this.findLines();
-              if (wins.length > 0) {
-                this.showWin(wins, () => {
+            this.alignReel(reel);
+
+            const finish = () => {
+              reel.filters = [];
+              if (idx === this.cols - 1) {
+                const wins = this.findLines();
+                if (wins.length > 0) {
+                  this.showWin(wins, () => {
+                    this.spinning = false;
+                    onComplete();
+                  });
+                } else {
                   this.spinning = false;
                   onComplete();
-                });
-              } else {
-                this.spinning = false;
-                onComplete();
+                }
               }
-            }
+            };
+
+            this.animateReelOffset(
+              reel,
+              this.END_BOUNCE_OFFSET,
+              this.END_SINK_DURATION,
+              () => {
+                this.animateReelOffset(
+                  reel,
+                  -this.END_BOUNCE_OFFSET,
+                  this.END_ANIM_DURATION,
+                  finish
+                );
+              }
+            );
           }
         });
         ticker.start();
