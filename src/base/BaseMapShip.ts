@@ -7,6 +7,8 @@ export class BaseMapShip {
   private battles: PIXI.Sprite[] = [];
   private routes: { x: number; y: number }[] = [];
   private current = 0;
+  private moveTime = 1000;
+  private onReachedEnd?: () => void;
 
   constructor(private app: PIXI.Application, private gameCode: string) {
     this.container = new PIXI.Container();
@@ -59,11 +61,54 @@ export class BaseMapShip {
     return this.container.width;
   }
 
-  public moveToNext(): void {
-    if (this.current + 1 >= this.routes.length) return;
+  public setMoveTime(ms: number): void {
+    this.moveTime = ms;
+  }
+
+  public setOnReachedEnd(cb: () => void): void {
+    this.onReachedEnd = cb;
+  }
+
+  public reset(): void {
+    this.current = 0;
+    this.flag.x = this.routes[0].x;
+    this.flag.y = this.routes[0].y;
+  }
+
+  public moveToNext(onDone?: () => void): void {
+    if (this.current + 1 >= this.routes.length) {
+      if (onDone) onDone();
+      return;
+    }
     this.current++;
-    this.flag.x = this.routes[this.current].x;
-    this.flag.y = this.routes[this.current].y;
+    const startX = this.flag.x;
+    const startY = this.flag.y;
+    const endPos = this.routes[this.current];
+    const start = Date.now();
+    const ticker = new PIXI.Ticker();
+    ticker.add(() => {
+      const elapsed = Date.now() - start;
+      const t = Math.min(elapsed / this.moveTime, 1);
+      this.flag.x = startX + (endPos.x - startX) * t;
+      this.flag.y = startY + (endPos.y - startY) * t;
+      if (t === 1) {
+        ticker.stop();
+        ticker.destroy();
+        if (this.current === this.routes.length - 1 && this.onReachedEnd) {
+          this.onReachedEnd();
+        }
+        if (onDone) onDone();
+      }
+    });
+    ticker.start();
+  }
+
+  public moveBy(steps: number, onDone?: () => void): void {
+    if (steps <= 0) {
+      if (onDone) onDone();
+      return;
+    }
+    this.moveToNext(() => this.moveBy(steps - 1, onDone));
   }
 
   public destroy(): void {
