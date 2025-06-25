@@ -130,7 +130,7 @@ export class BjxbSlotGame extends BaseSlotGame {
         this.endHotSpin();
       }
     } else {
-      if (this.score >= this.nextHotSpinScore) {
+      if (!this.gameSettings.mapShip && this.score >= this.nextHotSpinScore) {
         this.startHotSpin();
       }
     }
