@@ -65,6 +65,9 @@ export abstract class BaseSlotGame {
   protected SPIN_SPEED = 300;
   protected BLUR_AMOUNT = 30;
   protected WIN_TIME = 3000;
+  protected START_DELAY = 100;
+  protected START_OFFSET_Y = -30;
+  protected SPIN_DIRECTION: 'down' | 'up' = 'down';
 
   // border configuration
   protected hasBorder = false;
@@ -559,58 +562,87 @@ export abstract class BaseSlotGame {
     if (this.spinning) return;
     this.spinning = true;
     const spinTimes: number[] = [];
-    const blurFilter = new PIXI.filters.BlurFilter();
-    blurFilter.blur = this.BLUR_AMOUNT;
     for (let i = 0; i < this.cols; i++) {
       spinTimes.push(this.BASE_SPIN + i * this.SPIN_INCREMENT);
     }
     this.reels.forEach((reel, idx) => {
-      const start = Date.now();
-      reel.filters = [blurFilter];
-      const ticker = new PIXI.Ticker();
-      this.registerTicker(ticker);
-      ticker.add(() => {
-        const elapsed = Date.now() - start;
+      const timeoutId = window.setTimeout(() => {
+        const blur = new PIXI.filters.BlurFilter();
+        blur.blur = this.BLUR_AMOUNT;
+        reel.filters = [blur];
         for (let i = 0; i < reel.children.length; i += this.childPerCell) {
           const sym = reel.children[i] as any;
           const border = this.hasBorder ? (reel.children[i + 1] as any) : null;
-          sym.y += this.SPIN_SPEED * ticker.deltaTime;
-          if (border) border.y = sym.y;
-          const totalHeight =
-            this.rows * (this.reelHeight + this.rowSpacing) - this.rowSpacing;
-          if (sym.y >= totalHeight + this.reelHeight / 2) {
-            sym.y -= totalHeight;
-            if (border) border.y = sym.y;
-            const symIndex = Math.floor(
-              Math.random() * this.currentSymbols.length
-            );
-            const symbolName = this.currentSymbols[symIndex];
-            sym.texture = PIXI.Texture.from(
-              this.assets.symbol(Number(symbolName))
-            );
-            sym.name = symbolName;
-          }
+          sym.y += this.START_OFFSET_Y;
+          if (border) border.y += this.START_OFFSET_Y;
         }
-        if (elapsed > spinTimes[idx]) {
-          this.alignReel(reel);
-          reel.filters = [];
-          ticker.destroy();
-          this.unregisterTicker(ticker);
-          if (idx === this.cols - 1) {
-            const wins = this.findLines();
-            if (wins.length > 0) {
-              this.showWin(wins, () => {
-                this.spinning = false;
-                onComplete();
-              });
+        const start = Date.now();
+        const ticker = new PIXI.Ticker();
+        this.registerTicker(ticker);
+        ticker.add(() => {
+          const elapsed = Date.now() - start;
+          for (let i = 0; i < reel.children.length; i += this.childPerCell) {
+            const sym = reel.children[i] as any;
+            const border = this.hasBorder ? (reel.children[i + 1] as any) : null;
+            const delta = this.SPIN_SPEED * ticker.deltaTime;
+            if (this.SPIN_DIRECTION === 'down') {
+              sym.y += delta;
             } else {
-              this.spinning = false;
-              onComplete();
+              sym.y -= delta;
+            }
+            if (border) border.y = sym.y;
+            const totalHeight =
+              this.rows * (this.reelHeight + this.rowSpacing) - this.rowSpacing;
+            if (this.SPIN_DIRECTION === 'down') {
+              if (sym.y >= totalHeight + this.reelHeight / 2) {
+                sym.y -= totalHeight;
+                if (border) border.y = sym.y;
+                const symIndex = Math.floor(
+                  Math.random() * this.currentSymbols.length
+                );
+                const symbolName = this.currentSymbols[symIndex];
+                sym.texture = PIXI.Texture.from(
+                  this.assets.symbol(Number(symbolName))
+                );
+                sym.name = symbolName;
+              }
+            } else {
+              if (sym.y <= -this.reelHeight / 2) {
+                sym.y += totalHeight;
+                if (border) border.y = sym.y;
+                const symIndex = Math.floor(
+                  Math.random() * this.currentSymbols.length
+                );
+                const symbolName = this.currentSymbols[symIndex];
+                sym.texture = PIXI.Texture.from(
+                  this.assets.symbol(Number(symbolName))
+                );
+                sym.name = symbolName;
+              }
             }
           }
-        }
-      });
-      ticker.start();
+          if (elapsed > spinTimes[idx]) {
+            this.alignReel(reel);
+            reel.filters = [];
+            ticker.destroy();
+            this.unregisterTicker(ticker);
+            if (idx === this.cols - 1) {
+              const wins = this.findLines();
+              if (wins.length > 0) {
+                this.showWin(wins, () => {
+                  this.spinning = false;
+                  onComplete();
+                });
+              } else {
+                this.spinning = false;
+                onComplete();
+              }
+            }
+          }
+        });
+        ticker.start();
+      }, idx * this.START_DELAY);
+      this.registerTimeout(timeoutId);
     });
   }
 
