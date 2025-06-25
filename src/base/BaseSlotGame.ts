@@ -27,6 +27,7 @@ export abstract class BaseSlotGame {
   protected scoreText!: PIXI.Text;
   protected button!: PIXI.Container;
   protected mapShip?: BaseMapShip;
+  protected mapShipEndTriggered = false;
 
   private activeTickers: PIXI.Ticker[] = [];
   private activeTimeouts: number[] = [];
@@ -108,6 +109,8 @@ export abstract class BaseSlotGame {
               midBg.x + (midBg.width - this.mapShip!.width) / 2;
             this.mapShip!.setPosition(midBg.x, midBg.y - this.mapShip!.height);
           }
+          this.mapShip!.setMoveTime(1000);
+          this.mapShip!.setOnReachedEnd(() => this.onMapShipEnd());
         });
       }
 
@@ -310,6 +313,10 @@ export abstract class BaseSlotGame {
     // subclasses can override
   }
 
+  protected onMapShipEnd(): void {
+    this.mapShipEndTriggered = true;
+  }
+
   protected populateReels(symbolSet: string[]): void {
     for (let c = 0; c < this.cols; c++) {
       for (let r = 0; r < this.rows; r++) {
@@ -449,6 +456,9 @@ export abstract class BaseSlotGame {
   }
 
   protected showWin(lines: any[], onDone: () => void) {
+    if (this.mapShip) {
+      this.mapShip.moveBy(lines.length);
+    }
     const hitSprites: any[] = [];
     const uniqueCells = new Set<string>();
     lines.forEach(l => {
