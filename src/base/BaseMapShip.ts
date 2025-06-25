@@ -34,7 +34,7 @@ export class BaseMapShip {
     }
 
     this.winner = PIXI.Sprite.from(`${base}winner.png`);
-    this.winner.anchor.set(0, 0.1);
+    this.winner.anchor.set(0, 0.5);
     this.winner.x = this.routes[this.routes.length - 1].x;
     this.winner.y = this.routes[this.routes.length - 1].y;
     this.container.addChild(this.winner);

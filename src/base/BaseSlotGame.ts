@@ -109,7 +109,7 @@ export abstract class BaseSlotGame {
               midBg.x + (midBg.width - this.mapShip!.width) / 2;
             this.mapShip!.setPosition(midBg.x, midBg.y - this.mapShip!.height);
           }
-          this.mapShip!.setMoveTime(1000);
+          this.mapShip!.setMoveTime(300);
           this.mapShip!.setOnReachedEnd(() => this.onMapShipEnd());
         });
       }
