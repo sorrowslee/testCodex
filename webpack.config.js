@@ -9,6 +9,14 @@ module.exports = {
         test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: /node_modules/
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        type: 'asset/resource' // ✅ Webpack 5 內建，處理 binary 圖片檔案
+      },
+      {
+        test: /\.json$/,
+        type: 'javascript/auto' // ✅ 確保 .json 不被當成 ES 模組解析
       }
     ]
   },
