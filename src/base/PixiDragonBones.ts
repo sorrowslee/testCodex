@@ -71,7 +71,7 @@ export class PixiDragonBones extends PIXI.Container {
                 const frameNames = (slot.display || []).map((d: any) => d.path || d.name);
                 const frames = frameNames
                   .map((fn: string) => textures[fn])
-                  .filter((t): t is PIXI.Texture => !!t);
+                  .filter((t:any): t is PIXI.Texture => !!t);
                 if (frames.length === 0) return;
                 let sprite: PIXI.Sprite | PIXI.AnimatedSprite;
                 if (frames.length === 1) {
