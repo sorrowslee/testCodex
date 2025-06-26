@@ -34,15 +34,19 @@ export class PixiDragonBones extends PIXI.Container {
         .add('texPng', texPngPath)
         .load((l, r) => {
           try {
-            const factory = dragonBones.PixiFactory.factory;
-            factory.parseDragonBonesData(r.ske.data);
-            factory.parseTextureAtlasData(r.texJson.data, r.texPng.texture);
-            this.armatureDisplay = factory.buildArmatureDisplay(this.armatureName);
-            if (this.armatureDisplay) {
-              this.addChild(this.armatureDisplay);
-            } else {
-              // eslint-disable-next-line no-console
-              console.warn(`Armature ${this.armatureName} not found in ${this.resName}`);
+
+            if(r != undefined && r.ske != undefined && r.texJson != undefined && r.texPng != undefined) {
+      
+              const factory = dragonBones.PixiFactory.factory;
+              factory.parseDragonBonesData(r.ske.data);
+              factory.parseTextureAtlasData(r.texJson.data, r.texPng.texture);
+              this.armatureDisplay = factory.buildArmatureDisplay(this.armatureName);
+              if (this.armatureDisplay) {
+                this.addChild(this.armatureDisplay);
+              } else {
+                // eslint-disable-next-line no-console
+                console.warn(`Armature ${this.armatureName} not found in ${this.resName}`);
+              }
             }
           } catch (e) {
             // eslint-disable-next-line no-console
