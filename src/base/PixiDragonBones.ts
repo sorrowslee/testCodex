@@ -1,16 +1,15 @@
 import * as PIXI from 'pixi.js';
 
-// Minimal typings for dragonBones global provided by pixi5-dragonbones
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const dragonBones: any;
-
 /**
  * PixiDragonBones
- * A lightweight DragonBones wrapper for Pixi.js 5.x
+ * Lightweight DragonBones replacement built on basic Pixi classes.
+ * This class parses DragonBones JSON files and builds sprites/animations
+ * using only Pixi.Sprite and Pixi.AnimatedSprite.
  */
 export class PixiDragonBones extends PIXI.Container {
-  private armatureDisplay?: any;
   private loadPromise: Promise<void>;
+  private slotSprites: Record<string, PIXI.Sprite | PIXI.AnimatedSprite> = {};
+
   constructor(
     private gameCode: string,
     private resName: string,
@@ -40,24 +39,54 @@ export class PixiDragonBones extends PIXI.Container {
               r.texJson !== undefined &&
               r.texPng !== undefined
             ) {
-              if (typeof (globalThis as any).dragonBones !== 'undefined') {
-                const factory = (globalThis as any).dragonBones.PixiFactory.factory;
-                factory.parseDragonBonesData(r.ske.data);
-                factory.parseTextureAtlasData(r.texJson.data, r.texPng.texture);
-                this.armatureDisplay = factory.buildArmatureDisplay(this.armatureName);
-                if (this.armatureDisplay) {
-                  this.addChild(this.armatureDisplay);
-                } else {
-                  // eslint-disable-next-line no-console
-                  console.warn(`Armature ${this.armatureName} not found in ${this.resName}`);
-                }
-              } else {
-                // Fallback: display texture as a simple sprite when dragonBones is missing
+              // build texture dictionary from texJson
+              const textures: Record<string, PIXI.Texture> = {};
+              const baseTex = r.texPng.texture.baseTexture;
+              const subTextures = r.texJson.data.SubTexture as Array<{
+                name: string;
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+              }>;
+              subTextures.forEach(st => {
+                const rect = new PIXI.Rectangle(st.x, st.y, st.width, st.height);
+                textures[st.name] = new PIXI.Texture(baseTex, rect);
+              });
+
+              // select armature
+              const armatures = r.ske.data.armature || [];
+              const armature =
+                armatures.find((a: any) => a.name === this.armatureName) ||
+                armatures[0];
+              if (!armature || !armature.skin || !armature.skin[0]) {
                 // eslint-disable-next-line no-console
-                console.warn('dragonBones library missing, using static sprite');
-                this.armatureDisplay = new PIXI.Sprite(r.texPng.texture);
-                this.addChild(this.armatureDisplay);
+                console.warn('Invalid dragonBones data for', this.armatureName);
+                resolve();
+                return;
               }
+
+              const slots = armature.skin[0].slot || [];
+              slots.forEach((slot: any) => {
+                const frameNames = (slot.display || []).map((d: any) => d.path || d.name);
+                const frames = frameNames
+                  .map((fn: string) => textures[fn])
+                  .filter((t): t is PIXI.Texture => !!t);
+                if (frames.length === 0) return;
+                let sprite: PIXI.Sprite | PIXI.AnimatedSprite;
+                if (frames.length === 1) {
+                  sprite = new PIXI.Sprite(frames[0]);
+                } else {
+                  const anim = new PIXI.AnimatedSprite(frames);
+                  anim.animationSpeed = 1 / frames.length;
+                  anim.loop = true;
+                  anim.play();
+                  sprite = anim;
+                }
+                sprite.anchor.set(0.5);
+                this.slotSprites[slot.name] = sprite;
+                this.addChild(sprite);
+              });
             }
           } catch (e) {
             // eslint-disable-next-line no-console
@@ -68,29 +97,28 @@ export class PixiDragonBones extends PIXI.Container {
     });
   }
 
-  public async play(animName?: string, loop = true): Promise<void> {
+  public async play(_animName?: string, loop = true): Promise<void> {
     await this.loadPromise;
-    if (!this.armatureDisplay || !this.armatureDisplay.animation) return;
-    const name = animName || this.armatureDisplay.animation.lastAnimationName;
-    const playTimes = loop ? 0 : 1;
-    this.armatureDisplay.animation.play(name, playTimes);
+    Object.values(this.slotSprites).forEach(s => {
+      if (s instanceof PIXI.AnimatedSprite) {
+        s.loop = loop;
+        s.gotoAndPlay(0);
+      }
+    });
   }
 
   public async stop(): Promise<void> {
     await this.loadPromise;
-    if (this.armatureDisplay && this.armatureDisplay.animation) {
-      this.armatureDisplay.animation.stop();
-    }
+    Object.values(this.slotSprites).forEach(s => {
+      if (s instanceof PIXI.AnimatedSprite) {
+        s.stop();
+      }
+    });
   }
 
   public release(): void {
-    if (this.armatureDisplay) {
-      if (this.armatureDisplay.animation) {
-        this.armatureDisplay.animation.stop();
-      }
-      this.armatureDisplay.destroy({ children: true, texture: false });
-      this.armatureDisplay = undefined;
-    }
+    Object.values(this.slotSprites).forEach(s => s.destroy());
+    this.slotSprites = {};
     this.removeChildren();
   }
 }
