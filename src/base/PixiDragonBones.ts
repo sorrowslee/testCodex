@@ -34,18 +34,29 @@ export class PixiDragonBones extends PIXI.Container {
         .add('texPng', texPngPath)
         .load((l, r) => {
           try {
-
-            if(r != undefined && r.ske != undefined && r.texJson != undefined && r.texPng != undefined) {
-      
-              const factory = dragonBones.PixiFactory.factory;
-              factory.parseDragonBonesData(r.ske.data);
-              factory.parseTextureAtlasData(r.texJson.data, r.texPng.texture);
-              this.armatureDisplay = factory.buildArmatureDisplay(this.armatureName);
-              if (this.armatureDisplay) {
-                this.addChild(this.armatureDisplay);
+            if (
+              r !== undefined &&
+              r.ske !== undefined &&
+              r.texJson !== undefined &&
+              r.texPng !== undefined
+            ) {
+              if (typeof (globalThis as any).dragonBones !== 'undefined') {
+                const factory = (globalThis as any).dragonBones.PixiFactory.factory;
+                factory.parseDragonBonesData(r.ske.data);
+                factory.parseTextureAtlasData(r.texJson.data, r.texPng.texture);
+                this.armatureDisplay = factory.buildArmatureDisplay(this.armatureName);
+                if (this.armatureDisplay) {
+                  this.addChild(this.armatureDisplay);
+                } else {
+                  // eslint-disable-next-line no-console
+                  console.warn(`Armature ${this.armatureName} not found in ${this.resName}`);
+                }
               } else {
+                // Fallback: display texture as a simple sprite when dragonBones is missing
                 // eslint-disable-next-line no-console
-                console.warn(`Armature ${this.armatureName} not found in ${this.resName}`);
+                console.warn('dragonBones library missing, using static sprite');
+                this.armatureDisplay = new PIXI.Sprite(r.texPng.texture);
+                this.addChild(this.armatureDisplay);
               }
             }
           } catch (e) {
