@@ -4,19 +4,22 @@ import { FfpSlotGame } from './games/ffp/FfpSlotGame';
 import { AlpszmSlotGame } from './games/alpszm/AlpszmSlotGame';
 import { Lobby } from './Lobby';
 import { AssetPaths } from './setting';
+import { ResourceManager } from './base/ResourceManager';
 
 class SceneManager {
   private current: { destroy(): void; appInstance: PIXI.Application } | null = null;
 
   public showLobby(): void {
     this.cleanup();
-    const lobby = new Lobby(id => this.startGame(id));
+    const lobby = new Lobby(id => { void this.startGame(id); });
     this.current = lobby;
     lobby.start('game');
   }
 
-  private startGame(id: string): void {
+  private async startGame(id: string): Promise<void> {
     this.cleanup();
+    await ResourceManager.preloadDragonBones(id);
+
     if (id === 'bjxb') {
       const game = new BjxbSlotGame();
       this.current = game;
