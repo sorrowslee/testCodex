@@ -34,4 +34,19 @@ export class ResourceManager {
       });
     });
   }
+
+  public static getDragonBonesPaths(
+    gameCode: string,
+    resName: string
+  ): { ske: string; texJson: string; texPng: string } {
+    const base = `./${gameCode}/dragonBones/`;
+    const skeKey = `${base}${resName}_ske.json`;
+    const texJsonKey = `${base}${resName}_tex.json`;
+    const texPngKey = `${base}${resName}_tex.png`;
+    return {
+      ske: dragonBonesContext(skeKey),
+      texJson: dragonBonesContext(texJsonKey),
+      texPng: dragonBonesContext(texPngKey)
+    } as const;
+  }
 }
