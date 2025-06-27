@@ -32,8 +32,8 @@ export class SpinButton extends PIXI.Container {
     this.upArmature = new PixiDragonBones(gameCode, resName, armatureName);
     this.overlayArmature = new PixiDragonBones(gameCode, resName, armatureName);
     this.overlayArmature.visible = false;
-    this.addChild(this.upArmature);
     this.addChild(this.overlayArmature);
+    this.addChild(this.upArmature);
     this.addChild(this.spinIcon);
     this.addChild(this.stopIcon);
 
@@ -52,7 +52,11 @@ export class SpinButton extends PIXI.Container {
     this.overlayArmature.visible = true;
     this.upArmature.visible = false;
     await this.overlayArmature.play('Overlay', false);
-    this.upArmature.visible = true;
+
+    setTimeout(() => {
+      this.upArmature.visible = true;
+    }, 500); // Adjust timeout as needed
+    
     if (this.onPressed) this.onPressed();
   }
 
