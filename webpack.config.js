@@ -16,7 +16,7 @@ module.exports = {
       },
       {
         test: /\.json$/,
-        type: 'json' // ✅ 使用內建 JSON 解析，避免解析錯誤
+        type: 'asset/resource' // Export JSON files as separate assets for runtime loading
       }
     ]
   },
