@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+// Expose PIXI globally for pixi5-dragonbones which expects a global PIXI.
+(window as any).PIXI = PIXI;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dragonBones = require('pixi5-dragonbones');
 

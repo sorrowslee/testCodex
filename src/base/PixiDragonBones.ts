@@ -1,9 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { ResourceManager } from './ResourceManager';
+// Some versions of pixi5-dragonbones expect PIXI on window. Assign before require.
+(window as any).PIXI = PIXI;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dragonBones = require('pixi5-dragonbones');
-// Some versions of pixi5-dragonbones expect PIXI on window
-(window as any).PIXI = PIXI;
 
 /**
  * PixiDragonBones
