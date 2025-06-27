@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const dragonBones = require('pixi5-dragonbones');
 
 // webpack require context for all dragonBones assets
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -28,7 +30,39 @@ export class ResourceManager {
     });
 
     return new Promise(resolve => {
-      loader.load(() => {
+      loader.load((l, res) => {
+        const factory = dragonBones.PixiFactory.factory;
+        const groups: Record<string, { ske?: any; texJson?: any; texPng?: PIXI.Texture }> = {};
+
+        resources.forEach(key => {
+          const r = res[key];
+          const match = key.match(/dragonBones\/(.+?)_(ske|tex)\.(json|png)$/);
+          if (!match || !r) return;
+          const name = match[1];
+          const type = match[2];
+          groups[name] = groups[name] || {};
+
+          if (type === 'tex' && key.endsWith('.json')) {
+            groups[name].texJson = r.data;
+          } else if (type === 'tex' && key.endsWith('.png')) {
+            groups[name].texPng = r.texture;
+          } else if (type === 'ske') {
+            groups[name].ske = r.data;
+          }
+        });
+
+        Object.entries(groups).forEach(([name, g]) => {
+          if (g.texJson && g.texPng) {
+            factory.parseTextureAtlasData(g.texJson, g.texPng.baseTexture ?? g.texPng, name);
+          }
+        });
+
+        Object.entries(groups).forEach(([name, g]) => {
+          if (g.ske) {
+            factory.parseDragonBonesData(g.ske, name);
+          }
+        });
+
         this.loadedGames[gameCode] = true;
         resolve();
       });
