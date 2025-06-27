@@ -212,7 +212,7 @@ export abstract class BaseSlotGame {
       }
 
       if (this.gameSettings.spinButton && bottomBg) {
-        const btn = new SpinButton(gameCode, () => {
+        const btn = new SpinButton(gameCode, `${gameCode}_a`, 'Anim_Btn_Spin', () => {
           this.spin(() => {
             if (btn) btn.reset();
             this.onSpinEnd();
