@@ -5,7 +5,6 @@ import { ResourceManager } from './ResourceManager';
 const dragonBones = require('pixi5-dragonbones');
 
 export class SpinButton extends PIXI.Container {
-  private base: PIXI.Sprite;
   private spinIcon: PIXI.Sprite;
   private stopIcon: PIXI.Sprite;
   private armature: PixiDragonBones;
@@ -19,22 +18,20 @@ export class SpinButton extends PIXI.Container {
   ) {
     super();
 
-    this.base = new PIXI.Sprite();
     this.spinIcon = new PIXI.Sprite();
     this.stopIcon = new PIXI.Sprite();
-    [this.base, this.spinIcon, this.stopIcon].forEach(s => {
+    [this.spinIcon, this.stopIcon].forEach(s => {
       s.anchor.set(0.5);
       s.scale.set(1.1);
     });
     this.stopIcon.visible = false;
-    this.addChild(this.base);
-    this.addChild(this.spinIcon);
-    this.addChild(this.stopIcon);
 
     this.loadTextures(gameCode, resName);
 
     this.armature = new PixiDragonBones(gameCode, resName, armatureName);
     this.addChild(this.armature);
+    this.addChild(this.spinIcon);
+    this.addChild(this.stopIcon);
 
     this.interactive = true;
     this.buttonMode = true;
@@ -65,7 +62,6 @@ export class SpinButton extends PIXI.Container {
     const factory = dragonBones.PixiFactory.factory;
     const getSprite = (name: string): PIXI.Sprite =>
       factory.getTextureDisplay(name, resName) as PIXI.Sprite;
-    this.base.texture = getSprite('Btn_Spin/Get').texture;
     this.spinIcon.texture = getSprite('Btn_Spin/Spin').texture;
     this.stopIcon.texture = getSprite('Btn_Spin/Stop').texture;
   }
