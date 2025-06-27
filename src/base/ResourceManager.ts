@@ -24,7 +24,7 @@ export class ResourceManager {
     const loader = new PIXI.Loader();
     resources.forEach((key: string) => {
       const url = dragonBonesContext(key);
-      loader.add(url, url);
+      loader.add(key, url);
     });
 
     return new Promise(resolve => {
