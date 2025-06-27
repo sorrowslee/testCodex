@@ -1,5 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { PixiDragonBones } from './PixiDragonBones';
+import { ResourceManager } from './ResourceManager';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const dragonBones = require('pixi5-dragonbones');
 
 export class SpinButton extends PIXI.Container {
   private base: PIXI.Sprite;
@@ -16,10 +19,9 @@ export class SpinButton extends PIXI.Container {
   ) {
     super();
 
-    const prefix = `assets/${gameCode}/spinButton/`;
-    this.base = PIXI.Sprite.from(`${prefix}Btn_Spin_Get.png`);
-    this.spinIcon = PIXI.Sprite.from(`${prefix}Btn_Spin_Spin.png`);
-    this.stopIcon = PIXI.Sprite.from(`${prefix}Btn_Spin_Stop.png`);
+    this.base = new PIXI.Sprite();
+    this.spinIcon = new PIXI.Sprite();
+    this.stopIcon = new PIXI.Sprite();
     [this.base, this.spinIcon, this.stopIcon].forEach(s => {
       s.anchor.set(0.5);
       s.scale.set(1.1);
@@ -28,6 +30,8 @@ export class SpinButton extends PIXI.Container {
     this.addChild(this.base);
     this.addChild(this.spinIcon);
     this.addChild(this.stopIcon);
+
+    this.loadTextures(gameCode, resName);
 
     this.armature = new PixiDragonBones(gameCode, resName, armatureName);
     this.addChild(this.armature);
@@ -54,5 +58,15 @@ export class SpinButton extends PIXI.Container {
     this.spinIcon.visible = true;
     this.stopIcon.visible = false;
     this.armature.play('Up');
+  }
+
+  private async loadTextures(gameCode: string, resName: string): Promise<void> {
+    await ResourceManager.preloadDragonBones(gameCode);
+    const factory = dragonBones.PixiFactory.factory;
+    const getSprite = (name: string): PIXI.Sprite =>
+      factory.getTextureDisplay(name, resName) as PIXI.Sprite;
+    this.base.texture = getSprite('Btn_Spin/Get').texture;
+    this.spinIcon.texture = getSprite('Btn_Spin/Spin').texture;
+    this.stopIcon.texture = getSprite('Btn_Spin/Stop').texture;
   }
 }

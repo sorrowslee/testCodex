@@ -67,7 +67,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
 
     const autoBtn = new PixiDragonBonesButton(
       'alpszm',
-      'assets/alpszm/spinButton/Btn_Spin_Get.png',
+      'Btn_Spin/Get',
       'alpszm_a',
       'Anim_Btn_Auto'
     );
