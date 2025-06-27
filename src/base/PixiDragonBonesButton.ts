@@ -21,23 +21,26 @@ export class PixiDragonBonesButton extends PIXI.Container {
     this.addChild(this.effect);
   }
 
+  private async setEffectPosition(x:number, y:number): Promise<void> {
+
+    if(this.effect == undefined) 
+      return;
+
+    this.effect.position.set(x, y);
+  }
+
   private async centerEffect(): Promise<void> {
-    const anyEffect = this.effect as any;
-    if (anyEffect.buildPromise) {
-      await anyEffect.buildPromise;
-    }
-    const display = anyEffect.armatureDisplay as PIXI.DisplayObject | undefined;
-    if (display) {
-      const bounds = display.getLocalBounds();
-      display.pivot.set(bounds.width / 2, bounds.height / 2);
-      display.position.set(0, 0);
-    }
-    this.effect.position.set(0, 0);
+
+    if(this.effect == undefined ||
+        this.base == undefined) 
+      return;
+
+    this.effect.position.set(this.base.width / 2, this.base.height / 2);
   }
 
   public async play(): Promise<void> {
-    await this.effect.play();
     await this.centerEffect();
+    await this.effect.play();
   }
 
   public async stop(): Promise<void> {
