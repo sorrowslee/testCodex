@@ -2,6 +2,9 @@ import * as PIXI from 'pixi.js';
 import { PixiDragonBones } from './PixiDragonBones';
 
 export class SpinButton extends PIXI.Container {
+  private base: PIXI.Sprite;
+  private spinIcon: PIXI.Sprite;
+  private stopIcon: PIXI.Sprite;
   private armature: PixiDragonBones;
   private disabled = false;
 
@@ -12,6 +15,19 @@ export class SpinButton extends PIXI.Container {
     private onPressed: () => void
   ) {
     super();
+
+    const prefix = `assets/${gameCode}/spinButton/`;
+    this.base = PIXI.Sprite.from(`${prefix}Btn_Spin_Get.png`);
+    this.spinIcon = PIXI.Sprite.from(`${prefix}Btn_Spin_Spin.png`);
+    this.stopIcon = PIXI.Sprite.from(`${prefix}Btn_Spin_Stop.png`);
+    [this.base, this.spinIcon, this.stopIcon].forEach(s => {
+      s.anchor.set(0.5);
+      s.scale.set(1.1);
+    });
+    this.stopIcon.visible = false;
+    this.addChild(this.base);
+    this.addChild(this.spinIcon);
+    this.addChild(this.stopIcon);
 
     this.armature = new PixiDragonBones(gameCode, resName, armatureName);
     this.addChild(this.armature);
@@ -26,6 +42,8 @@ export class SpinButton extends PIXI.Container {
   private async handleClick(): Promise<void> {
     if (this.disabled) return;
     this.disabled = true;
+    this.spinIcon.visible = false;
+    this.stopIcon.visible = true;
     await this.armature.play('Overlay', false);
     await this.armature.play('Down', false);
     if (this.onPressed) this.onPressed();
@@ -33,6 +51,8 @@ export class SpinButton extends PIXI.Container {
 
   public reset(): void {
     this.disabled = false;
+    this.spinIcon.visible = true;
+    this.stopIcon.visible = false;
     this.armature.play('Up');
   }
 }
