@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { BaseSlotGame } from '../../base/BaseSlotGame';
-import { PixiDragonBones } from '../../base/PixiDragonBones';
+import { PixiDragonBonesButton } from '../../base/PixiDragonBonesButton';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 
 export class AlpszmSlotGame extends BaseSlotGame {
@@ -65,16 +65,17 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.hotSpinText.visible = false;
     this.gameContainer.addChild(this.hotSpinText);
 
-    const alpszm_effect_auto = new PixiDragonBones(
+    const autoBtn = new PixiDragonBonesButton(
       'alpszm',
+      'assets/alpszm/spinButton/Btn_Spin_Get.png',
       'alpszm_a',
       'Anim_Btn_Auto'
     );
-    alpszm_effect_auto.name = 'alpszm_effect_auto';
-    alpszm_effect_auto.x = 560;
-    alpszm_effect_auto.y = 840;
-    alpszm_effect_auto.play();
-    this.gameContainer.addChild(alpszm_effect_auto);
+    autoBtn.name = 'alpszm_effect_auto';
+    autoBtn.x = 560;
+    autoBtn.y = 840;
+    autoBtn.play();
+    this.gameContainer.addChild(autoBtn);
   }
 
   protected onSpinEnd(): void {
