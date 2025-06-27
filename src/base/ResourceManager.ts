@@ -36,7 +36,7 @@ export class ResourceManager {
         const factory = dragonBones.PixiFactory.factory;
         const groups: Record<string, { ske?: any; texJson?: any; texPng?: PIXI.Texture }> = {};
 
-        resources.forEach(key => {
+        resources.forEach((key: string) => {
           const r = res[key];
           const match = key.match(/dragonBones\/(.+?)_(ske|tex)\.(json|png)$/);
           if (!match || !r) return;
