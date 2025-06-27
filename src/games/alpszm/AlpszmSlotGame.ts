@@ -72,7 +72,10 @@ export class AlpszmSlotGame extends BaseSlotGame {
     );
     alpszm_effect_auto.name = 'alpszm_effect_auto';
     alpszm_effect_auto.x = 544;
-    alpszm_effect_auto.y = 1121;
+    // Align vertically with the spin button. The previous value placed the
+    // animation well below the visible area because it did not account for the
+    // game container's offset.
+    alpszm_effect_auto.y = this.button.y;
     alpszm_effect_auto.play();
     this.gameContainer.addChild(alpszm_effect_auto);
   }
