@@ -7,7 +7,8 @@ const dragonBones = require('pixi5-dragonbones');
 export class SpinButton extends PIXI.Container {
   private spinIcon: PIXI.Sprite;
   private stopIcon: PIXI.Sprite;
-  private armature: PixiDragonBones;
+  private upArmature: PixiDragonBones;
+  private overlayArmature: PixiDragonBones;
   private disabled = false;
 
   constructor(
@@ -28,8 +29,11 @@ export class SpinButton extends PIXI.Container {
 
     this.loadTextures(gameCode, resName);
 
-    this.armature = new PixiDragonBones(gameCode, resName, armatureName);
-    this.addChild(this.armature);
+    this.upArmature = new PixiDragonBones(gameCode, resName, armatureName);
+    this.overlayArmature = new PixiDragonBones(gameCode, resName, armatureName);
+    this.overlayArmature.visible = false;
+    this.addChild(this.upArmature);
+    this.addChild(this.overlayArmature);
     this.addChild(this.spinIcon);
     this.addChild(this.stopIcon);
 
@@ -37,7 +41,7 @@ export class SpinButton extends PIXI.Container {
     this.buttonMode = true;
     this.on('pointerdown', () => this.handleClick());
 
-    this.armature.play('Up').then(() => this.emit('loaded'));
+    this.upArmature.play('Up').then(() => this.emit('loaded'));
   }
 
   private async handleClick(): Promise<void> {
@@ -45,8 +49,8 @@ export class SpinButton extends PIXI.Container {
     this.disabled = true;
     this.spinIcon.visible = false;
     this.stopIcon.visible = true;
-    await this.armature.play('Overlay', false);
-    await this.armature.play('Down', false);
+    this.overlayArmature.visible = true;
+    await this.overlayArmature.play('Overlay', false);
     if (this.onPressed) this.onPressed();
   }
 
@@ -54,7 +58,9 @@ export class SpinButton extends PIXI.Container {
     this.disabled = false;
     this.spinIcon.visible = true;
     this.stopIcon.visible = false;
-    this.armature.play('Up');
+    this.overlayArmature.stop();
+    this.overlayArmature.visible = false;
+    this.upArmature.play('Up');
   }
 
   private async loadTextures(gameCode: string, resName: string): Promise<void> {
