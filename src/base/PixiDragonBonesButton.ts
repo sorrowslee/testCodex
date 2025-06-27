@@ -1,5 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { PixiDragonBones } from './PixiDragonBones';
+import { ResourceManager } from './ResourceManager';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const dragonBones = require('pixi5-dragonbones');
 
 export class PixiDragonBonesButton extends PIXI.Container {
   private base: PIXI.Sprite;
@@ -13,9 +16,11 @@ export class PixiDragonBonesButton extends PIXI.Container {
   ) {
     super();
 
-    this.base = PIXI.Sprite.from(baseTextureName);
+    this.base = new PIXI.Sprite();
     this.base.anchor.set(0.5);
     this.addChild(this.base);
+
+    this.loadBaseTexture(gameCode, resName, baseTextureName);
 
     this.effect = new PixiDragonBones(gameCode, resName, armatureName);
     this.addChild(this.effect);
@@ -53,5 +58,16 @@ export class PixiDragonBonesButton extends PIXI.Container {
 
   public hideEffect(): void {
     this.effect.visible = false;
+  }
+
+  private async loadBaseTexture(
+    gameCode: string,
+    resName: string,
+    textureName: string
+  ): Promise<void> {
+    await ResourceManager.preloadDragonBones(gameCode);
+    const factory = dragonBones.PixiFactory.factory;
+    const sprite = factory.getTextureDisplay(textureName, resName) as PIXI.Sprite;
+    this.base.texture = sprite.texture;
   }
 }
