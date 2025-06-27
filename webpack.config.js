@@ -16,7 +16,7 @@ module.exports = {
       },
       {
         test: /\.json$/,
-        type: 'javascript/auto' // ✅ 確保 .json 不被當成 ES 模組解析
+        type: 'json' // ✅ 使用內建 JSON 解析，避免解析錯誤
       }
     ]
   },
