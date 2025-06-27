@@ -50,7 +50,9 @@ export class SpinButton extends PIXI.Container {
     this.spinIcon.visible = false;
     this.stopIcon.visible = true;
     this.overlayArmature.visible = true;
+    this.upArmature.visible = false;
     await this.overlayArmature.play('Overlay', false);
+    this.upArmature.visible = true;
     if (this.onPressed) this.onPressed();
   }
 
