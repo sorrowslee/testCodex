@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { ResourceManager } from './ResourceManager';
 
 /**
  * PixiDragonBones
@@ -21,16 +22,14 @@ export class PixiDragonBones extends PIXI.Container {
 
   private loadResources(): Promise<void> {
     return new Promise(resolve => {
-      const basePath = `assets/${this.gameCode}/dragonBones/`;
-      const skePath = `${basePath}${this.resName}_ske.json`;
-      const texJsonPath = `${basePath}${this.resName}_tex.json`;
-      const texPngPath = `${basePath}${this.resName}_tex.png`;
+      const { ske, texJson, texPng } =
+        ResourceManager.getDragonBonesPaths(this.gameCode, this.resName);
 
       const loader = new PIXI.Loader();
       loader
-        .add('ske', skePath)
-        .add('texJson', texJsonPath)
-        .add('texPng', texPngPath)
+        .add('ske', ske)
+        .add('texJson', texJson)
+        .add('texPng', texPng)
         .load((l, r) => {
           try {
             if (
