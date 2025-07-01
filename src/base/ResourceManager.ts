@@ -92,37 +92,30 @@ export class ResourceManager {
     const jsonUrl = imageContext(jsonKey);
     const pngUrl = imageContext(pngKey);
 
-    return fetch(jsonUrl)
-      .then(res => res.json())
-      .then(jsonData => {
+    return new Promise<void>(resolve => {
+      const loader = new PIXI.Loader();
+      loader.add(`${gameCode}_json`, jsonUrl).add(`${gameCode}_png`, pngUrl);
+      loader.load((l, resources) => {
+        const jsonRes = resources[`${gameCode}_json`];
+        const pngRes = resources[`${gameCode}_png`];
+
+        const jsonData = jsonRes?.data ?? {};
         if (!jsonData.meta) {
           jsonData.meta = { image: jsonData.file };
         } else if (!jsonData.meta.image && jsonData.file) {
           jsonData.meta.image = jsonData.file;
         }
 
-        return new Promise<void>(resolve => {
-          const texture = PIXI.Texture.from(pngUrl);
-          const onLoad = () => {
-            const sheet = new PIXI.Spritesheet(
-              texture.baseTexture ?? texture,
-              jsonData
-            );
-            sheet.parse(() => {
-              this.loadedImages[gameCode] = true;
-              resolve();
-            });
-          };
-          if (texture.baseTexture.valid) {
-            onLoad();
-          } else {
-            texture.baseTexture.once('loaded', onLoad);
-          }
+        const texture = pngRes?.texture ?? PIXI.Texture.EMPTY;
+        const sheet = new PIXI.Spritesheet(texture.baseTexture ?? texture, jsonData);
+        sheet.parse(() => {
+          this.loadedImages[gameCode] = true;
+          resolve();
         });
-      })
-      .catch(() => {
-        this.loadedImages[gameCode] = true;
       });
+    }).catch(() => {
+      this.loadedImages[gameCode] = true;
+    });
   }
 
   public static getDragonBonesPaths(
