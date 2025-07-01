@@ -4,12 +4,10 @@ import * as PIXI from 'pixi.js';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dragonBones = require('pixi5-dragonbones');
 
-// webpack require context for all dragonBones assets
+// webpack require context for all DragonBones assets so they are included in
+// the bundle. The resources are loaded at runtime via PIXI's loader.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dragonBonesContext = (require as any).context('../../assets', true, /dragonBones\/.*\.(json|png)$/);
-// webpack require context for game image atlases
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const imageContext = (require as any).context('../../assets', true, /image\/.*\.(json|png)$/);
 
 export class ResourceManager {
   private static loadedGames: Record<string, boolean> = {};
@@ -80,17 +78,8 @@ export class ResourceManager {
       return Promise.resolve();
     }
 
-    const jsonKey = `./${gameCode}/image/${gameCode}.json`;
-    const pngKey = `./${gameCode}/image/${gameCode}.png`;
-
-    const keys = imageContext.keys();
-    if (!keys.includes(jsonKey) || !keys.includes(pngKey)) {
-      this.loadedImages[gameCode] = true;
-      return Promise.resolve();
-    }
-
-    const jsonUrl = imageContext(jsonKey);
-    const pngUrl = imageContext(pngKey);
+    const jsonUrl = `assets/${gameCode}/image/${gameCode}.json`;
+    const pngUrl = `assets/${gameCode}/image/${gameCode}.png`;
 
     return Promise.all([
       fetch(jsonUrl).then(r => r.json()),
@@ -122,18 +111,20 @@ export class ResourceManager {
       });
   }
 
+  // Deprecated helper kept for backwards compatibility. The current build
+  // copies the entire `assets` folder to `dist`, so game code can simply
+  // reference assets via relative URLs without using webpack's require context.
+  // DragonBones files can be accessed under
+  // `assets/<gameCode>/dragonBones/<name>_ske.json` and similar paths.
   public static getDragonBonesPaths(
     gameCode: string,
     resName: string
   ): { ske: string; texJson: string; texPng: string } {
-    const base = `./${gameCode}/dragonBones/`;
-    const skeKey = `${base}${resName}_ske.json`;
-    const texJsonKey = `${base}${resName}_tex.json`;
-    const texPngKey = `${base}${resName}_tex.png`;
+    const base = `assets/${gameCode}/dragonBones/`;
     return {
-      ske: dragonBonesContext(skeKey),
-      texJson: dragonBonesContext(texJsonKey),
-      texPng: dragonBonesContext(texPngKey)
+      ske: `${base}${resName}_ske.json`,
+      texJson: `${base}${resName}_tex.json`,
+      texPng: `${base}${resName}_tex.png`
     } as const;
   }
 }
