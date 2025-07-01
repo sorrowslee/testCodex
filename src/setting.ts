@@ -1,5 +1,6 @@
 export interface GameAssetConfig {
-  symbolCount: number;
+  symbolCount?: number;
+  customSymbols?: string[];
   // animation type to frame count
   animations?: Record<string, number>;
   bg: string;
@@ -10,7 +11,7 @@ export interface GameAssetConfig {
   /** Optional border image path */
   border?: string;
   lines: { joint: string; body: string };
-  symbol: (index: number) => string;
+  symbol?: (index: number) => string;
   animationFrame: (type: string, index: number) => string;
 }
 
@@ -34,9 +35,9 @@ export interface GameRuleSettings {
   /** Number of rows per reel */
   rows: number;
   /** Width of each block (symbol) in pixels */
-  blockWidth: number;
+  blockWidth?: number;
   /** Height of each block (symbol) in pixels */
-  blockHeight: number;
+  blockHeight?: number;
   /** Horizontal spacing between columns in pixels */
   colSpacing: number;
   /** Vertical spacing between rows in pixels */
@@ -59,7 +60,7 @@ export interface GameRuleSettings {
 
 function createGameConfig(
   name: string,
-  symbolCount: number,
+  symbolCount: number = 0,
   animations?: Record<string, number>,
   hasBorder: boolean = false
 ): GameAssetConfig {
@@ -94,7 +95,7 @@ function createGameConfig(
 export const AssetPaths = {
   bjxb: createGameConfig('bjxb', 10, { hunter: 51 }, true),
   ffp: createGameConfig('ffp', 6, undefined, false),
-  alpszm: createGameConfig('alpszm', 4, undefined, false),
+  alpszm: createGameConfig('alpszm', 0, undefined, false),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
@@ -140,8 +141,8 @@ export const AlpszmGameSettings: GameRuleSettings = {
   ...DefaultGameSettings,
   cols: 5,
   rows: 3,
-  blockWidth: 120,
-  blockHeight: 140,
+  blockWidth: undefined,
+  blockHeight: undefined,
   mapShip: true,
   singleBackground: false,
   colSpacing: 36,

@@ -5,19 +5,35 @@ import { SpinButton } from '../../base/SpinButton';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 
 export class AlpszmSlotGame extends BaseSlotGame {
+  private readonly customSymbols = [
+    'alpszm_A',
+    'alpszm_E',
+    'alpszm_J',
+    'alpszm_K',
+    'alpszm_N',
+    'alpszm_Q',
+    'alpszm_SA',
+    'alpszm_SB',
+    'alpszm_SC',
+    'alpszm_SD',
+    'alpszm_T',
+    'alpszm_W1',
+    'alpszm_W2'
+  ];
+
   constructor(settings: GameRuleSettings = AlpszmGameSettings) {
-    super(settings, AssetPaths.alpszm);
+    super(settings, AssetPaths.alpszm, this.customSymbols);
   }
   private hunter?: PIXI.AnimatedSprite;
   private hotSpinText!: PIXI.Text;
   private inHotSpin = false;
   private hotSpinsLeft = 0;
   private nextHotSpinScore = this.gameSettings.hotSpinThresholdMultiple;
-  // Symbols are referenced by number strings (e.g. '001')
-  private normalSymbols = Array.from({ length: AssetPaths.alpszm.symbolCount }, (_, i) =>
-    (i + 1).toString().padStart(3, '0')
+  private normalSymbols = this.customSymbols;
+  private hotSymbols = this.customSymbols.slice(
+    0,
+    this.gameSettings.hotSpinSymbolTypeCount
   );
-  private hotSymbols = this.normalSymbols.slice(0, this.gameSettings.hotSpinSymbolTypeCount);
 
   protected getBackgroundPath(): string {
     return AssetPaths.alpszm.bg;

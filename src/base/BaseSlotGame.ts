@@ -5,12 +5,13 @@ import { BaseMapShip } from './BaseMapShip';
 export abstract class BaseSlotGame {
   constructor(
     protected gameSettings: GameRuleSettings = DefaultGameSettings,
-    protected assets: GameAssetConfig = AssetPaths.bjxb
+    protected assets: GameAssetConfig = AssetPaths.bjxb,
+    protected customSymbols?: string[]
   ) {
     this.rows = gameSettings.rows;
     this.cols = gameSettings.cols;
-    this.reelWidth = gameSettings.blockWidth;
-    this.reelHeight = gameSettings.blockHeight;
+    this.reelWidth = gameSettings.blockWidth ?? 0;
+    this.reelHeight = gameSettings.blockHeight ?? 0;
     this.hasBorder = !!assets.border;
     this.childPerCell = this.hasBorder ? 2 : 1;
     this.colSpacing = gameSettings.colSpacing;
@@ -78,17 +79,29 @@ export abstract class BaseSlotGame {
 
   protected currentSymbols: string[] = [];
 
+  protected getSymbolTexture(name: string): PIXI.Texture {
+    if (this.customSymbols) {
+      return PIXI.Texture.from(name);
+    }
+    return PIXI.Texture.from(this.assets.symbol!(Number(name)));
+  }
+
   protected abstract getBackgroundPath(): string;
   protected abstract getInitialSymbols(): string[];
 
   public start(containerId: string = 'game'): void {
+    this.currentSymbols = this.getInitialSymbols();
+    if (this.reelWidth === 0 || this.reelHeight === 0) {
+      const tex = this.getSymbolTexture(this.currentSymbols[0]);
+      this.reelWidth = tex.width;
+      this.reelHeight = tex.height;
+    }
     const REEL_LAYOUT_WIDTH =
       this.cols * this.reelWidth + (this.cols - 1) * this.colSpacing;
     const REEL_LAYOUT_HEIGHT =
       this.rows * this.reelHeight + (this.rows - 1) * this.rowSpacing;
     const GAME_WIDTH = REEL_LAYOUT_WIDTH;
     const GAME_HEIGHT = REEL_LAYOUT_HEIGHT + 100 + this.SCORE_AREA_HEIGHT;
-    this.currentSymbols = this.getInitialSymbols();
 
     this.app = new PIXI.Application({
       width: this.APP_WIDTH,
@@ -188,9 +201,7 @@ export abstract class BaseSlotGame {
             Math.random() * this.currentSymbols.length
           );
           const symbolName = this.currentSymbols[symIndex];
-          const texture = PIXI.Texture.from(
-            this.assets.symbol(Number(symbolName))
-          );
+          const texture = this.getSymbolTexture(symbolName);
           const symbol = new PIXI.Sprite(texture);
           symbol.name = symbolName;
           symbol.anchor.set(0.5);
@@ -341,9 +352,7 @@ export abstract class BaseSlotGame {
         const border = this.hasBorder
           ? (this.reels[c].children[r * this.childPerCell + 1] as any)
           : null;
-        sym.texture = PIXI.Texture.from(
-          this.assets.symbol(Number(symbolSet[idx]))
-        );
+        sym.texture = this.getSymbolTexture(symbolSet[idx]);
         sym.name = symbolSet[idx];
         sym.y = r * (this.reelHeight + this.rowSpacing) + this.reelHeight / 2;
         sym.scale.set(this.blockScale);
@@ -622,9 +631,7 @@ export abstract class BaseSlotGame {
                   Math.random() * this.currentSymbols.length
                 );
                 const symbolName = this.currentSymbols[symIndex];
-                sym.texture = PIXI.Texture.from(
-                  this.assets.symbol(Number(symbolName))
-                );
+                sym.texture = this.getSymbolTexture(symbolName);
                 sym.name = symbolName;
               }
             } else {
@@ -635,9 +642,7 @@ export abstract class BaseSlotGame {
                   Math.random() * this.currentSymbols.length
                 );
                 const symbolName = this.currentSymbols[symIndex];
-                sym.texture = PIXI.Texture.from(
-                  this.assets.symbol(Number(symbolName))
-                );
+                sym.texture = this.getSymbolTexture(symbolName);
                 sym.name = symbolName;
               }
             }
