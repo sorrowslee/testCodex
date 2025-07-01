@@ -88,8 +88,6 @@ export class Lobby {
     let startY = 0;
 
     const entries = [
-      { id: 'bjxb', name: '雪山尋寶', icon: AssetPaths.lobby.bjxb },
-      { id: 'ffp', name: '水果盤', icon: AssetPaths.lobby.ffp },
       { id: 'alpszm', name: '奧林帕斯', icon: AssetPaths.lobby.alpszm }
     ];
 
