@@ -99,8 +99,6 @@ export const AssetPaths = {
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
     backBtn: 'assets/lobby/backBtn.png',
-    bjxb: 'assets/lobby/lobby_icons/bjxb.png',
-    ffp: 'assets/lobby/lobby_icons/ffp.png',
     alpszm: 'assets/lobby/lobby_icons/alpszm.png'
   }
 } as const;
@@ -122,20 +120,6 @@ export const DefaultGameSettings: GameRuleSettings = {
   singleBackground: false
 };
 
-export const BjxbGameSettings: GameRuleSettings = {
-  ...DefaultGameSettings,
-  singleBackground: true
-};
-
-export const FfpGameSettings: GameRuleSettings = {
-  ...DefaultGameSettings,
-  cols: 5,
-  rows: 5,
-  blockWidth: 128,
-  blockHeight: 90,
-  mapShip: false,
-  singleBackground: true
-};
 
 export const AlpszmGameSettings: GameRuleSettings = {
   ...DefaultGameSettings,
