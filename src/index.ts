@@ -18,6 +18,7 @@ class SceneManager {
 
   private async startGame(id: string): Promise<void> {
     this.cleanup();
+    await ResourceManager.preloadGameImages(id);
     await ResourceManager.preloadDragonBones(id);
 
     if (id === 'bjxb') {
