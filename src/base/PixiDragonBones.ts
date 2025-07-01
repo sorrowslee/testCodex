@@ -57,4 +57,30 @@ export class PixiDragonBones extends PIXI.Container {
     }
     this.removeChildren();
   }
+
+  // 龍骨動畫的播放可以用這個，真正實現了await功能，times = 1就播一次，times = 0就會無限播放，要注意使用
+  // callback是可選的，當動畫播放完成時會調用
+  static async play(
+    armature: any,
+    animName: string,
+    times: number = 1,
+    callback?: () => void
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      const display = armature.armatureDisplay;
+
+      if (times === 0) {
+        // 無限播放：立即執行 callback 和 resolve
+        display.animation.play(animName, 0);
+        if (callback) callback();
+        resolve();
+      } else {
+        display.once('complete', () => {
+          if (callback) callback();
+          resolve();
+        });
+        display.animation.play(animName, times);
+      }
+    });
+  }
 }

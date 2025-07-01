@@ -51,12 +51,13 @@ export class SpinButton extends PIXI.Container {
     this.stopIcon.visible = true;
     this.overlayArmature.visible = true;
     this.upArmature.visible = false;
-    await this.overlayArmature.play('Overlay', false);
 
-    setTimeout(() => {
-      this.upArmature.visible = true;
-    }, 500); // Adjust timeout as needed
-    
+    // 等待播放龍骨動畫
+    await PixiDragonBones.play(this.overlayArmature, 'Overlay', 1)
+
+    // 播放完後，繼續播放上層動畫
+    this.upArmature.visible = true;
+
     if (this.onPressed) this.onPressed();
   }
 
