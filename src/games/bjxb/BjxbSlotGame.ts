@@ -12,7 +12,7 @@ export class BjxbSlotGame extends BaseSlotGame {
   private hotSpinsLeft = 0;
   private nextHotSpinScore = this.gameSettings.hotSpinThresholdMultiple;
   // Symbols are referenced by number strings (e.g. '001')
-  private normalSymbols = Array.from({ length: AssetPaths.bjxb.symbolCount }, (_, i) =>
+  private normalSymbols = Array.from({ length: AssetPaths.bjxb.symbolCount! }, (_, i): string =>
     (i + 1).toString().padStart(3, '0')
   );
   private hotSymbols = this.normalSymbols.slice(0, this.gameSettings.hotSpinSymbolTypeCount);

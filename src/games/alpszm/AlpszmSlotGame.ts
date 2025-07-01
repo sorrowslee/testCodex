@@ -4,33 +4,33 @@ import { PixiDragonBonesButton } from '../../base/PixiDragonBonesButton';
 import { SpinButton } from '../../base/SpinButton';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 
-export class AlpszmSlotGame extends BaseSlotGame {
-  private readonly customSymbols = [
-    'alpszm_A',
-    'alpszm_E',
-    'alpszm_J',
-    'alpszm_K',
-    'alpszm_N',
-    'alpszm_Q',
-    'alpszm_SA',
-    'alpszm_SB',
-    'alpszm_SC',
-    'alpszm_SD',
-    'alpszm_T',
-    'alpszm_W1',
-    'alpszm_W2'
-  ];
+const SYMBOLS = [
+  'alpszm_A',
+  'alpszm_E',
+  'alpszm_J',
+  'alpszm_K',
+  'alpszm_N',
+  'alpszm_Q',
+  'alpszm_SA',
+  'alpszm_SB',
+  'alpszm_SC',
+  'alpszm_SD',
+  'alpszm_T',
+  'alpszm_W1',
+  'alpszm_W2'
+] as const;
 
+export class AlpszmSlotGame extends BaseSlotGame {
   constructor(settings: GameRuleSettings = AlpszmGameSettings) {
-    super(settings, AssetPaths.alpszm, this.customSymbols);
+    super(settings, AssetPaths.alpszm, [...SYMBOLS]);
   }
   private hunter?: PIXI.AnimatedSprite;
   private hotSpinText!: PIXI.Text;
   private inHotSpin = false;
   private hotSpinsLeft = 0;
   private nextHotSpinScore = this.gameSettings.hotSpinThresholdMultiple;
-  private normalSymbols = this.customSymbols;
-  private hotSymbols = this.customSymbols.slice(
+  private normalSymbols = [...SYMBOLS];
+  private hotSymbols = SYMBOLS.slice(
     0,
     this.gameSettings.hotSpinSymbolTypeCount
   );
