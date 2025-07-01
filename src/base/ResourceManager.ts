@@ -89,39 +89,40 @@ export class ResourceManager {
       return Promise.resolve();
     }
 
-    const loader = new PIXI.Loader();
-    loader.add(jsonKey, imageContext(jsonKey));
-    loader.add(pngKey, imageContext(pngKey));
+    const jsonUrl = imageContext(jsonKey);
+    const pngUrl = imageContext(pngKey);
 
-    return new Promise(resolve => {
-      loader.load((l, res) => {
-        const jsonData = res[jsonKey]?.data;
-        const texture = res[pngKey]?.texture;
-        if (jsonData && texture) {
-          // Some atlas JSON files in this project use a non-standard
-          // "file" field instead of the expected meta.image property.
-          // Pixi's Spritesheet loader expects json.meta.image to exist,
-          // so provide it if missing to avoid runtime errors.
-          if (!jsonData.meta) {
-            jsonData.meta = { image: jsonData.file };
-          } else if (!jsonData.meta.image && jsonData.file) {
-            jsonData.meta.image = jsonData.file;
-          }
-
-          const sheet = new PIXI.Spritesheet(
-            texture.baseTexture ?? texture,
-            jsonData
-          );
-          sheet.parse(() => {
-            this.loadedImages[gameCode] = true;
-            resolve();
-          });
-        } else {
-          this.loadedImages[gameCode] = true;
-          resolve();
+    return fetch(jsonUrl)
+      .then(res => res.json())
+      .then(jsonData => {
+        if (!jsonData.meta) {
+          jsonData.meta = { image: jsonData.file };
+        } else if (!jsonData.meta.image && jsonData.file) {
+          jsonData.meta.image = jsonData.file;
         }
+
+        return new Promise<void>(resolve => {
+          const texture = PIXI.Texture.from(pngUrl);
+          const onLoad = () => {
+            const sheet = new PIXI.Spritesheet(
+              texture.baseTexture ?? texture,
+              jsonData
+            );
+            sheet.parse(() => {
+              this.loadedImages[gameCode] = true;
+              resolve();
+            });
+          };
+          if (texture.baseTexture.valid) {
+            onLoad();
+          } else {
+            texture.baseTexture.once('loaded', onLoad);
+          }
+        });
+      })
+      .catch(() => {
+        this.loadedImages[gameCode] = true;
       });
-    });
   }
 
   public static getDragonBonesPaths(
