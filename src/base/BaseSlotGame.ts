@@ -701,7 +701,10 @@ export abstract class BaseSlotGame {
       if (parent) {
         parent.removeChild(this.app.view);
       }
-      this.app.destroy(true, { children: true, texture: true, baseTexture: true });
+      // Do not destroy textures so they can be reused when returning to the game
+      // otherwise DragonBones assets will be removed from the global cache
+      // causing errors on subsequent entries
+      this.app.destroy(true, { children: true });
     }
   }
 

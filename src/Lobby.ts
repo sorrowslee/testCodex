@@ -210,7 +210,9 @@ export class Lobby {
     if (this.app) {
       const parent = this.app.view.parentNode;
       if (parent) parent.removeChild(this.app.view);
-      this.app.destroy(true, { children: true, texture: true, baseTexture: true });
+      // Keep textures cached when destroying the lobby so returning to games
+      // that share assets does not fail due to missing base textures
+      this.app.destroy(true, { children: true });
     }
   }
 
