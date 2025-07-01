@@ -98,7 +98,20 @@ export class ResourceManager {
         const jsonData = res[jsonKey]?.data;
         const texture = res[pngKey]?.texture;
         if (jsonData && texture) {
-          const sheet = new PIXI.Spritesheet(texture.baseTexture ?? texture, jsonData);
+          // Some atlas JSON files in this project use a non-standard
+          // "file" field instead of the expected meta.image property.
+          // Pixi's Spritesheet loader expects json.meta.image to exist,
+          // so provide it if missing to avoid runtime errors.
+          if (!jsonData.meta) {
+            jsonData.meta = { image: jsonData.file };
+          } else if (!jsonData.meta.image && jsonData.file) {
+            jsonData.meta.image = jsonData.file;
+          }
+
+          const sheet = new PIXI.Spritesheet(
+            texture.baseTexture ?? texture,
+            jsonData
+          );
           sheet.parse(() => {
             this.loadedImages[gameCode] = true;
             resolve();
