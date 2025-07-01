@@ -93,22 +93,88 @@ export class ResourceManager {
       })
     ])
       .then(([jsonData, texture]) => {
-        if (!jsonData.meta) {
-          jsonData.meta = { image: jsonData.file };
-        } else if (!jsonData.meta.image && jsonData.file) {
-          jsonData.meta.image = jsonData.file;
-        }
-        return new Promise<void>(resolve => {
-          const sheet = new PIXI.Spritesheet(texture.baseTexture, jsonData);
-          sheet.parse(() => {
+        // 將 Egret 格式轉換為 PIXI 格式
+        const convertedData = this.convertEgretToPIXI(jsonData);
+        
+        return new Promise<void>((resolve, reject) => {
+          const sheet = new PIXI.Spritesheet(texture.baseTexture, convertedData);
+          
+          sheet.parse((textures) => {
+            console.log(`Successfully parsed ${Object.keys(textures).length} textures for ${gameCode}`);
             this.loadedImages[gameCode] = true;
             resolve();
           });
         });
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(`Failed to load images for ${gameCode}:`, error);
         this.loadedImages[gameCode] = true;
+        throw error;
       });
+  }
+
+  // 新增格式轉換方法
+  private static convertEgretToPIXI(egretData: any): any {
+    const pixiData = {
+      frames: {} as { [key: string]: any },
+      meta: {
+        image: egretData.file,
+        format: "RGBA8888",
+        size: { w: 0, h: 0 } // 這個會在後面計算
+      }
+    };
+
+    // 轉換每個 frame
+    for (const [frameName, frameData] of Object.entries(egretData.frames)) {
+      const egretFrame = frameData as any;
+      
+      pixiData.frames[frameName] = {
+        frame: { 
+          x: egretFrame.x, 
+          y: egretFrame.y, 
+          w: egretFrame.w, 
+          h: egretFrame.h 
+        },
+        rotated: false,
+        trimmed: egretFrame.offX !== 0 || egretFrame.offY !== 0 || 
+                egretFrame.w !== egretFrame.sourceW || 
+                egretFrame.h !== egretFrame.sourceH,
+        spriteSourceSize: { 
+          x: egretFrame.offX || 0, 
+          y: egretFrame.offY || 0, 
+          w: egretFrame.w, 
+          h: egretFrame.h 
+        },
+        sourceSize: { 
+          w: egretFrame.sourceW || egretFrame.w, 
+          h: egretFrame.sourceH || egretFrame.h 
+        }
+      };
+    }
+
+    return pixiData;
+  }
+
+  /**
+   * 安全地取得 texture，包含錯誤處理
+   */
+  public static getTexture(textureName: string): PIXI.Texture {
+    const texture = PIXI.utils.TextureCache[textureName];
+    return texture;
+  }
+
+  /**
+   * 檢查遊戲資源是否已載入
+   */
+  public static isGameLoaded(gameCode: string): boolean {
+    return !!this.loadedImages[gameCode];
+  }
+
+  /**
+   * 清除特定遊戲的載入狀態（用於重新載入）
+   */
+  public static clearGameLoadStatus(gameCode: string): void {
+    delete this.loadedImages[gameCode];
   }
 
   // Deprecated helper kept for backwards compatibility. The current build

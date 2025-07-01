@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { AssetPaths, DefaultGameSettings, GameRuleSettings, GameAssetConfig } from '../setting';
 import { BaseMapShip } from './BaseMapShip';
+import { ResourceManager } from './ResourceManager';
 
 export abstract class BaseSlotGame {
   constructor(
@@ -81,7 +82,8 @@ export abstract class BaseSlotGame {
 
   protected getSymbolTexture(name: string): PIXI.Texture {
     if (this.customSymbols) {
-      return PIXI.Texture.from(name);
+
+      return ResourceManager.getTexture(name);
     }
     return PIXI.Texture.from(this.assets.symbol!(Number(name)));
   }
