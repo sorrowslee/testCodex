@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { BaseSlotGame } from '../../base/BaseSlotGame';
 import { PixiDragonBonesButton } from '../../base/PixiDragonBonesButton';
+import { SpinButton } from '../../base/SpinButton';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 
 export class AlpszmSlotGame extends BaseSlotGame {
@@ -24,6 +25,24 @@ export class AlpszmSlotGame extends BaseSlotGame {
 
   protected getInitialSymbols(): string[] {
     return this.normalSymbols;
+  }
+
+  protected createSpinButton(gameCode: string, bottomBg: PIXI.Sprite | null): PIXI.Container {
+    const btn = new SpinButton(gameCode, `${gameCode}_a`, 'Anim_Btn_Spin', () => {
+      this.spin(() => {
+        if (btn) btn.reset();
+        this.onSpinEnd();
+      });
+    });
+    const layoutBtn = () => {
+      if (bottomBg) {
+        btn.x = bottomBg.width / 2 + 18;
+        btn.y = bottomBg.y - bottomBg.height / 2 + 10;
+      }
+    };
+    btn.on('loaded', layoutBtn);
+    if (btn.width > 0) layoutBtn();
+    return btn;
   }
 
   public start(containerId: string = 'game'): void {
