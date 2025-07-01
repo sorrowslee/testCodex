@@ -7,9 +7,13 @@ const dragonBones = require('pixi5-dragonbones');
 // webpack require context for all dragonBones assets
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dragonBonesContext = (require as any).context('../../assets', true, /dragonBones\/.*\.(json|png)$/);
+// webpack require context for game image atlases
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const imageContext = (require as any).context('../../assets', true, /image\/.*\.(json|png)$/);
 
 export class ResourceManager {
   private static loadedGames: Record<string, boolean> = {};
+  private static loadedImages: Record<string, boolean> = {};
 
   public static preloadDragonBones(gameCode: string): Promise<void> {
     if (this.loadedGames[gameCode]) {
@@ -67,6 +71,42 @@ export class ResourceManager {
 
         this.loadedGames[gameCode] = true;
         resolve();
+      });
+    });
+  }
+
+  public static preloadGameImages(gameCode: string): Promise<void> {
+    if (this.loadedImages[gameCode]) {
+      return Promise.resolve();
+    }
+
+    const jsonKey = `./${gameCode}/image/${gameCode}.json`;
+    const pngKey = `./${gameCode}/image/${gameCode}.png`;
+
+    const keys = imageContext.keys();
+    if (!keys.includes(jsonKey) || !keys.includes(pngKey)) {
+      this.loadedImages[gameCode] = true;
+      return Promise.resolve();
+    }
+
+    const loader = new PIXI.Loader();
+    loader.add(jsonKey, imageContext(jsonKey));
+    loader.add(pngKey, imageContext(pngKey));
+
+    return new Promise(resolve => {
+      loader.load((l, res) => {
+        const jsonData = res[jsonKey]?.data;
+        const texture = res[pngKey]?.texture;
+        if (jsonData && texture) {
+          const sheet = new PIXI.Spritesheet(texture.baseTexture ?? texture, jsonData);
+          sheet.parse(() => {
+            this.loadedImages[gameCode] = true;
+            resolve();
+          });
+        } else {
+          this.loadedImages[gameCode] = true;
+          resolve();
+        }
       });
     });
   }
