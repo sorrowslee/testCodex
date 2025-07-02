@@ -12,6 +12,7 @@ const dragonBonesContext = (require as any).context('../../assets', true, /drago
 export class ResourceManager {
   private static loadedGames: Record<string, boolean> = {};
   private static loadedImages: Record<string, boolean> = {};
+  private static imageTextures: Record<string, string[]> = {};
 
   public static preloadDragonBones(gameCode: string): Promise<void> {
     if (this.loadedGames[gameCode]) {
@@ -100,7 +101,9 @@ export class ResourceManager {
           const sheet = new PIXI.Spritesheet(texture.baseTexture, convertedData);
           
           sheet.parse((textures) => {
-            console.log(`Successfully parsed ${Object.keys(textures).length} textures for ${gameCode}`);
+            const names = Object.keys(textures);
+            this.imageTextures[gameCode] = names;
+            console.log(`Successfully parsed ${names.length} textures for ${gameCode}`);
             this.loadedImages[gameCode] = true;
             resolve();
           });
@@ -174,6 +177,24 @@ export class ResourceManager {
    * 清除特定遊戲的載入狀態（用於重新載入）
    */
   public static clearGameLoadStatus(gameCode: string): void {
+    this.unloadGameImages(gameCode);
+  }
+
+  /**
+   * 卸載特定遊戲的貼圖資源
+   */
+  public static unloadGameImages(gameCode: string): void {
+    const textures = this.imageTextures[gameCode];
+    if (textures) {
+      textures.forEach(name => {
+        const tex = PIXI.utils.TextureCache[name];
+        if (tex) {
+          tex.destroy(true);
+          delete PIXI.utils.TextureCache[name];
+        }
+      });
+      delete this.imageTextures[gameCode];
+    }
     delete this.loadedImages[gameCode];
   }
 
