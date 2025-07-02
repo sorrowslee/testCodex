@@ -34,10 +34,6 @@ export interface GameRuleSettings {
   cols: number;
   /** Number of rows per reel */
   rows: number;
-  /** Width of each block (symbol) in pixels */
-  blockWidth?: number;
-  /** Height of each block (symbol) in pixels */
-  blockHeight?: number;
   /** Horizontal spacing between columns in pixels */
   colSpacing: number;
   /** Vertical spacing between rows in pixels */
@@ -111,8 +107,6 @@ export const DefaultGameSettings: GameRuleSettings = {
   hotSpinSymbolTypeCount: 3,
   cols: 7,
   rows: 5,
-  blockWidth: 128,
-  blockHeight: 128,
   colSpacing: 0,
   rowSpacing: 0,
   blockScale: 1,
@@ -125,8 +119,6 @@ export const AlpszmGameSettings: GameRuleSettings = {
   ...DefaultGameSettings,
   cols: 5,
   rows: 3,
-  blockWidth: undefined,
-  blockHeight: undefined,
   mapShip: true,
   singleBackground: false,
   colSpacing: 36,

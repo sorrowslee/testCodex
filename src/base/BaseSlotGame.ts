@@ -11,8 +11,8 @@ export abstract class BaseSlotGame {
   ) {
     this.rows = gameSettings.rows;
     this.cols = gameSettings.cols;
-    this.reelWidth = gameSettings.blockWidth ?? 0;
-    this.reelHeight = gameSettings.blockHeight ?? 0;
+    this.reelWidth = 0;
+    this.reelHeight = 0;
     this.hasBorder = !!assets.border;
     this.childPerCell = this.hasBorder ? 2 : 1;
     this.colSpacing = gameSettings.colSpacing;
