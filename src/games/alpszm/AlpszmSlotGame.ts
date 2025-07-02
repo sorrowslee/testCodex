@@ -4,6 +4,7 @@ import { PixiDragonBonesButton } from '../../base/PixiDragonBonesButton';
 import { PixiSpinButton } from '../../base/PixiSpinButton';
 import { AlpszmSlotGameUISetting } from './AlpszmSlotGame_uiSetting';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
+import { ResourceManager } from '../../base/ResourceManager';
 
 const SYMBOLS = [
   'alpszm_A',
@@ -37,6 +38,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
   );
   private autoBtn!: PixiDragonBonesButton;
   private autoMode = false;
+  private betMaxBtn!: PIXI.Sprite;
 
   protected getBackgroundPath(): string {
     return AssetPaths.alpszm.bg;
@@ -126,6 +128,32 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.autoBtn.on('pointerdown', () => this.toggleAutoMode());
     this.autoBtn.stop();
     this.gameContainer.addChild(this.autoBtn);
+
+    this.betMaxBtn = new PIXI.Sprite(
+      ResourceManager.getTexture('alpszm_bet_max_button_normal')
+    );
+    this.betMaxBtn.anchor.set(0.5);
+    this.betMaxBtn.scale.set(AlpszmSlotGameUISetting.betMaxButton.scale);
+    this.betMaxBtn.x = AlpszmSlotGameUISetting.betMaxButton.x;
+    this.betMaxBtn.y = AlpszmSlotGameUISetting.betMaxButton.y;
+    this.betMaxBtn.interactive = true;
+    this.betMaxBtn.buttonMode = true;
+    this.betMaxBtn.on('pointerdown', () => {
+      this.betMaxBtn.texture = ResourceManager.getTexture(
+        'alpszm_bet_max_button_press'
+      );
+    });
+    const resetBetMaxTexture = () => {
+      this.betMaxBtn.texture = ResourceManager.getTexture(
+        'alpszm_bet_max_button_normal'
+      );
+    };
+    this.betMaxBtn.on('pointerup', () => {
+      resetBetMaxTexture();
+      this.onBetMax();
+    });
+    this.betMaxBtn.on('pointerupoutside', resetBetMaxTexture);
+    this.gameContainer.addChild(this.betMaxBtn);
   }
 
 
@@ -223,6 +251,10 @@ export class AlpszmSlotGame extends BaseSlotGame {
         this.onSpinEnd();
       });
     }
+  }
+
+  private onBetMax(): void {
+    // TODO: implement bet max logic
   }
 }
 
