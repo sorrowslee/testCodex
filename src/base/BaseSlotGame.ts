@@ -32,6 +32,10 @@ export abstract class BaseSlotGame {
   protected mapShip?: BaseMapShip;
   protected mapShipEndTriggered = false;
 
+  // reel layout dimensions derived from background image
+  protected reelLayoutWidth = 0;
+  protected reelLayoutHeight = 0;
+
   private activeTickers: PIXI.Ticker[] = [];
   private activeTimeouts: number[] = [];
 
@@ -110,12 +114,12 @@ export abstract class BaseSlotGame {
       this.cellWidth = dims.width;
       this.cellHeight = dims.height;
     }
-    const REEL_LAYOUT_WIDTH =
+    this.reelLayoutWidth =
       this.cols * this.cellWidth + (this.cols - 1) * this.colSpacing;
-    const REEL_LAYOUT_HEIGHT =
+    this.reelLayoutHeight =
       this.rows * this.cellHeight + (this.rows - 1) * this.rowSpacing;
-    const GAME_WIDTH = REEL_LAYOUT_WIDTH;
-    const GAME_HEIGHT = REEL_LAYOUT_HEIGHT + 100 + this.SCORE_AREA_HEIGHT;
+    const GAME_WIDTH = this.reelLayoutWidth;
+    const GAME_HEIGHT = this.reelLayoutHeight + 100 + this.SCORE_AREA_HEIGHT;
 
     this.app = new PIXI.Application({
       width: this.APP_WIDTH,
@@ -180,6 +184,13 @@ export abstract class BaseSlotGame {
         top.y = offsetY;
         mid.y = top.y + top.height;
         bottom.y = mid.y + mid.height;
+        // update reel layout size based on mid background
+        this.reelLayoutWidth = mid.width;
+        this.reelLayoutHeight = mid.height;
+        const GAME_WIDTH = this.reelLayoutWidth;
+        const GAME_HEIGHT = this.reelLayoutHeight + 100 + this.SCORE_AREA_HEIGHT;
+        this.gameContainer.x = (this.APP_WIDTH - GAME_WIDTH) / 2;
+        this.gameContainer.y = (this.APP_HEIGHT - GAME_HEIGHT) / 2;
         // add backgrounds behind game container
         this.app.stage.addChildAt(top, 0);
         this.app.stage.addChildAt(mid, 1);
@@ -214,10 +225,8 @@ export abstract class BaseSlotGame {
     midBg: PIXI.Sprite | null,
     bottomBg: PIXI.Sprite | null
   ): void {
-    const REEL_LAYOUT_WIDTH =
-      this.cols * this.cellWidth + (this.cols - 1) * this.colSpacing;
-    const REEL_LAYOUT_HEIGHT =
-      this.rows * this.cellHeight + (this.rows - 1) * this.rowSpacing;
+    const REEL_LAYOUT_WIDTH = this.reelLayoutWidth;
+    const REEL_LAYOUT_HEIGHT = this.reelLayoutHeight;
     const GAME_WIDTH = REEL_LAYOUT_WIDTH;
 
     if (this.gameSettings.mapShip) {
@@ -331,10 +340,8 @@ export abstract class BaseSlotGame {
   }
 
   protected createSpinButton(gameCode: string, bottomBg: PIXI.Sprite | null): PIXI.Container {
-    const REEL_LAYOUT_WIDTH =
-      this.cols * this.cellWidth + (this.cols - 1) * this.colSpacing;
-    const REEL_LAYOUT_HEIGHT =
-      this.rows * this.cellHeight + (this.rows - 1) * this.rowSpacing;
+    const REEL_LAYOUT_WIDTH = this.reelLayoutWidth;
+    const REEL_LAYOUT_HEIGHT = this.reelLayoutHeight;
 
     const btn = new PIXI.Container();
     const btnBgWidth = 160;
