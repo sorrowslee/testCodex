@@ -723,6 +723,15 @@ export abstract class BaseSlotGame {
       // otherwise DragonBones assets will be removed from the global cache
       // causing errors on subsequent entries
       this.app.destroy(true, { children: true });
+
+      // When the PIXI application is destroyed the WebGL context is lost which
+      // may drop textures from the cache. Clear the load status so that assets
+      // are reloaded next time this game starts.
+      const match = /assets\/(.*?)\//.exec(this.assets.bg);
+      const code = match ? match[1] : '';
+      if (code) {
+        ResourceManager.clearGameLoadStatus(code);
+      }
     }
   }
 
