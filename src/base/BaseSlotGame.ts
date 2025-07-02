@@ -11,8 +11,8 @@ export abstract class BaseSlotGame {
   ) {
     this.rows = gameSettings.rows;
     this.cols = gameSettings.cols;
-    this.reelWidth = 0;
-    this.reelHeight = 0;
+    this.cellWidth = 0;
+    this.cellHeight = 0;
     this.hasBorder = !!assets.border;
     this.childPerCell = this.hasBorder ? 2 : 1;
     this.colSpacing = gameSettings.colSpacing;
@@ -51,10 +51,10 @@ export abstract class BaseSlotGame {
   protected SCORE_AREA_HEIGHT = 100;
   protected APP_WIDTH = 1900;
   protected APP_HEIGHT = 1300;
-  protected reelWidth!: number;
-  protected reelHeight!: number;
   protected rows!: number;
   protected cols!: number;
+  protected cellWidth = 0;
+  protected cellHeight = 0;
   protected REEL_SCALE = 0.9;
   protected colSpacing = 0;
   protected rowSpacing = 0;
@@ -91,17 +91,28 @@ export abstract class BaseSlotGame {
   protected abstract getBackgroundPath(): string;
   protected abstract getInitialSymbols(): string[];
 
+  private computeCellDimensions() {
+    let maxW = 0;
+    let maxH = 0;
+    for (const name of this.currentSymbols) {
+      const tex = this.getSymbolTexture(name);
+      if (tex.width > maxW) maxW = tex.width;
+      if (tex.height > maxH) maxH = tex.height;
+    }
+    return { width: maxW, height: maxH };
+  }
+
   public start(containerId: string = 'game'): void {
     this.currentSymbols = this.getInitialSymbols();
-    if (this.reelWidth === 0 || this.reelHeight === 0) {
-      const tex = this.getSymbolTexture(this.currentSymbols[0]);
-      this.reelWidth = tex.width;
-      this.reelHeight = tex.height;
+    if (this.cellWidth === 0 || this.cellHeight === 0) {
+      const dims = this.computeCellDimensions();
+      this.cellWidth = dims.width;
+      this.cellHeight = dims.height;
     }
     const REEL_LAYOUT_WIDTH =
-      this.cols * this.reelWidth + (this.cols - 1) * this.colSpacing;
+      this.cols * this.cellWidth + (this.cols - 1) * this.colSpacing;
     const REEL_LAYOUT_HEIGHT =
-      this.rows * this.reelHeight + (this.rows - 1) * this.rowSpacing;
+      this.rows * this.cellHeight + (this.rows - 1) * this.rowSpacing;
     const GAME_WIDTH = REEL_LAYOUT_WIDTH;
     const GAME_HEIGHT = REEL_LAYOUT_HEIGHT + 100 + this.SCORE_AREA_HEIGHT;
 
@@ -195,7 +206,7 @@ export abstract class BaseSlotGame {
 
       for (let i = 0; i < this.cols; i++) {
         const rc = new PIXI.Container();
-        rc.x = i * (this.reelWidth + this.colSpacing);
+        rc.x = i * (this.cellWidth + this.colSpacing);
         this.reelContainer.addChild(rc);
         this.reels.push(rc);
         for (let j = 0; j < this.rows; j++) {
@@ -207,15 +218,15 @@ export abstract class BaseSlotGame {
           const symbol = new PIXI.Sprite(texture);
           symbol.name = symbolName;
           symbol.anchor.set(0.5);
-          symbol.x = this.reelWidth / 2;
+          symbol.x = this.cellWidth / 2;
           symbol.y =
-            j * (this.reelHeight + this.rowSpacing) + this.reelHeight / 2;
+            j * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
           symbol.scale.set(this.blockScale);
           rc.addChild(symbol);
           if (this.hasBorder && this.assets.border) {
             const border = PIXI.Sprite.from(this.assets.border);
             border.anchor.set(0.5);
-            border.x = this.reelWidth / 2;
+            border.x = this.cellWidth / 2;
             border.y = symbol.y;
             border.scale.set(this.blockScale);
             rc.addChild(border);
@@ -313,9 +324,9 @@ export abstract class BaseSlotGame {
 
   protected createSpinButton(gameCode: string, bottomBg: PIXI.Sprite | null): PIXI.Container {
     const REEL_LAYOUT_WIDTH =
-      this.cols * this.reelWidth + (this.cols - 1) * this.colSpacing;
+      this.cols * this.cellWidth + (this.cols - 1) * this.colSpacing;
     const REEL_LAYOUT_HEIGHT =
-      this.rows * this.reelHeight + (this.rows - 1) * this.rowSpacing;
+      this.rows * this.cellHeight + (this.rows - 1) * this.rowSpacing;
 
     const btn = new PIXI.Container();
     const btnBgWidth = 160;
@@ -356,7 +367,7 @@ export abstract class BaseSlotGame {
           : null;
         sym.texture = this.getSymbolTexture(symbolSet[idx]);
         sym.name = symbolSet[idx];
-        sym.y = r * (this.reelHeight + this.rowSpacing) + this.reelHeight / 2;
+        sym.y = r * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
         sym.scale.set(this.blockScale);
         if (border) {
           border.y = sym.y;
@@ -457,8 +468,8 @@ export abstract class BaseSlotGame {
 
   protected cellPos(r: number, c: number) {
     return {
-      x: c * (this.reelWidth + this.colSpacing) + this.reelWidth / 2,
-      y: r * (this.reelHeight + this.rowSpacing) + this.reelHeight / 2
+      x: c * (this.cellWidth + this.colSpacing) + this.cellWidth / 2,
+      y: r * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2
     };
   }
 
@@ -557,8 +568,8 @@ export abstract class BaseSlotGame {
     reel.children.forEach((child: any, i: number) => {
       const row = Math.floor(i / this.childPerCell);
       child.y =
-        row * (this.reelHeight + this.rowSpacing) + this.reelHeight / 2;
-      child.x = this.reelWidth / 2;
+        row * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
+      child.x = this.cellWidth / 2;
       child.scale.set(this.blockScale);
     });
   }
@@ -624,9 +635,9 @@ export abstract class BaseSlotGame {
             }
             if (border) border.y = sym.y;
             const totalHeight =
-              this.rows * (this.reelHeight + this.rowSpacing) - this.rowSpacing;
+              this.rows * (this.cellHeight + this.rowSpacing) - this.rowSpacing;
             if (this.SPIN_DIRECTION === 'down') {
-              if (sym.y >= totalHeight + this.reelHeight / 2) {
+              if (sym.y >= totalHeight + this.cellHeight / 2) {
                 sym.y -= totalHeight;
                 if (border) border.y = sym.y;
                 const symIndex = Math.floor(
@@ -637,7 +648,7 @@ export abstract class BaseSlotGame {
                 sym.name = symbolName;
               }
             } else {
-              if (sym.y <= -this.reelHeight / 2) {
+              if (sym.y <= -this.cellHeight / 2) {
                 sym.y += totalHeight;
                 if (border) border.y = sym.y;
                 const symIndex = Math.floor(

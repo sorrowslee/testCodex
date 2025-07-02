@@ -27,7 +27,7 @@ export class FfpSlotGame extends BaseSlotGame {
 
   public start(containerId: string = 'game'): void {
     super.start(containerId);
-    const GAME_WIDTH = this.cols * this.reelWidth;
+    const GAME_WIDTH = this.cols * this.cellWidth;
     const HUNTER_SCALE = 1;
     const HUNTER_X_OFFSET = 250;
     const HUNTER_Y_OFFSET = this.SCORE_AREA_HEIGHT + 190;
@@ -47,7 +47,7 @@ export class FfpSlotGame extends BaseSlotGame {
       this.hunter.x = this.gameContainer.x + GAME_WIDTH + HUNTER_X_OFFSET;
       this.hunter.y =
         this.gameContainer.y + this.SCORE_AREA_HEIGHT + HUNTER_Y_OFFSET +
-        (this.rows * this.reelHeight) / 2;
+        (this.rows * this.cellHeight) / 2;
       this.hunter.gotoAndStop(0);
       this.app.stage.addChild(this.hunter);
     }
