@@ -25,6 +25,7 @@ const SYMBOLS = [
 export class AlpszmSlotGame extends BaseSlotGame {
   constructor(settings: GameRuleSettings = AlpszmGameSettings) {
     super(settings, AssetPaths.alpszm, [...SYMBOLS]);
+    this.useTextureBlur = true;
   }
   private hunter?: PIXI.AnimatedSprite;
   private hotSpinText!: PIXI.Text;
