@@ -13,6 +13,11 @@ export const AlpszmSlotGameUISetting = {
     x: 633,
     y: 871,
   },
+  betMaxButton: {
+    scale: 1.0,
+    x: 500,
+    y: 871,
+  },
   spinButton: {
     scale: 1.1,
     offsetX: 82,
