@@ -40,6 +40,14 @@ export class AlpszmSlotGame extends BaseSlotGame {
   private autoBtn!: PixiDragonBonesButton;
   private autoMode = false;
   private betMaxBtn!: PIXI.Sprite;
+  private menuBtn!: PIXI.Sprite;
+  private menuPanel!: PIXI.Container;
+  private infoBtn!: PIXI.Sprite;
+  private effectBtn!: PIXI.Sprite;
+  private musicBtn!: PIXI.Sprite;
+  private exitBtn!: PIXI.Sprite;
+  private effectOn = true;
+  private musicOn = true;
 
   protected getBackgroundPath(): string {
     return AssetPaths.alpszm.bg;
@@ -155,6 +163,145 @@ export class AlpszmSlotGame extends BaseSlotGame {
     });
     this.betMaxBtn.on('pointerupoutside', resetBetMaxTexture);
     this.gameContainer.addChild(this.betMaxBtn);
+
+    // menu button
+    this.menuBtn = new PIXI.Sprite(
+      ResourceManager.getTexture('alpszm_system_menu_normal')
+    );
+    this.menuBtn.anchor.set(0.5);
+    this.menuBtn.scale.set(AlpszmSlotGameUISetting.menuButton.scale);
+    this.menuBtn.x = AlpszmSlotGameUISetting.menuButton.x;
+    this.menuBtn.y = AlpszmSlotGameUISetting.menuButton.y;
+    this.menuBtn.interactive = true;
+    this.menuBtn.buttonMode = true;
+    this.menuBtn.on('pointerdown', () => {
+      this.menuBtn.texture = ResourceManager.getTexture(
+        'alpszm_system_menu_press'
+      );
+    });
+    const resetMenuTex = () => {
+      this.menuBtn.texture = ResourceManager.getTexture(
+        'alpszm_system_menu_normal'
+      );
+    };
+    this.menuBtn.on('pointerup', () => {
+      resetMenuTex();
+      this.toggleMenu();
+    });
+    this.menuBtn.on('pointerupoutside', resetMenuTex);
+    this.gameContainer.addChild(this.menuBtn);
+
+    // menu panel setup
+    this.menuPanel = new PIXI.Container();
+    const panelBg = new PIXI.Sprite(
+      ResourceManager.getTexture('alpszm_system_menu_bg')
+    );
+    panelBg.anchor.set(0.5);
+    this.menuPanel.addChild(panelBg);
+    this.menuPanel.x = AlpszmSlotGameUISetting.menuPanel.x;
+    this.menuPanel.y = AlpszmSlotGameUISetting.menuPanel.y;
+    this.menuPanel.visible = false;
+    this.gameContainer.addChild(this.menuPanel);
+
+    // info button
+    this.infoBtn = new PIXI.Sprite(
+      ResourceManager.getTexture('alpszm_system_menu_panel_gameinfo_button_normal')
+    );
+    this.infoBtn.anchor.set(0.5);
+    this.infoBtn.position.set(
+      AlpszmSlotGameUISetting.infoButton.x,
+      AlpszmSlotGameUISetting.infoButton.y
+    );
+    this.infoBtn.interactive = true;
+    this.infoBtn.buttonMode = true;
+    this.infoBtn.on('pointerdown', () => {
+      this.infoBtn.texture = ResourceManager.getTexture(
+        'alpszm_system_menu_panel_gameinfo_button_press'
+      );
+    });
+    const resetInfoTex = () => {
+      this.infoBtn.texture = ResourceManager.getTexture(
+        'alpszm_system_menu_panel_gameinfo_button_normal'
+      );
+    };
+    this.infoBtn.on('pointerup', () => {
+      resetInfoTex();
+      this.onInfoPressed();
+    });
+    this.infoBtn.on('pointerupoutside', resetInfoTex);
+    this.menuPanel.addChild(this.infoBtn);
+
+    // effect button
+    this.effectBtn = new PIXI.Sprite(
+      ResourceManager.getTexture('alpszm_system_menu_panel_effect_button_on')
+    );
+    this.effectBtn.anchor.set(0.5);
+    this.effectBtn.position.set(
+      AlpszmSlotGameUISetting.effectButton.x,
+      AlpszmSlotGameUISetting.effectButton.y
+    );
+    this.effectBtn.interactive = true;
+    this.effectBtn.buttonMode = true;
+    this.effectBtn.on('pointerup', () => {
+      this.effectOn = !this.effectOn;
+      this.effectBtn.texture = ResourceManager.getTexture(
+        this.effectOn
+          ? 'alpszm_system_menu_panel_effect_button_on'
+          : 'alpszm_system_menu_panel_effect_button_off'
+      );
+      this.onEffectToggle(this.effectOn);
+    });
+    this.menuPanel.addChild(this.effectBtn);
+
+    // music button
+    this.musicBtn = new PIXI.Sprite(
+      ResourceManager.getTexture('alpszm_system_menu_panel_music_button_on')
+    );
+    this.musicBtn.anchor.set(0.5);
+    this.musicBtn.position.set(
+      AlpszmSlotGameUISetting.musicButton.x,
+      AlpszmSlotGameUISetting.musicButton.y
+    );
+    this.musicBtn.interactive = true;
+    this.musicBtn.buttonMode = true;
+    this.musicBtn.on('pointerup', () => {
+      this.musicOn = !this.musicOn;
+      this.musicBtn.texture = ResourceManager.getTexture(
+        this.musicOn
+          ? 'alpszm_system_menu_panel_music_button_on'
+          : 'alpszm_system_menu_panel_music_button_off'
+      );
+      this.onMusicToggle(this.musicOn);
+    });
+    this.menuPanel.addChild(this.musicBtn);
+
+    // exit button
+    this.exitBtn = new PIXI.Sprite(
+      ResourceManager.getTexture('alpszm_system_menu_panel_exit_button_normal')
+    );
+    this.exitBtn.anchor.set(0.5);
+    this.exitBtn.position.set(
+      AlpszmSlotGameUISetting.exitButton.x,
+      AlpszmSlotGameUISetting.exitButton.y
+    );
+    this.exitBtn.interactive = true;
+    this.exitBtn.buttonMode = true;
+    this.exitBtn.on('pointerdown', () => {
+      this.exitBtn.texture = ResourceManager.getTexture(
+        'alpszm_system_menu_panel_exit_button_press'
+      );
+    });
+    const resetExitTex = () => {
+      this.exitBtn.texture = ResourceManager.getTexture(
+        'alpszm_system_menu_panel_exit_button_normal'
+      );
+    };
+    this.exitBtn.on('pointerup', () => {
+      resetExitTex();
+      this.onExit();
+    });
+    this.exitBtn.on('pointerupoutside', resetExitTex);
+    this.menuPanel.addChild(this.exitBtn);
   }
 
 
@@ -256,6 +403,27 @@ export class AlpszmSlotGame extends BaseSlotGame {
 
   private onBetMax(): void {
     // TODO: implement bet max logic
+  }
+
+  private toggleMenu(): void {
+    this.menuPanel.visible = !this.menuPanel.visible;
+  }
+
+  private onInfoPressed(): void {
+    // TODO: show game info
+  }
+
+  private onEffectToggle(on: boolean): void {
+    // TODO: handle effect toggle
+  }
+
+  private onMusicToggle(on: boolean): void {
+    // TODO: handle music toggle
+  }
+
+  private onExit(): void {
+    // same behavior as the back button
+    window.location.reload();
   }
 }
 
