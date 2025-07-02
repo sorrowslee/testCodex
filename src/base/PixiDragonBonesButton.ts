@@ -23,6 +23,7 @@ export class PixiDragonBonesButton extends PIXI.Container {
     this.loadBaseTexture(gameCode, resName, baseTextureName);
 
     this.effect = new PixiDragonBones(gameCode, resName, armatureName);
+    this.effect.visible = false;
     this.addChild(this.effect);
   }
 
@@ -44,11 +45,13 @@ export class PixiDragonBonesButton extends PIXI.Container {
   }
 
   public async play(): Promise<void> {
+    this.effect.visible = true;
     await this.centerEffect();
     await this.effect.play();
   }
 
   public async stop(): Promise<void> {
+    this.effect.visible = false;
     await this.effect.stop();
   }
 
