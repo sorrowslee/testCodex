@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { ResourceManager } from './ResourceManager';
 
 export class BaseMapShip {
   private container: PIXI.Container;
@@ -15,15 +16,16 @@ export class BaseMapShip {
   }
 
   public async init(): Promise<void> {
-    const base = `assets/${this.gameCode}/map/${this.gameCode}_map_`;
-    const routeResp = await fetch(`${base}routes.json`);
+    const routeUrl = `assets/${this.gameCode}/map/${this.gameCode}_map_routes.json`;
+    const routeResp = await fetch(routeUrl);
     const data = (await routeResp.json()) as { routes: { x: number; y: number }[] };
     this.routes = data.routes.map(p => ({ x: Number(p.x), y: Number(p.y) }));
 
-    const reel = PIXI.Sprite.from(`${base}reel.png`);
+    const reelTex = ResourceManager.getTexture(`${this.gameCode}_map_reel`);
+    const reel = new PIXI.Sprite(reelTex);
     this.container.addChild(reel);
 
-    const battleTex = PIXI.Texture.from(`${base}battle.png`);
+    const battleTex = ResourceManager.getTexture(`${this.gameCode}_map_battle`);
     for (let i = 1; i < this.routes.length - 1; i++) {
       const b = new PIXI.Sprite(battleTex);
       b.anchor.set(0, 0.5);
@@ -33,13 +35,17 @@ export class BaseMapShip {
       this.container.addChild(b);
     }
 
-    this.winner = PIXI.Sprite.from(`${base}winner.png`);
+    this.winner = new PIXI.Sprite(
+      ResourceManager.getTexture(`${this.gameCode}_map_winner`)
+    );
     this.winner.anchor.set(0, 0.5);
     this.winner.x = this.routes[this.routes.length - 1].x;
     this.winner.y = this.routes[this.routes.length - 1].y;
     this.container.addChild(this.winner);
 
-    this.flag = PIXI.Sprite.from(`${base}flag.png`);
+    this.flag = new PIXI.Sprite(
+      ResourceManager.getTexture(`${this.gameCode}_map_flag`)
+    );
     this.flag.anchor.set(0, 0.5);
     this.flag.x = this.routes[0].x;
     this.flag.y = this.routes[0].y;
