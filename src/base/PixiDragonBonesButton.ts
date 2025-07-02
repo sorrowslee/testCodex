@@ -1,8 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { PixiDragonBones } from './PixiDragonBones';
 import { ResourceManager } from './ResourceManager';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const dragonBones = require('pixi5-dragonbones');
 
 export class PixiDragonBonesButton extends PIXI.Container {
   private base: PIXI.Sprite;
@@ -11,6 +9,7 @@ export class PixiDragonBonesButton extends PIXI.Container {
   constructor(
     gameCode: string,
     baseTextureName: string,
+    texturesOnBase: string[],
     resName: string,
     armatureName: string
   ) {
@@ -20,7 +19,9 @@ export class PixiDragonBonesButton extends PIXI.Container {
     this.base.anchor.set(0.5);
     this.addChild(this.base);
 
-    this.loadBaseTexture(gameCode, resName, baseTextureName);
+    this.loadBaseTexture(gameCode, baseTextureName);
+
+    this.loadTexturesOnBase(gameCode, texturesOnBase);
 
     this.effect = new PixiDragonBones(gameCode, resName, armatureName);
     this.effect.visible = false;
@@ -65,12 +66,28 @@ export class PixiDragonBonesButton extends PIXI.Container {
 
   private async loadBaseTexture(
     gameCode: string,
-    resName: string,
     textureName: string
   ): Promise<void> {
-    await ResourceManager.preloadDragonBones(gameCode);
-    const factory = dragonBones.PixiFactory.factory;
-    const sprite = factory.getTextureDisplay(textureName, resName) as PIXI.Sprite;
-    this.base.texture = sprite.texture;
+    await ResourceManager.preloadGameImages(gameCode);
+    const texture = ResourceManager.getTexture(textureName);
+    if (texture) {
+      this.base.texture = texture;
+    }
+  }
+
+  private async loadTexturesOnBase(
+    gameCode: string,
+    textureNames: string[]
+  ): Promise<void> {
+    if (!textureNames || textureNames.length === 0) return;
+    await ResourceManager.preloadGameImages(gameCode);
+    textureNames.forEach(name => {
+      const tex = ResourceManager.getTexture(name);
+      if (tex) {
+        const sprite = new PIXI.Sprite(tex);
+        sprite.anchor.set(0.5);
+        this.addChild(sprite);
+      }
+    });
   }
 }
