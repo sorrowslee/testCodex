@@ -70,6 +70,8 @@ export abstract class BaseSlotGame {
   protected SPIN_INCREMENT = 300;
   protected SPIN_SPEED = 300;
   protected BLUR_AMOUNT = 30;
+  protected useTextureBlur = false;
+  protected blurSuffix = '_blur';
   protected WIN_TIME = 3000;
   protected START_DELAY = 300;
   protected START_OFFSET_Y = -50;
@@ -85,12 +87,12 @@ export abstract class BaseSlotGame {
 
   protected currentSymbols: string[] = [];
 
-  protected getSymbolTexture(name: string): PIXI.Texture {
+  protected getSymbolTexture(name: string, blurred = false): PIXI.Texture {
+    const texName = blurred ? `${name}${this.blurSuffix}` : name;
     if (this.customSymbols) {
-
-      return ResourceManager.getTexture(name);
+      return ResourceManager.getTexture(texName);
     }
-    return PIXI.Texture.from(this.assets.symbol!(Number(name)));
+    return PIXI.Texture.from(this.assets.symbol!(Number(texName)));
   }
 
   protected abstract getBackgroundPath(): string;
@@ -100,7 +102,7 @@ export abstract class BaseSlotGame {
     let maxW = 0;
     let maxH = 0;
     for (const name of this.currentSymbols) {
-      const tex = this.getSymbolTexture(name);
+      const tex = this.getSymbolTexture(name, false);
       if (tex.width > maxW) maxW = tex.width;
       if (tex.height > maxH) maxH = tex.height;
     }
@@ -298,7 +300,7 @@ export abstract class BaseSlotGame {
           Math.random() * this.currentSymbols.length
         );
         const symbolName = this.currentSymbols[symIndex];
-        const texture = this.getSymbolTexture(symbolName);
+        const texture = this.getSymbolTexture(symbolName, false);
         const symbol = new PIXI.Sprite(texture);
         symbol.name = symbolName;
         symbol.anchor.set(0.5);
@@ -377,7 +379,7 @@ export abstract class BaseSlotGame {
         const border = this.hasBorder
           ? (this.reels[c].children[r * this.childPerCell + 1] as any)
           : null;
-        sym.texture = this.getSymbolTexture(symbolSet[idx]);
+        sym.texture = this.getSymbolTexture(symbolSet[idx], false);
         sym.name = symbolSet[idx];
         sym.y = r * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
         sym.scale.set(this.blockScale);
@@ -623,9 +625,18 @@ export abstract class BaseSlotGame {
     }
     this.reels.forEach((reel, idx) => {
       const timeoutId = window.setTimeout(() => {
-        const blur = new PIXI.filters.BlurFilter();
-        blur.blur = this.BLUR_AMOUNT;
-        reel.filters = [blur];
+        if (this.useTextureBlur) {
+          reel.children.forEach((c: any, i: number) => {
+            if (i % this.childPerCell === 0) {
+              const name = c.name || '';
+              c.texture = this.getSymbolTexture(name, true);
+            }
+          });
+        } else {
+          const blur = new PIXI.filters.BlurFilter();
+          blur.blur = this.BLUR_AMOUNT;
+          reel.filters = [blur];
+        }
         this.animateReelOffset(
           reel,
           this.START_OFFSET_Y,
@@ -656,7 +667,7 @@ export abstract class BaseSlotGame {
                   Math.random() * this.currentSymbols.length
                 );
                 const symbolName = this.currentSymbols[symIndex];
-                sym.texture = this.getSymbolTexture(symbolName);
+                sym.texture = this.getSymbolTexture(symbolName, this.useTextureBlur);
                 sym.name = symbolName;
               }
             } else {
@@ -667,7 +678,7 @@ export abstract class BaseSlotGame {
                   Math.random() * this.currentSymbols.length
                 );
                 const symbolName = this.currentSymbols[symIndex];
-                sym.texture = this.getSymbolTexture(symbolName);
+                sym.texture = this.getSymbolTexture(symbolName, this.useTextureBlur);
                 sym.name = symbolName;
               }
             }
@@ -679,7 +690,16 @@ export abstract class BaseSlotGame {
             this.alignReel(reel);
 
             const finish = () => {
-              reel.filters = [];
+              if (this.useTextureBlur) {
+                reel.children.forEach((c: any, i: number) => {
+                  if (i % this.childPerCell === 0) {
+                    const name = c.name || '';
+                    c.texture = this.getSymbolTexture(name, false);
+                  }
+                });
+              } else {
+                reel.filters = [];
+              }
               if (idx === this.cols - 1) {
                 const wins = this.findLines();
                 if (wins.length > 0) {
