@@ -55,7 +55,7 @@ export abstract class BaseSlotGame {
   protected cols!: number;
   protected cellWidth = 0;
   protected cellHeight = 0;
-  protected REEL_SCALE = 0.9;
+  protected REEL_SCALE = 0.8;
   protected colSpacing = 0;
   protected rowSpacing = 0;
   protected blockScale = 1;

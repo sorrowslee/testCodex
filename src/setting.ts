@@ -121,8 +121,8 @@ export const AlpszmGameSettings: GameRuleSettings = {
   rows: 3,
   mapShip: true,
   singleBackground: false,
-  colSpacing: 36,
+  colSpacing: -15,
   rowSpacing: 32,
   blockScale: 1.2,
-  reelY:190
+  reelY: 226
 };
