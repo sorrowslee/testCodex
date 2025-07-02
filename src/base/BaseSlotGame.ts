@@ -281,6 +281,7 @@ export abstract class BaseSlotGame {
     this.scoreText.anchor.set(0.5, 0);
     this.scoreText.x = REEL_LAYOUT_WIDTH / 2;
     this.scoreText.y = BaseSlotGameUISetting.scoreText.y;
+    this.scoreText.visible = false;
     this.gameContainer.addChild(this.scoreText);
 
     const reelMask = new PIXI.Graphics();
