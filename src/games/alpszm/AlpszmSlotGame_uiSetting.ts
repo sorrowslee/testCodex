@@ -20,28 +20,28 @@ export const AlpszmSlotGameUISetting = {
   },
   menuButton: {
     scale: 1.0,
-    x: 80,
-    y: 80,
+    x: 130,
+    y: 915,
   },
   menuPanel: {
-    x: 0,
-    y: 0,
+    x: 210,
+    y: 640,
   },
   infoButton: {
     x: 0,
-    y: -120,
+    y: -160,
   },
   effectButton: {
     x: 0,
-    y: -40,
+    y: -55,
   },
   musicButton: {
     x: 0,
-    y: 40,
+    y: 50,
   },
   exitButton: {
     x: 0,
-    y: 120,
+    y: 155,
   },
   spinButton: {
     scale: 1.1,
