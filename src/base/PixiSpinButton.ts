@@ -4,7 +4,7 @@ import { ResourceManager } from './ResourceManager';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dragonBones = require('pixi5-dragonbones');
 
-export class SpinButton extends PIXI.Container {
+export class PixiSpinButton extends PIXI.Container {
   private spinIcon: PIXI.Sprite;
   private stopIcon: PIXI.Sprite;
   private upArmature: PixiDragonBones;

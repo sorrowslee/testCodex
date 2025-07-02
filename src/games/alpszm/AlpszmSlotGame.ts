@@ -1,7 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { BaseSlotGame } from '../../base/BaseSlotGame';
 import { PixiDragonBonesButton } from '../../base/PixiDragonBonesButton';
-import { SpinButton } from '../../base/SpinButton';
+import { PixiSpinButton } from '../../base/PixiSpinButton';
+import { AlpszmSlotGameUISetting } from './AlpszmSlotGame_uiSetting';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 
 const SYMBOLS = [
@@ -44,7 +45,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
   }
 
   protected createSpinButton(gameCode: string, bottomBg: PIXI.Sprite | null): PIXI.Container {
-    const btn = new SpinButton(gameCode, `${gameCode}_a`, 'Anim_Btn_Spin', () => {
+    const btn = new PixiSpinButton(gameCode, `${gameCode}_a`, 'Anim_Btn_Spin', () => {
       this.spin(() => {
         if (btn) btn.reset();
         this.onSpinEnd();
@@ -61,12 +62,18 @@ export class AlpszmSlotGame extends BaseSlotGame {
     return btn;
   }
 
-  public start(containerId: string = 'game'): void {
-    super.start(containerId);
+  protected initUIs(
+    gameCode: string,
+    topBg: PIXI.Sprite | null,
+    midBg: PIXI.Sprite | null,
+    bottomBg: PIXI.Sprite | null
+  ): void {
+    super.initUIs(gameCode, topBg, midBg, bottomBg);
+
     const GAME_WIDTH = this.cols * this.cellWidth;
-    const HUNTER_SCALE = 1;
-    const HUNTER_X_OFFSET = 250;
-    const HUNTER_Y_OFFSET = this.SCORE_AREA_HEIGHT + 190;
+    const HUNTER_SCALE = AlpszmSlotGameUISetting.hunter.scale;
+    const HUNTER_X_OFFSET = AlpszmSlotGameUISetting.hunter.xOffset;
+    const HUNTER_Y_OFFSET = this.SCORE_AREA_HEIGHT + AlpszmSlotGameUISetting.hunter.yOffset;
 
     if (this.assets.animations?.hunter) {
       const hunterFrames: PIXI.Texture[] = [];
@@ -95,8 +102,8 @@ export class AlpszmSlotGame extends BaseSlotGame {
       stroke: 0x333333,
       strokeThickness: 6
     });
-    this.hotSpinText.x = 20;
-    this.hotSpinText.y = 20;
+    this.hotSpinText.x = AlpszmSlotGameUISetting.hotSpinText.x;
+    this.hotSpinText.y = AlpszmSlotGameUISetting.hotSpinText.y;
     this.hotSpinText.visible = false;
     this.gameContainer.addChild(this.hotSpinText);
 
@@ -107,11 +114,12 @@ export class AlpszmSlotGame extends BaseSlotGame {
       'Anim_Btn_Auto'
     );
     autoBtn.name = 'alpszm_effect_auto';
-    autoBtn.x = 560;
-    autoBtn.y = 840;
+    autoBtn.x = AlpszmSlotGameUISetting.autoButton.x;
+    autoBtn.y = AlpszmSlotGameUISetting.autoButton.y;
     autoBtn.play();
     this.gameContainer.addChild(autoBtn);
   }
+
 
   protected onSpinEnd(): void {
     if (this.mapShipEndTriggered) {
