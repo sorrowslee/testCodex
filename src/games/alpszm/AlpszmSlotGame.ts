@@ -53,8 +53,9 @@ export class AlpszmSlotGame extends BaseSlotGame {
     });
     const layoutBtn = () => {
       if (bottomBg) {
-        btn.x = bottomBg.width / 2 + 18;
-        btn.y = bottomBg.y - bottomBg.height / 2 + 10;
+        btn.scale.set(AlpszmSlotGameUISetting.spinButton.scale);
+        btn.x = bottomBg.width / 2 + AlpszmSlotGameUISetting.spinButton.offsetX;
+        btn.y = bottomBg.y - bottomBg.height / 2 + AlpszmSlotGameUISetting.spinButton.offsetY;
       }
     };
     btn.on('loaded', layoutBtn);
@@ -114,6 +115,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
       'Anim_Btn_Auto'
     );
     autoBtn.name = 'alpszm_effect_auto';
+    autoBtn.scale.set(AlpszmSlotGameUISetting.autoButton.scale);
     autoBtn.x = AlpszmSlotGameUISetting.autoButton.x;
     autoBtn.y = AlpszmSlotGameUISetting.autoButton.y;
     autoBtn.play();

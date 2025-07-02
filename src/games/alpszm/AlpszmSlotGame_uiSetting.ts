@@ -9,7 +9,13 @@ export const AlpszmSlotGameUISetting = {
     y: 20,
   },
   autoButton: {
-    x: 560,
-    y: 840,
+    scale: 0.9,
+    x: 630,
+    y: 870,
+  },
+  spinButton: {
+    scale: 1.1,
+    offsetX: 82,
+    offsetY: 40,
   },
 };
