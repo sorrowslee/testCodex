@@ -35,6 +35,8 @@ export class AlpszmSlotGame extends BaseSlotGame {
     0,
     this.gameSettings.hotSpinSymbolTypeCount
   );
+  private autoBtn!: PixiDragonBonesButton;
+  private autoMode = false;
 
   protected getBackgroundPath(): string {
     return AssetPaths.alpszm.bg;
@@ -108,19 +110,22 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.hotSpinText.visible = false;
     this.gameContainer.addChild(this.hotSpinText);
 
-    const autoBtn = new PixiDragonBonesButton(
+    this.autoBtn = new PixiDragonBonesButton(
       'alpszm',
       'alpszm_hang_up_button_normal',
       ['alpszm_hang_up_icon_normal'],
       'alpszm_a',
       'Anim_Btn_Auto'
     );
-    autoBtn.name = 'alpszm_effect_auto';
-    autoBtn.scale.set(AlpszmSlotGameUISetting.autoButton.scale);
-    autoBtn.x = AlpszmSlotGameUISetting.autoButton.x;
-    autoBtn.y = AlpszmSlotGameUISetting.autoButton.y;
-    autoBtn.play();
-    this.gameContainer.addChild(autoBtn);
+    this.autoBtn.name = 'alpszm_effect_auto';
+    this.autoBtn.scale.set(AlpszmSlotGameUISetting.autoButton.scale);
+    this.autoBtn.x = AlpszmSlotGameUISetting.autoButton.x;
+    this.autoBtn.y = AlpszmSlotGameUISetting.autoButton.y;
+    this.autoBtn.interactive = true;
+    this.autoBtn.buttonMode = true;
+    this.autoBtn.on('pointerdown', () => this.toggleAutoMode());
+    this.autoBtn.stop();
+    this.gameContainer.addChild(this.autoBtn);
   }
 
 
@@ -177,6 +182,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
     if (this.mapShip) {
       this.mapShip.reset();
     }
+    this.checkAutoSpin();
   }
 
   private checkHotSpin() {
@@ -195,7 +201,27 @@ export class AlpszmSlotGame extends BaseSlotGame {
     } else {
       if (!this.gameSettings.mapShip && this.score >= this.nextHotSpinScore) {
         this.startHotSpin();
+      } else {
+        this.checkAutoSpin();
       }
+    }
+  }
+
+  private toggleAutoMode() {
+    this.autoMode = !this.autoMode;
+    if (this.autoMode) {
+      this.autoBtn.play();
+      this.checkAutoSpin();
+    } else {
+      this.autoBtn.stop();
+    }
+  }
+
+  private checkAutoSpin() {
+    if (this.autoMode && !this.spinning && !this.inHotSpin) {
+      this.spin(() => {
+        this.onSpinEnd();
+      });
     }
   }
 }

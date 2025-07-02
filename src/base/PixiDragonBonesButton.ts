@@ -5,6 +5,7 @@ import { ResourceManager } from './ResourceManager';
 export class PixiDragonBonesButton extends PIXI.Container {
   private base: PIXI.Sprite;
   private effect: PixiDragonBones;
+  private overlaySprites: PIXI.Sprite[] = [];
 
   constructor(
     gameCode: string,
@@ -46,6 +47,7 @@ export class PixiDragonBonesButton extends PIXI.Container {
   }
 
   public async play(): Promise<void> {
+    this.overlaySprites.forEach(s => (s.visible = false));
     this.effect.visible = true;
     await this.centerEffect();
     await this.effect.play();
@@ -54,6 +56,7 @@ export class PixiDragonBonesButton extends PIXI.Container {
   public async stop(): Promise<void> {
     this.effect.visible = false;
     await this.effect.stop();
+    this.overlaySprites.forEach(s => (s.visible = true));
   }
 
   public showEffect(): void {
@@ -86,6 +89,7 @@ export class PixiDragonBonesButton extends PIXI.Container {
       if (tex) {
         const sprite = new PIXI.Sprite(tex);
         sprite.anchor.set(0.5);
+        this.overlaySprites.push(sprite);
         this.addChild(sprite);
       }
     });
