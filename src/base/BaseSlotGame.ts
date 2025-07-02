@@ -184,9 +184,6 @@ export abstract class BaseSlotGame {
         top.y = offsetY;
         mid.y = top.y + top.height;
         bottom.y = mid.y + mid.height;
-        // update reel layout size based on mid background
-        this.reelLayoutWidth = mid.width;
-        this.reelLayoutHeight = mid.height;
         const GAME_WIDTH = this.reelLayoutWidth;
         const GAME_HEIGHT = this.reelLayoutHeight + 100 + this.SCORE_AREA_HEIGHT;
         this.gameContainer.x = (this.APP_WIDTH - GAME_WIDTH) / 2;
