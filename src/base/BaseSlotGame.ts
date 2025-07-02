@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { AssetPaths, DefaultGameSettings, GameRuleSettings, GameAssetConfig } from '../setting';
 import { BaseMapShip } from './BaseMapShip';
 import { ResourceManager } from './ResourceManager';
+import { BaseSlotGameUISetting } from './BaseSlotGame_uiSetting';
 
 export abstract class BaseSlotGame {
   constructor(
@@ -134,114 +135,7 @@ export abstract class BaseSlotGame {
     const gameCode = bgCodeMatch ? bgCodeMatch[1] : '';
 
     const finishInit = (topBg: PIXI.Sprite | null, midBg: PIXI.Sprite | null, bottomBg: PIXI.Sprite | null) => {
-      if (this.gameSettings.mapShip) {
-        this.mapShip = new BaseMapShip(this.app, gameCode);
-        this.mapShip.init().then(() => {
-          if (!this.gameSettings.singleBackground && midBg) {
-            const x =
-              midBg.x + (midBg.width - this.mapShip!.width) / 2;
-            this.mapShip!.setPosition(midBg.x, midBg.y - this.mapShip!.height);
-          }
-          this.mapShip!.setMoveTime(300);
-          this.mapShip!.setOnReachedEnd(() => this.onMapShipEnd());
-        });
-      }
-
-
-      this.reelContainer = new PIXI.Container();
-      let scale = this.REEL_SCALE;
-      if (this.gameSettings.reelWidth) {
-        scale =
-          this.gameSettings.reelWidth /
-          (REEL_LAYOUT_WIDTH);
-      }
-      if (this.gameSettings.reelHeight) {
-        const hScale =
-          this.gameSettings.reelHeight /
-          (REEL_LAYOUT_HEIGHT);
-        scale = Math.min(scale, hScale);
-      }
-      this.REEL_SCALE = scale;
-      this.reelContainer.scale.set(this.REEL_SCALE);
-
-      const scaledWidth = REEL_LAYOUT_WIDTH * this.REEL_SCALE;
-      const scaledHeight = REEL_LAYOUT_HEIGHT * this.REEL_SCALE;
-      let defaultX = (GAME_WIDTH - scaledWidth) / 2;
-      let defaultY = this.SCORE_AREA_HEIGHT;
-      if (!this.gameSettings.singleBackground && midBg) {
-        const midX = midBg.x - this.gameContainer.x;
-        const midY = midBg.y - this.gameContainer.y;
-        defaultX = midX + (midBg.width - scaledWidth) / 2;
-        defaultY = midY + (midBg.height - scaledHeight) / 2;
-      }
-      this.reelContainer.x =
-        this.gameSettings.reelX !== undefined
-          ? this.gameSettings.reelX
-          : defaultX;
-      this.reelContainer.y =
-        this.gameSettings.reelY !== undefined
-          ? this.gameSettings.reelY
-          : defaultY;
-      this.gameContainer.addChild(this.reelContainer);
-
-      // score display
-      this.scoreText = new PIXI.Text('Score: 0', {
-        fill: 0xffe066,
-        fontSize: 48,
-        fontWeight: 'bold',
-        stroke: 0x333333,
-        strokeThickness: 6
-      });
-      this.scoreText.anchor.set(0.5, 0);
-      this.scoreText.x = REEL_LAYOUT_WIDTH / 2;
-      this.scoreText.y = 20;
-      this.gameContainer.addChild(this.scoreText);
-
-      const reelMask = new PIXI.Graphics();
-      reelMask.beginFill(0xffffff);
-      reelMask.drawRect(0, 0, REEL_LAYOUT_WIDTH, REEL_LAYOUT_HEIGHT);
-      reelMask.endFill();
-      this.reelContainer.addChild(reelMask);
-      this.reelContainer.mask = reelMask;
-
-      for (let i = 0; i < this.cols; i++) {
-        const rc = new PIXI.Container();
-        rc.x = i * (this.cellWidth + this.colSpacing);
-        this.reelContainer.addChild(rc);
-        this.reels.push(rc);
-        for (let j = 0; j < this.rows; j++) {
-          const symIndex = Math.floor(
-            Math.random() * this.currentSymbols.length
-          );
-          const symbolName = this.currentSymbols[symIndex];
-          const texture = this.getSymbolTexture(symbolName);
-          const symbol = new PIXI.Sprite(texture);
-          symbol.name = symbolName;
-          symbol.anchor.set(0.5);
-          symbol.x = this.cellWidth / 2;
-          symbol.y =
-            j * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
-          symbol.scale.set(this.blockScale);
-          rc.addChild(symbol);
-          if (this.hasBorder && this.assets.border) {
-            const border = PIXI.Sprite.from(this.assets.border);
-            border.anchor.set(0.5);
-            border.x = this.cellWidth / 2;
-            border.y = symbol.y;
-            border.scale.set(this.blockScale);
-            rc.addChild(border);
-          }
-        }
-      }
-
-      this.button = this.createSpinButton(gameCode, bottomBg);
-      this.gameContainer.addChild(this.button);
-
-      this.lineContainer = new PIXI.Container();
-      this.lineContainer.x = this.reelContainer.x;
-      this.lineContainer.y = this.reelContainer.y;
-      this.lineContainer.scale.set(this.REEL_SCALE);
-      this.gameContainer.addChild(this.lineContainer);
+      this.initUIs(gameCode, topBg, midBg, bottomBg);
     };
 
     if (this.gameSettings.singleBackground) {
@@ -314,6 +208,120 @@ export abstract class BaseSlotGame {
     // old code removed; logic moved to finishInit
   }
 
+  protected initUIs(
+    gameCode: string,
+    topBg: PIXI.Sprite | null,
+    midBg: PIXI.Sprite | null,
+    bottomBg: PIXI.Sprite | null
+  ): void {
+    const REEL_LAYOUT_WIDTH =
+      this.cols * this.cellWidth + (this.cols - 1) * this.colSpacing;
+    const REEL_LAYOUT_HEIGHT =
+      this.rows * this.cellHeight + (this.rows - 1) * this.rowSpacing;
+    const GAME_WIDTH = REEL_LAYOUT_WIDTH;
+
+    if (this.gameSettings.mapShip) {
+      this.mapShip = new BaseMapShip(this.app, gameCode);
+      this.mapShip.init().then(() => {
+        if (!this.gameSettings.singleBackground && midBg) {
+          this.mapShip!.setPosition(midBg.x, midBg.y - this.mapShip!.height);
+        }
+        this.mapShip!.setMoveTime(300);
+        this.mapShip!.setOnReachedEnd(() => this.onMapShipEnd());
+      });
+    }
+
+    this.reelContainer = new PIXI.Container();
+    let scale = this.REEL_SCALE;
+    if (this.gameSettings.reelWidth) {
+      scale = this.gameSettings.reelWidth / REEL_LAYOUT_WIDTH;
+    }
+    if (this.gameSettings.reelHeight) {
+      const hScale = this.gameSettings.reelHeight / REEL_LAYOUT_HEIGHT;
+      scale = Math.min(scale, hScale);
+    }
+    this.REEL_SCALE = scale;
+    this.reelContainer.scale.set(this.REEL_SCALE);
+
+    const scaledWidth = REEL_LAYOUT_WIDTH * this.REEL_SCALE;
+    const scaledHeight = REEL_LAYOUT_HEIGHT * this.REEL_SCALE;
+    let defaultX = (GAME_WIDTH - scaledWidth) / 2;
+    let defaultY = this.SCORE_AREA_HEIGHT;
+    if (!this.gameSettings.singleBackground && midBg) {
+      const midX = midBg.x - this.gameContainer.x;
+      const midY = midBg.y - this.gameContainer.y;
+      defaultX = midX + (midBg.width - scaledWidth) / 2;
+      defaultY = midY + (midBg.height - scaledHeight) / 2;
+    }
+    this.reelContainer.x =
+      this.gameSettings.reelX !== undefined
+        ? this.gameSettings.reelX
+        : defaultX;
+    this.reelContainer.y =
+      this.gameSettings.reelY !== undefined
+        ? this.gameSettings.reelY
+        : defaultY;
+    this.gameContainer.addChild(this.reelContainer);
+
+    this.scoreText = new PIXI.Text('Score: 0', {
+      fill: 0xffe066,
+      fontSize: 48,
+      fontWeight: 'bold',
+      stroke: 0x333333,
+      strokeThickness: 6
+    });
+    this.scoreText.anchor.set(0.5, 0);
+    this.scoreText.x = REEL_LAYOUT_WIDTH / 2;
+    this.scoreText.y = BaseSlotGameUISetting.scoreText.y;
+    this.gameContainer.addChild(this.scoreText);
+
+    const reelMask = new PIXI.Graphics();
+    reelMask.beginFill(0xffffff);
+    reelMask.drawRect(0, 0, REEL_LAYOUT_WIDTH, REEL_LAYOUT_HEIGHT);
+    reelMask.endFill();
+    this.reelContainer.addChild(reelMask);
+    this.reelContainer.mask = reelMask;
+
+    for (let i = 0; i < this.cols; i++) {
+      const rc = new PIXI.Container();
+      rc.x = i * (this.cellWidth + this.colSpacing);
+      this.reelContainer.addChild(rc);
+      this.reels.push(rc);
+      for (let j = 0; j < this.rows; j++) {
+        const symIndex = Math.floor(
+          Math.random() * this.currentSymbols.length
+        );
+        const symbolName = this.currentSymbols[symIndex];
+        const texture = this.getSymbolTexture(symbolName);
+        const symbol = new PIXI.Sprite(texture);
+        symbol.name = symbolName;
+        symbol.anchor.set(0.5);
+        symbol.x = this.cellWidth / 2;
+        symbol.y =
+          j * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
+        symbol.scale.set(this.blockScale);
+        rc.addChild(symbol);
+        if (this.hasBorder && this.assets.border) {
+          const border = PIXI.Sprite.from(this.assets.border);
+          border.anchor.set(0.5);
+          border.x = this.cellWidth / 2;
+          border.y = symbol.y;
+          border.scale.set(this.blockScale);
+          rc.addChild(border);
+        }
+      }
+    }
+
+    this.button = this.createSpinButton(gameCode, bottomBg);
+    this.gameContainer.addChild(this.button);
+
+    this.lineContainer = new PIXI.Container();
+    this.lineContainer.x = this.reelContainer.x;
+    this.lineContainer.y = this.reelContainer.y;
+    this.lineContainer.scale.set(this.REEL_SCALE);
+    this.gameContainer.addChild(this.lineContainer);
+  }
+
   protected onSpinEnd(): void {
     // subclasses can override
   }
@@ -348,7 +356,7 @@ export abstract class BaseSlotGame {
     btn.interactive = true;
     btn.buttonMode = true;
     btn.x = (REEL_LAYOUT_WIDTH - btnBgWidth) / 2;
-    btn.y = REEL_LAYOUT_HEIGHT + 20 + this.SCORE_AREA_HEIGHT;
+    btn.y = REEL_LAYOUT_HEIGHT + BaseSlotGameUISetting.spinButton.offsetY + this.SCORE_AREA_HEIGHT;
     btn.on('pointerdown', () => {
       this.spin(() => {
         this.onSpinEnd();
