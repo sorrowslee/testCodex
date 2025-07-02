@@ -124,5 +124,5 @@ export const AlpszmGameSettings: GameRuleSettings = {
   colSpacing: -15,
   rowSpacing: 32,
   blockScale: 1.2,
-  reelY: 216
+  reelY: 236
 };

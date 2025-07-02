@@ -232,7 +232,7 @@ export abstract class BaseSlotGame {
       this.mapShip = new BaseMapShip(this.app, gameCode);
       this.mapShip.init().then(() => {
         if (!this.gameSettings.singleBackground && midBg) {
-          this.mapShip!.setPosition(midBg.x, midBg.y - this.mapShip!.height);
+          this.mapShip!.setPosition(midBg.x, midBg.y - this.mapShip!.height / 2);
         }
         this.mapShip!.setMoveTime(300);
         this.mapShip!.setOnReachedEnd(() => this.onMapShipEnd());
