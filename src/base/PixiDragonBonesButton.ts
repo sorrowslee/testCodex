@@ -37,19 +37,9 @@ export class PixiDragonBonesButton extends PIXI.Container {
     this.effect.position.set(x, y);
   }
 
-  private async centerEffect(): Promise<void> {
-
-    if(this.effect == undefined ||
-        this.base == undefined) 
-      return;
-
-    this.effect.position.set(this.base.width / 2, this.base.height / 2);
-  }
-
   public async play(): Promise<void> {
     this.overlaySprites.forEach(s => (s.visible = false));
     this.effect.visible = true;
-    await this.centerEffect();
     await this.effect.play();
   }
 
