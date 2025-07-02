@@ -66,14 +66,14 @@ export abstract class BaseSlotGame {
   protected blockScale = 1;
 
   // spin configuration
-  protected BASE_SPIN = 500;
+  protected BASE_SPIN = 300;
   protected SPIN_INCREMENT = 300;
   protected SPIN_SPEED = 300;
   protected BLUR_AMOUNT = 30;
   protected useTextureBlur = false;
   protected blurSuffix = '_blur';
   protected WIN_TIME = 3000;
-  protected START_DELAY = 300;
+  protected START_DELAY = 100;
   protected START_OFFSET_Y = -50;
   protected START_ANIM_DURATION = 200;
   protected END_BOUNCE_OFFSET = 30;
