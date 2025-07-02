@@ -66,17 +66,17 @@ export abstract class BaseSlotGame {
   protected blockScale = 1;
 
   // spin configuration
-  protected BASE_SPIN = 1000;
+  protected BASE_SPIN = 500;
   protected SPIN_INCREMENT = 300;
   protected SPIN_SPEED = 300;
   protected BLUR_AMOUNT = 30;
   protected WIN_TIME = 3000;
   protected START_DELAY = 300;
-  protected START_OFFSET_Y = -30;
+  protected START_OFFSET_Y = -50;
   protected START_ANIM_DURATION = 200;
   protected END_BOUNCE_OFFSET = 30;
   protected END_ANIM_DURATION = 200;
-  protected END_SINK_DURATION = 100;
+  protected END_SINK_DURATION = 300;
   protected SPIN_DIRECTION: 'down' | 'up' = 'down';
 
   // border configuration
