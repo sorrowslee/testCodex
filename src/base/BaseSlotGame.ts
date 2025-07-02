@@ -689,17 +689,19 @@ export abstract class BaseSlotGame {
             this.unregisterTicker(ticker);
             this.alignReel(reel);
 
+            // restore symbols when braking animation begins
+            if (this.useTextureBlur) {
+              reel.children.forEach((c: any, i: number) => {
+                if (i % this.childPerCell === 0) {
+                  const name = c.name || '';
+                  c.texture = this.getSymbolTexture(name, false);
+                }
+              });
+            } else {
+              reel.filters = [];
+            }
+
             const finish = () => {
-              if (this.useTextureBlur) {
-                reel.children.forEach((c: any, i: number) => {
-                  if (i % this.childPerCell === 0) {
-                    const name = c.name || '';
-                    c.texture = this.getSymbolTexture(name, false);
-                  }
-                });
-              } else {
-                reel.filters = [];
-              }
               if (idx === this.cols - 1) {
                 const wins = this.findLines();
                 if (wins.length > 0) {
