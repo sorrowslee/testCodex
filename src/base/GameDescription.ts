@@ -26,6 +26,8 @@ export interface GameDescriptionConfig {
 export class GameDescription extends PIXI.Container {
   private readonly PAGE_WIDTH = 720;
   private readonly PAGE_HEIGHT = 1280;
+  /** fraction of page height required to switch page when dragging */
+  private readonly SWIPE_THRESHOLD = 0.1;
 
   private rulesContainer: PIXI.Container;
   private guideContainer: PIXI.Container;
@@ -136,9 +138,21 @@ export class GameDescription extends PIXI.Container {
     if (!this.dragging) return;
     this.dragging = false;
     const max = this.getMaxScroll(this.activeContainer);
-    const current = -this.activeContainer.y;
-    const index = Math.round(current / this.PAGE_HEIGHT);
-    const y = -index * this.PAGE_HEIGHT;
+    const startIndex = Math.round(-this.startContainerY / this.PAGE_HEIGHT);
+    const delta = this.activeContainer.y - this.startContainerY;
+    const threshold = this.PAGE_HEIGHT * this.SWIPE_THRESHOLD;
+    let index = startIndex;
+    if (delta <= -threshold) {
+      index = Math.min(
+        startIndex + 1,
+        this.activeContainer.children.length - 1
+      );
+    } else if (delta >= threshold) {
+      index = Math.max(startIndex - 1, 0);
+    }
+    let y = -index * this.PAGE_HEIGHT;
+    if (y > 0) y = 0;
+    if (y < -max) y = -max;
     this.activeContainer.y = y;
     if (this.activeContainer === this.rulesContainer) {
       this.scrollPos.rules = y;
