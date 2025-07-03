@@ -27,7 +27,6 @@ export abstract class BaseSlotGame {
   protected lineContainer!: PIXI.Container;
   protected reels: PIXI.Container[] = [];
   protected score = 0;
-  protected scoreText!: PIXI.Text;
   protected button!: PIXI.Container;
   protected mapShip?: BaseMapShip;
   protected mapShipEndTriggered = false;
@@ -271,18 +270,6 @@ export abstract class BaseSlotGame {
         : defaultY;
     this.gameContainer.addChild(this.reelContainer);
 
-    this.scoreText = new PIXI.Text('Score: 0', {
-      fill: 0xffe066,
-      fontSize: 48,
-      fontWeight: 'bold',
-      stroke: 0x333333,
-      strokeThickness: 6
-    });
-    this.scoreText.anchor.set(0.5, 0);
-    this.scoreText.x = REEL_LAYOUT_WIDTH / 2;
-    this.scoreText.y = BaseSlotGameUISetting.scoreText.y;
-    this.scoreText.visible = false;
-    this.gameContainer.addChild(this.scoreText);
 
     const reelMask = new PIXI.Graphics();
     reelMask.beginFill(0xffffff);
@@ -488,25 +475,6 @@ export abstract class BaseSlotGame {
     };
   }
 
-  protected animateScore() {
-    const start = Date.now();
-    const duration = 600;
-    const ticker = new PIXI.Ticker();
-    this.registerTicker(ticker);
-    ticker.add(() => {
-      const elapsed = Date.now() - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const scale = 1 + 0.5 * Math.sin(progress * Math.PI);
-      this.scoreText.scale.set(scale);
-      if (progress === 1) {
-        this.scoreText.scale.set(1);
-        ticker.stop();
-        ticker.destroy();
-        this.unregisterTicker(ticker);
-      }
-    });
-    ticker.start();
-  }
 
   protected showWin(lines: any[], onDone: () => void) {
     if (this.mapShip) {
@@ -554,8 +522,6 @@ export abstract class BaseSlotGame {
     const gained = uniqueCells.size * this.gameSettings.scorePerBlock;
     if (gained > 0) {
       this.score += gained;
-      this.scoreText.text = `Score: ${this.score}`;
-      this.animateScore();
     }
 
     const pulseTicker = new PIXI.Ticker();
