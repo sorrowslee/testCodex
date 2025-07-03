@@ -5,6 +5,7 @@ import { PixiSpinButton } from '../../base/PixiSpinButton';
 import { AlpszmSlotGameUISetting } from './AlpszmSlotGame_uiSetting';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 import { ResourceManager } from '../../base/ResourceManager';
+import { GameDescription } from './GameDescription';
 
 const SYMBOLS = [
   'alpszm_A',
@@ -21,6 +22,19 @@ const SYMBOLS = [
   'alpszm_W1',
   'alpszm_W2'
 ] as const;
+
+const RULES_PAGES = [
+  'alpszm_game_description_rules_page1.jpg',
+  'alpszm_game_description_rules_page2.jpg',
+  'alpszm_game_description_rules_page3.jpg',
+  'alpszm_game_description_rules_page4.jpg'
+];
+
+const GUIDE_PAGES = [
+  'alpszm_game_description_guide_page1.jpg',
+  'alpszm_game_description_guide_page2.jpg',
+  'alpszm_game_description_guide_page3.jpg'
+];
 
 export class AlpszmSlotGame extends BaseSlotGame {
   constructor(settings: GameRuleSettings = AlpszmGameSettings) {
@@ -46,6 +60,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
   private effectBtn!: PIXI.Sprite;
   private musicBtn!: PIXI.Sprite;
   private exitBtn!: PIXI.Sprite;
+  private descriptionView?: GameDescription;
   private effectOn = true;
   private musicOn = true;
 
@@ -410,7 +425,20 @@ export class AlpszmSlotGame extends BaseSlotGame {
   }
 
   private onInfoPressed(): void {
-    // TODO: show game info
+    if (this.descriptionView) return;
+    this.menuPanel.visible = false;
+    this.descriptionView = new GameDescription('alpszm', () => {
+      if (this.descriptionView) {
+        this.app.stage.removeChild(this.descriptionView);
+        this.descriptionView.destroy({ children: true });
+        this.descriptionView = undefined;
+      }
+    }, RULES_PAGES, GUIDE_PAGES);
+    const x = (this.APP_WIDTH - 720) / 2;
+    const y = (this.APP_HEIGHT - 1280) / 2;
+    this.descriptionView.x = x;
+    this.descriptionView.y = y;
+    this.app.stage.addChild(this.descriptionView);
   }
 
   private onEffectToggle(on: boolean): void {
