@@ -94,7 +94,6 @@ export const AssetPaths = {
   alpszm: createGameConfig('alpszm', 0, undefined, false),
   lobby: {
     bg: 'assets/lobby/lobby_bg.png',
-    backBtn: 'assets/lobby/backBtn.png',
     alpszm: 'assets/lobby/lobby_icons/alpszm.png'
   }
 } as const;

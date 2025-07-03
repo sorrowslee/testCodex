@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { AlpszmSlotGame } from './games/alpszm/AlpszmSlotGame';
 import { Lobby } from './Lobby';
-import { AssetPaths } from './setting';
 import { ResourceManager } from './base/ResourceManager';
 
 class SceneManager {
@@ -23,18 +22,7 @@ class SceneManager {
       const game = new AlpszmSlotGame();
       this.current = game;
       game.start('game');
-      this.addBackButton(game.appInstance);
     }
-  }
-
-  private addBackButton(app: PIXI.Application): void {
-    const btn = PIXI.Sprite.from(AssetPaths.lobby.backBtn);
-    btn.interactive = true;
-    btn.buttonMode = true;
-    btn.x = 20;
-    btn.y = 20;
-    btn.on('pointertap', () => this.showLobby());
-    app.stage.addChild(btn);
   }
 
   private cleanup(): void {
