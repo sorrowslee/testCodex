@@ -38,8 +38,8 @@ export class GameDescription extends PIXI.Container {
 
     this.rulesBtn = new PIXI.Sprite(ResourceManager.getTexture(`${gameCode}_game_description_rules_button_press`));
     this.rulesBtn.anchor.set(0.5);
-    this.rulesBtn.x = this.rulesBtn.width / 2 + 20;
-    this.rulesBtn.y = this.topBg.height / 2;
+    this.rulesBtn.x = 220;
+    this.rulesBtn.y = 105;
     this.rulesBtn.interactive = true;
     this.rulesBtn.buttonMode = true;
     this.rulesBtn.on('pointertap', () => this.showRules());
@@ -47,8 +47,8 @@ export class GameDescription extends PIXI.Container {
 
     this.guideBtn = new PIXI.Sprite(ResourceManager.getTexture(`${gameCode}_game_description_guide_button_normal`));
     this.guideBtn.anchor.set(0.5);
-    this.guideBtn.x = this.PAGE_WIDTH - this.guideBtn.width / 2 - 20;
-    this.guideBtn.y = this.topBg.height / 2;
+    this.guideBtn.x = 500;
+    this.guideBtn.y = 105;
     this.guideBtn.interactive = true;
     this.guideBtn.buttonMode = true;
     this.guideBtn.on('pointertap', () => this.showGuide());
