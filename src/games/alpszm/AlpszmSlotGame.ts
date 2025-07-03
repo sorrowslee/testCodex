@@ -5,7 +5,7 @@ import { PixiSpinButton } from '../../base/PixiSpinButton';
 import { AlpszmSlotGameUISetting } from './AlpszmSlotGame_uiSetting';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 import { ResourceManager } from '../../base/ResourceManager';
-import { GameDescription } from './GameDescription';
+import { GameDescription, GameDescriptionConfig } from '../../base/GameDescription';
 
 const SYMBOLS = [
   'alpszm_A',
@@ -35,6 +35,24 @@ const GUIDE_PAGES = [
   'alpszm_game_description_guide_page2.jpg',
   'alpszm_game_description_guide_page3.jpg'
 ];
+
+const DESCRIPTION_CONFIG: GameDescriptionConfig = {
+  gameCode: 'alpszm',
+  rulesPages: RULES_PAGES,
+  guidePages: GUIDE_PAGES,
+  rulesButton: {
+    normal: 'alpszm_game_description_rules_button_normal',
+    press: 'alpszm_game_description_rules_button_press'
+  },
+  guideButton: {
+    normal: 'alpszm_game_description_guide_button_normal',
+    press: 'alpszm_game_description_guide_button_press'
+  },
+  closeButton: {
+    normal: 'alpszm_game_description_close_button_normal',
+    press: 'alpszm_game_description_close_button_press'
+  }
+};
 
 export class AlpszmSlotGame extends BaseSlotGame {
   constructor(settings: GameRuleSettings = AlpszmGameSettings) {
@@ -427,13 +445,13 @@ export class AlpszmSlotGame extends BaseSlotGame {
   private onInfoPressed(): void {
     if (this.descriptionView) return;
     this.menuPanel.visible = false;
-    this.descriptionView = new GameDescription('alpszm', () => {
+    this.descriptionView = new GameDescription(DESCRIPTION_CONFIG, () => {
       if (this.descriptionView) {
         this.app.stage.removeChild(this.descriptionView);
         this.descriptionView.destroy({ children: true });
         this.descriptionView = undefined;
       }
-    }, RULES_PAGES, GUIDE_PAGES);
+    });
     const x = (this.APP_WIDTH - 720) / 2;
     const y = (this.APP_HEIGHT - 1280) / 2;
     this.descriptionView.x = x;

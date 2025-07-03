@@ -1,5 +1,27 @@
 import * as PIXI from 'pixi.js';
-import { ResourceManager } from '../../base/ResourceManager';
+import { ResourceManager } from './ResourceManager';
+
+export interface DescriptionButtonTextures {
+  normal: string;
+  press: string;
+}
+
+export interface GameDescriptionConfig {
+  /** game code for asset path */
+  gameCode: string;
+  /** file names of rules pages inside assets/<gameCode>/description */
+  rulesPages: string[];
+  /** file names of guide pages inside assets/<gameCode>/description */
+  guidePages: string[];
+  /** textures for rules button */
+  rulesButton: DescriptionButtonTextures;
+  /** textures for guide button */
+  guideButton: DescriptionButtonTextures;
+  /** textures for close button */
+  closeButton: DescriptionButtonTextures;
+  /** optional custom top background image path */
+  topBg?: string;
+}
 
 export class GameDescription extends PIXI.Container {
   private readonly PAGE_WIDTH = 720;
@@ -18,25 +40,23 @@ export class GameDescription extends PIXI.Container {
   private dragStartY = 0;
   private startContainerY = 0;
 
-  constructor(
-    private gameCode: string,
-    onClose: () => void,
-    private rulesPages: string[],
-    private guidePages: string[]
-  ) {
+  constructor(private config: GameDescriptionConfig, onClose: () => void) {
     super();
 
-    this.rulesContainer = this.createPageContainer(rulesPages);
-    this.guideContainer = this.createPageContainer(guidePages);
+    this.rulesContainer = this.createPageContainer(config.rulesPages);
+    this.guideContainer = this.createPageContainer(config.guidePages);
     this.guideContainer.visible = false;
     this.addChild(this.rulesContainer);
     this.addChild(this.guideContainer);
     this.activeContainer = this.rulesContainer;
 
-    this.topBg = PIXI.Sprite.from(`assets/${gameCode}/description/${gameCode}_game_description_top.jpg`);
+    const topPath =
+      config.topBg ??
+      `assets/${config.gameCode}/description/${config.gameCode}_game_description_top.jpg`;
+    this.topBg = PIXI.Sprite.from(topPath);
     this.addChild(this.topBg);
 
-    this.rulesBtn = new PIXI.Sprite(ResourceManager.getTexture(`${gameCode}_game_description_rules_button_press`));
+    this.rulesBtn = new PIXI.Sprite(ResourceManager.getTexture(config.rulesButton.press));
     this.rulesBtn.anchor.set(0.5);
     this.rulesBtn.x = 220;
     this.rulesBtn.y = 105;
@@ -45,7 +65,7 @@ export class GameDescription extends PIXI.Container {
     this.rulesBtn.on('pointertap', () => this.showRules());
     this.addChild(this.rulesBtn);
 
-    this.guideBtn = new PIXI.Sprite(ResourceManager.getTexture(`${gameCode}_game_description_guide_button_normal`));
+    this.guideBtn = new PIXI.Sprite(ResourceManager.getTexture(config.guideButton.normal));
     this.guideBtn.anchor.set(0.5);
     this.guideBtn.x = 500;
     this.guideBtn.y = 105;
@@ -54,7 +74,7 @@ export class GameDescription extends PIXI.Container {
     this.guideBtn.on('pointertap', () => this.showGuide());
     this.addChild(this.guideBtn);
 
-    this.closeBtn = new PIXI.Sprite(ResourceManager.getTexture(`${gameCode}_game_description_close_button_normal`));
+    this.closeBtn = new PIXI.Sprite(ResourceManager.getTexture(config.closeButton.normal));
     this.closeBtn.anchor.set(0.5);
     this.closeBtn.x = this.PAGE_WIDTH - this.closeBtn.width / 2 - 10;
     this.closeBtn.y = this.closeBtn.height / 2 + 10;
@@ -62,14 +82,14 @@ export class GameDescription extends PIXI.Container {
     this.closeBtn.buttonMode = true;
     this.closeBtn
       .on('pointerdown', () => {
-        this.closeBtn.texture = ResourceManager.getTexture(`${gameCode}_game_description_close_button_press`);
+        this.closeBtn.texture = ResourceManager.getTexture(config.closeButton.press);
       })
       .on('pointerup', () => {
-        this.closeBtn.texture = ResourceManager.getTexture(`${gameCode}_game_description_close_button_normal`);
+        this.closeBtn.texture = ResourceManager.getTexture(config.closeButton.normal);
         onClose();
       })
       .on('pointerupoutside', () => {
-        this.closeBtn.texture = ResourceManager.getTexture(`${gameCode}_game_description_close_button_normal`);
+        this.closeBtn.texture = ResourceManager.getTexture(config.closeButton.normal);
       });
     this.addChild(this.closeBtn);
 
@@ -84,7 +104,7 @@ export class GameDescription extends PIXI.Container {
   private createPageContainer(pages: string[]): PIXI.Container {
     const container = new PIXI.Container();
     pages.forEach((p, i) => {
-      const sprite = PIXI.Sprite.from(`assets/${this.gameCode}/description/${p}`);
+      const sprite = PIXI.Sprite.from(`assets/${this.config.gameCode}/description/${p}`);
       sprite.y = i * this.PAGE_HEIGHT;
       container.addChild(sprite);
     });
@@ -134,8 +154,8 @@ export class GameDescription extends PIXI.Container {
     this.activeContainer = this.rulesContainer;
     this.activeContainer.visible = true;
     this.activeContainer.y = this.scrollPos.rules;
-    this.rulesBtn.texture = ResourceManager.getTexture(`${this.gameCode}_game_description_rules_button_press`);
-    this.guideBtn.texture = ResourceManager.getTexture(`${this.gameCode}_game_description_guide_button_normal`);
+    this.rulesBtn.texture = ResourceManager.getTexture(this.config.rulesButton.press);
+    this.guideBtn.texture = ResourceManager.getTexture(this.config.guideButton.normal);
   }
 
   private showGuide(): void {
@@ -145,7 +165,8 @@ export class GameDescription extends PIXI.Container {
     this.activeContainer = this.guideContainer;
     this.activeContainer.visible = true;
     this.activeContainer.y = this.scrollPos.guide;
-    this.rulesBtn.texture = ResourceManager.getTexture(`${this.gameCode}_game_description_rules_button_normal`);
-    this.guideBtn.texture = ResourceManager.getTexture(`${this.gameCode}_game_description_guide_button_press`);
+    this.rulesBtn.texture = ResourceManager.getTexture(this.config.rulesButton.normal);
+    this.guideBtn.texture = ResourceManager.getTexture(this.config.guideButton.press);
   }
 }
+
