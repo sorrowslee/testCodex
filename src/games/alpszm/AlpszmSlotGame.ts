@@ -6,6 +6,7 @@ import { AlpszmSlotGameUISetting } from './AlpszmSlotGame_uiSetting';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 import { ResourceManager } from '../../base/ResourceManager';
 import { GameDescription, GameDescriptionConfig } from '../../base/GameDescription';
+import { PixiSlotLineMgr } from '../../base/PixiSlotLineMgr';
 
 const SYMBOLS = [
   'alpszm_A',
@@ -34,6 +35,29 @@ const GUIDE_PAGES = [
   'alpszm_game_description_guide_page1.jpg',
   'alpszm_game_description_guide_page2.jpg',
   'alpszm_game_description_guide_page3.jpg'
+];
+
+const PAYLINES: number[][] = [
+  [1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0],
+  [2, 2, 2, 2, 2],
+  [0, 1, 2, 1, 0],
+  [2, 1, 0, 1, 2],
+  [0, 0, 1, 0, 0],
+  [2, 2, 1, 2, 2],
+  [1, 0, 0, 0, 1],
+  [1, 2, 2, 2, 1],
+  [0, 1, 1, 1, 0],
+  [2, 1, 1, 1, 2],
+  [0, 1, 0, 1, 0],
+  [2, 1, 2, 1, 2],
+  [1, 1, 0, 1, 1],
+  [1, 1, 2, 1, 1],
+  [0, 2, 0, 2, 0],
+  [2, 0, 2, 0, 2],
+  [0, 2, 2, 1, 0],
+  [2, 0, 0, 1, 2],
+  [1, 0, 2, 0, 1]
 ];
 
 const DESCRIPTION_CONFIG: GameDescriptionConfig = {
@@ -470,6 +494,85 @@ export class AlpszmSlotGame extends BaseSlotGame {
   private onExit(): void {
     // same behavior as the back button
     window.location.reload();
+  }
+
+  private isWild(name: string): boolean {
+    return name === 'alpszm_W1' || name === 'alpszm_W2' || name === 'WILD';
+  }
+
+  private getPlateResult(): string[][] {
+    const plate: string[][] = [];
+    for (let c = 0; c < this.cols; c++) {
+      plate[c] = [];
+      for (let r = 0; r < this.rows; r++) {
+        const sprite = this.reels[c].children[r * this.childPerCell] as any;
+        plate[c][r] = sprite.name || '';
+      }
+    }
+    return plate;
+  }
+
+  protected findLines(): { lineIndex: number; cells: { r: number; c: number }[] }[] {
+    const grid = this.gridState();
+    const wins: { lineIndex: number; cells: { r: number; c: number }[] }[] = [];
+
+    PAYLINES.forEach((line, idx) => {
+      let baseSymbol: string | null = null;
+      const cells: { r: number; c: number }[] = [];
+      for (let c = 0; c < this.cols; c++) {
+        const r = line[c];
+        const symbol = grid[r][c].name;
+        if (baseSymbol === null && !this.isWild(symbol)) {
+          baseSymbol = symbol;
+        }
+        if (baseSymbol === null) {
+          cells.push({ r, c });
+          continue;
+        }
+        if (symbol === baseSymbol || this.isWild(symbol)) {
+          cells.push({ r, c });
+        } else {
+          break;
+        }
+      }
+      if (baseSymbol !== null && cells.length >= 3) {
+        wins.push({ lineIndex: idx, cells });
+      }
+    });
+
+    return wins;
+  }
+
+  protected showWin(
+    lines: { lineIndex: number; cells: { r: number; c: number }[] }[],
+    onDone: () => void
+  ) {
+    if (this.mapShip) {
+      this.mapShip.moveBy(lines.length);
+    }
+
+    const plate = this.getPlateResult();
+    const winning_list = lines.map(l => l.cells.map(c => [c.r, c.c]));
+    const winning_line_index_list = lines.map(l => l.lineIndex);
+
+    const uniqueCells = new Set<string>();
+    lines.forEach(l => {
+      l.cells.forEach(c => uniqueCells.add(`${c.r}-${c.c}`));
+    });
+    const gained = uniqueCells.size * this.gameSettings.scorePerBlock;
+    if (gained > 0) {
+      this.score += gained;
+    }
+
+    PixiSlotLineMgr.Set_Winning(plate, winning_list as any, [], winning_line_index_list);
+    PixiSlotLineMgr.Set_TotalLine();
+
+    const timeoutId = window.setTimeout(() => {
+      PixiSlotLineMgr.Clear_AniGroup_All();
+      this.onSpinEnd();
+      onDone();
+    }, this.WIN_TIME);
+    (this as any).registerTimeout(timeoutId);
   }
 }
 
