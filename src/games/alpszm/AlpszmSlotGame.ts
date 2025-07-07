@@ -552,7 +552,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
     }
 
     const plate = this.getPlateResult();
-    const winning_list = lines.map(l => l.cells.map(c => [c.r, c.c]));
+    const winning_list = lines.map(l => l.cells.map(c => c.r));
     const winning_line_index_list = lines.map(l => l.lineIndex);
 
     const uniqueCells = new Set<string>();
@@ -564,7 +564,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
       this.score += gained;
     }
 
-    SlotLineMgr.Set_Winning(plate, winning_list as any, [], winning_line_index_list);
+    SlotLineMgr.Set_Winning(plate, winning_list, [], winning_line_index_list);
     SlotLineMgr.Set_TotalLine();
 
     const timeoutId = window.setTimeout(() => {
