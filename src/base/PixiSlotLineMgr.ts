@@ -1,5 +1,11 @@
 import * as PIXI from 'pixi.js';
-import { PixiDragonBones } from '../src/base/PixiDragonBones';
+import { PixiDragonBones } from './PixiDragonBones';
+import { SlotLineClass, Line_Type } from './PixiSlotLineClass';
+
+declare const GameConfig: { page_name: string };
+declare const SetTimeOutMgr: {
+  call_SetTimeOut(cb: () => void, time: number): number;
+};
 
 /**
  * PixiSlotLineMgr
