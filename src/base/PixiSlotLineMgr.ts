@@ -312,8 +312,8 @@ class PixiSlotLineMgr extends SlotLineClass {
     }
 
     if (!this.plate_symbol_aniGroup[row][col].visible) {
-      this.slot_controller.getSymbol(row, col).visible = false;
-
+      // Keep original symbol visible so it doesn't disappear while the
+      // DragonBones animation plays on top of it.
       const loop_flag = !loop;
       this.plate_symbol_aniGroup[row][col].visible = true;
       this.plate_symbol_aniGroup[row][col].play(symbolName, loop_flag);
