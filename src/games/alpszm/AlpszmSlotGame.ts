@@ -7,6 +7,7 @@ import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting'
 import { ResourceManager } from '../../base/ResourceManager';
 import { GameDescription, GameDescriptionConfig } from '../../base/GameDescription';
 import { SlotLineMgr } from '../../base/PixiSlotLineMgr';
+import { Line_Type } from '../../base/PixiSlotLineClass';
 
 const SYMBOLS = [
   'alpszm_A',
@@ -105,6 +106,9 @@ export class AlpszmSlotGame extends BaseSlotGame {
   private descriptionView?: GameDescription;
   private effectOn = true;
   private musicOn = true;
+  private symbolEffectLayer!: PIXI.Container;
+  private lineEffectLayer!: PIXI.Container;
+  private wayEffectLayer!: PIXI.Container;
 
   protected getBackgroundPath(): string {
     return AssetPaths.alpszm.bg;
@@ -140,6 +144,35 @@ export class AlpszmSlotGame extends BaseSlotGame {
     bottomBg: PIXI.Sprite | null
   ): void {
     super.initUIs(gameCode, topBg, midBg, bottomBg);
+
+    // setup effect layers for SlotLineMgr
+    this.symbolEffectLayer = new PIXI.Container();
+    this.lineEffectLayer = new PIXI.Container();
+    this.wayEffectLayer = new PIXI.Container();
+    [this.symbolEffectLayer, this.lineEffectLayer, this.wayEffectLayer].forEach(
+      layer => {
+        layer.x = this.reelContainer.x;
+        layer.y = this.reelContainer.y;
+        layer.scale.set(this.REEL_SCALE);
+        this.gameContainer.addChild(layer);
+      }
+    );
+
+    const arrSymCount = new Array(this.cols).fill(this.rows);
+    const arrPosY = new Array(this.cols).fill(0);
+    const slotController = {
+      getSymbol: (row: number, col: number) =>
+        this.reels[row].children[col * this.childPerCell] as PIXI.Sprite
+    };
+
+    SlotLineMgr.Set_LineController(
+      slotController,
+      Line_Type.Line,
+      this.cellWidth + this.colSpacing,
+      this.cellHeight + this.rowSpacing,
+      arrSymCount
+    );
+    SlotLineMgr.Set_Symbol(arrPosY, this.symbolEffectLayer);
 
     const GAME_WIDTH = this.cols * this.cellWidth;
     const HUNTER_SCALE = AlpszmSlotGameUISetting.hunter.scale;
