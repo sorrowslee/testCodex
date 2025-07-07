@@ -175,6 +175,9 @@ export class AlpszmSlotGame extends BaseSlotGame {
       arrSymCount
     );
     SlotLineMgr.Set_Symbol(arrPosY, this.symbolEffectLayer);
+    // initialize line and way animations for SlotLineMgr
+    SlotLineMgr.Set_Line(PAYLINES.length, 'Anim_Line', this.lineEffectLayer);
+    SlotLineMgr.Set_Way(arrPosY, this.wayEffectLayer);
 
     const GAME_WIDTH = this.cols * this.cellWidth;
     const HUNTER_SCALE = AlpszmSlotGameUISetting.hunter.scale;
