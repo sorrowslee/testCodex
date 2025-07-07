@@ -6,7 +6,7 @@ import { AlpszmSlotGameUISetting } from './AlpszmSlotGame_uiSetting';
 import { AssetPaths, GameRuleSettings, AlpszmGameSettings } from '../../setting';
 import { ResourceManager } from '../../base/ResourceManager';
 import { GameDescription, GameDescriptionConfig } from '../../base/GameDescription';
-import { PixiSlotLineMgr } from '../../base/PixiSlotLineMgr';
+import { SlotLineMgr } from '../../base/PixiSlotLineMgr';
 
 const SYMBOLS = [
   'alpszm_A',
@@ -564,11 +564,11 @@ export class AlpszmSlotGame extends BaseSlotGame {
       this.score += gained;
     }
 
-    PixiSlotLineMgr.Set_Winning(plate, winning_list as any, [], winning_line_index_list);
-    PixiSlotLineMgr.Set_TotalLine();
+    SlotLineMgr.Set_Winning(plate, winning_list as any, [], winning_line_index_list);
+    SlotLineMgr.Set_TotalLine();
 
     const timeoutId = window.setTimeout(() => {
-      PixiSlotLineMgr.Clear_AniGroup_All();
+      SlotLineMgr.Clear_AniGroup_All();
       this.onSpinEnd();
       onDone();
     }, this.WIN_TIME);
