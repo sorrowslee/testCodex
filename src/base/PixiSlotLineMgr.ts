@@ -315,16 +315,19 @@ class PixiSlotLineMgr extends SlotLineClass {
       this.slot_controller.getSymbol(row, col).visible = false;
 
       const loop_flag = !loop;
+      this.plate_symbol_aniGroup[row][col].visible = true;
       this.plate_symbol_aniGroup[row][col].play(symbolName, loop_flag);
     }
   }
 
   protected Do_WayFnc(row: number, col: number): void {
+    this.plate_way_aniGroup[row][col].visible = true;
     this.plate_way_aniGroup[row][col].play('Connect', false);
   }
 
   protected Do_LineFnc(index: number): void {
     const lineIndex = this.winning_line_index_list[index];
+    this.plate_line_aniGroup[lineIndex].visible = true;
     PixiDragonBones.play(this.plate_line_aniGroup[lineIndex], '5', 1);
   }
 }
