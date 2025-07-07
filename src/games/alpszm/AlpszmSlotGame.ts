@@ -145,6 +145,8 @@ export class AlpszmSlotGame extends BaseSlotGame {
   ): void {
     super.initUIs(gameCode, topBg, midBg, bottomBg);
 
+    SlotLineMgr.setGameCode(gameCode);
+
     // setup effect layers for SlotLineMgr
     this.symbolEffectLayer = new PIXI.Container();
     this.lineEffectLayer = new PIXI.Container();

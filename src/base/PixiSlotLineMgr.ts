@@ -1,8 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { PixiDragonBones } from './PixiDragonBones';
 import { SlotLineClass, Line_Type } from './PixiSlotLineClass';
-
-declare const GameConfig: { page_name: string };
 declare const SetTimeOutMgr: {
   call_SetTimeOut(cb: () => void, time: number): number;
 };
@@ -13,6 +11,12 @@ declare const SetTimeOutMgr: {
  * Manages slot line animations using PixiDragonBones.
  */
 class PixiSlotLineMgr extends SlotLineClass {
+  /** Current game code used for loading DragonBones assets */
+  private gameCode = '';
+
+  public setGameCode(code: string): void {
+    this.gameCode = code;
+  }
   private slot_aniSymbolAnchor!: PIXI.Container;
   private slot_aniLineAnchor!: PIXI.Container;
   private slot_aniWayAnchor!: PIXI.Container;
@@ -59,7 +63,7 @@ class PixiSlotLineMgr extends SlotLineClass {
 
   private InitAni_Symbol(): void {
     const row_count = this.slot_reel_symCount.length;
-    const resName = GameConfig.page_name + '_a';
+    const resName = this.gameCode + '_a';
 
     this.Check_Symbol(row_count, this.slot_rowSpace, this.slot_colSpace, resName);
     this.Reset_Symbol_ResName(resName);
@@ -80,7 +84,7 @@ class PixiSlotLineMgr extends SlotLineClass {
       for (let y = col_count - 1; y >= 0; y--) {
         let symbol: PixiDragonBones;
         if (y >= sym_col_count) {
-          symbol = new PixiDragonBones(GameConfig.page_name, resName, '');
+          symbol = new PixiDragonBones(this.gameCode, resName, '');
           this.plate_symbol_aniGroup[x][y] = symbol;
         } else {
           symbol = this.plate_symbol_aniGroup[x][y];
@@ -116,7 +120,7 @@ class PixiSlotLineMgr extends SlotLineClass {
     this.slot_line_armatureName = line_armatureName;
     this.slot_aniLineAnchor = line_anchor;
 
-    const resName = GameConfig.page_name + '_a';
+    const resName = this.gameCode + '_a';
 
     this.Check_Line(resName);
     this.Clear_AniGroup_Line();
@@ -137,7 +141,7 @@ class PixiSlotLineMgr extends SlotLineClass {
     const line_total_count = this.slot_total_line_count;
 
     for (let x = lineGroup_length; x < line_total_count; ++x) {
-      const line = new PixiDragonBones(GameConfig.page_name, resName, this.slot_line_armatureName);
+      const line = new PixiDragonBones(this.gameCode, resName, this.slot_line_armatureName);
       this.plate_line_aniGroup.push(line);
     }
   }
@@ -170,7 +174,7 @@ class PixiSlotLineMgr extends SlotLineClass {
 
   private InitAni_Way(): void {
     const row_count = this.slot_reel_symCount.length;
-    const resName = GameConfig.page_name + '_a';
+    const resName = this.gameCode + '_a';
 
     this.Check_Way(row_count, this.slot_rowSpace, this.slot_colSpace, resName);
     this.Reset_Way_ResName(resName);
@@ -191,7 +195,7 @@ class PixiSlotLineMgr extends SlotLineClass {
       for (let y = 0; y < col_count; ++y) {
         let connect: PixiDragonBones;
         if (y >= way_col_count) {
-          connect = new PixiDragonBones(GameConfig.page_name, resName, 'Anim_Connect');
+          connect = new PixiDragonBones(this.gameCode, resName, 'Anim_Connect');
           this.plate_way_aniGroup[x][y] = connect;
         } else {
           connect = this.plate_way_aniGroup[x][y];
