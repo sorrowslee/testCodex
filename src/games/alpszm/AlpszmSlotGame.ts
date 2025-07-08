@@ -555,25 +555,26 @@ export class AlpszmSlotGame extends BaseSlotGame {
     const wins: { lineIndex: number; cells: { r: number; c: number }[] }[] = [];
 
     PAYLINES.forEach((line, idx) => {
-      let baseSymbol: string | null = null;
-      const cells: { r: number; c: number }[] = [];
-      for (let c = 0; c < this.cols; c++) {
+      const firstRow = line[0];
+      const firstSymbol = grid[firstRow][0].name;
+      if (this.isWild(firstSymbol)) {
+        return;
+      }
+
+      const baseSymbol = firstSymbol;
+      const cells: { r: number; c: number }[] = [{ r: firstRow, c: 0 }];
+
+      for (let c = 1; c < this.cols; c++) {
         const r = line[c];
         const symbol = grid[r][c].name;
-        if (baseSymbol === null && !this.isWild(symbol)) {
-          baseSymbol = symbol;
-        }
-        if (baseSymbol === null) {
-          cells.push({ r, c });
-          continue;
-        }
         if (symbol === baseSymbol || this.isWild(symbol)) {
           cells.push({ r, c });
         } else {
           break;
         }
       }
-      if (baseSymbol !== null && cells.length >= 3) {
+
+      if (cells.length >= 3) {
         wins.push({ lineIndex: idx, cells });
       }
     });
