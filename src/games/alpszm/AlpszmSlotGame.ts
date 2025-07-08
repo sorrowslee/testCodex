@@ -39,26 +39,26 @@ const GUIDE_PAGES = [
 ];
 
 const PAYLINES: number[][] = [
-  [1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0],
-  [2, 2, 2, 2, 2],
-  [0, 1, 2, 1, 0],
-  [2, 1, 0, 1, 2],
-  [0, 0, 1, 0, 0],
-  [2, 2, 1, 2, 2],
-  [1, 0, 0, 0, 1],
-  [1, 2, 2, 2, 1],
-  [0, 1, 1, 1, 0],
-  [2, 1, 1, 1, 2],
-  [0, 1, 0, 1, 0],
-  [2, 1, 2, 1, 2],
-  [1, 1, 0, 1, 1],
-  [1, 1, 2, 1, 1],
-  [0, 2, 0, 2, 0],
-  [2, 0, 2, 0, 2],
-  [0, 2, 2, 1, 0],
-  [2, 0, 0, 1, 2],
-  [1, 0, 2, 0, 1]
+  [0, 0, 0, 0, 0], // 1. top horizontal line
+  [1, 1, 1, 1, 1], // 2. middle horizontal line
+  [2, 2, 2, 2, 2], // 3. bottom horizontal line
+  [2, 1, 0, 1, 2], // 4. big inverted V (rows 1~3)
+  [0, 1, 2, 1, 0], // 5. big V (rows 1~3)
+  [0, 1, 0, 1, 0], // 6. small W (rows 1~2)
+  [1, 2, 1, 2, 1], // 7. small W (rows 2~3)
+  [1, 0, 1, 0, 1], // 8. small M (rows 1~2)
+  [2, 1, 2, 1, 2], // 9. small M (rows 2~3)
+  [0, 2, 0, 2, 0], // 10. big W (rows 1~3)
+  [1, 1, 2, 1, 1], // 11. small U (rows 2~3)
+  [0, 0, 1, 0, 0], // 12. small U (rows 1~2)
+  [1, 1, 0, 1, 1], // 13. small inverted U (rows 1~2)
+  [2, 2, 1, 2, 2], // 14. small inverted U (rows 2~3)
+  [1, 0, 0, 0, 1], // 15. small wide inverted U (rows 1~2)
+  [2, 1, 1, 1, 2], // 16. small wide inverted U (rows 2~3)
+  [1, 2, 2, 2, 1], // 17. small wide U (rows 2~3)
+  [0, 1, 1, 1, 0], // 18. small wide U (rows 1~2)
+  [2, 0, 2, 0, 2], // 19. big M (rows 1~3)
+  [0, 2, 2, 2, 0]  // 20. big wide U (rows 1~3)
 ];
 
 const DESCRIPTION_CONFIG: GameDescriptionConfig = {
