@@ -53,8 +53,8 @@ export const AlpszmSlotGameUISetting = {
    * These values are relative to the reel container position and scale.
    */
   effectLayer: {
-    xOffset: 0,
-    yOffset: 0,
-    scale: 1,
+    xOffset: 350,
+    yOffset: 150,
+    scale: 1.2,
   },
 };
