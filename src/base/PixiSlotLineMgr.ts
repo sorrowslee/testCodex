@@ -328,7 +328,8 @@ class PixiSlotLineMgr extends SlotLineClass {
   protected Do_LineFnc(index: number): void {
     const lineIndex = this.winning_line_index_list[index];
     this.plate_line_aniGroup[lineIndex].visible = true;
-    PixiDragonBones.play(this.plate_line_aniGroup[lineIndex], '5', 1);
+    const animName = String(lineIndex + 1);
+    PixiDragonBones.play(this.plate_line_aniGroup[lineIndex], animName, 1);
   }
 }
 
