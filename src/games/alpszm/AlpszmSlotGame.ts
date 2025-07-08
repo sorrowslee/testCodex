@@ -151,11 +151,12 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.symbolEffectLayer = new PIXI.Container();
     this.lineEffectLayer = new PIXI.Container();
     this.wayEffectLayer = new PIXI.Container();
+    const effectSetting = AlpszmSlotGameUISetting.effectLayer;
     [this.symbolEffectLayer, this.lineEffectLayer, this.wayEffectLayer].forEach(
       layer => {
-        layer.x = this.reelContainer.x;
-        layer.y = this.reelContainer.y;
-        layer.scale.set(this.REEL_SCALE);
+        layer.x = this.reelContainer.x + effectSetting.xOffset;
+        layer.y = this.reelContainer.y + effectSetting.yOffset;
+        layer.scale.set(this.REEL_SCALE * effectSetting.scale);
         this.gameContainer.addChild(layer);
       }
     );

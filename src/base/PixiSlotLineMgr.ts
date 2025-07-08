@@ -14,6 +14,9 @@ class PixiSlotLineMgr extends SlotLineClass {
   /** Current game code used for loading DragonBones assets */
   private gameCode = '';
 
+  /** Flag for keeping line animations visible for debugging */
+  public testLine = false;
+
   public setGameCode(code: string): void {
     this.gameCode = code;
   }
@@ -245,6 +248,7 @@ class PixiSlotLineMgr extends SlotLineClass {
   }
 
   public Clear_AniGroup_All(): void {
+    if (this.testLine) return;
     this.Clear_AniGroup_Symbol();
 
     if (this.type === Line_Type.Line) {
