@@ -278,16 +278,26 @@ export abstract class BaseSlotGame {
     this.reelContainer.addChild(reelMask);
     this.reelContainer.mask = reelMask;
 
+    const useTestPlate =
+      this.gameSettings.testPlateOpen &&
+      this.gameSettings.testPlate &&
+      this.gameSettings.testPlate.length > 0;
+
     for (let i = 0; i < this.cols; i++) {
       const rc = new PIXI.Container();
       rc.x = i * (this.cellWidth + this.colSpacing);
       this.reelContainer.addChild(rc);
       this.reels.push(rc);
       for (let j = 0; j < this.rows; j++) {
-        const symIndex = Math.floor(
-          Math.random() * this.currentSymbols.length
-        );
-        const symbolName = this.currentSymbols[symIndex];
+        let symbolName: string;
+        if (useTestPlate && this.gameSettings.testPlate![j]?.[i]) {
+          symbolName = this.gameSettings.testPlate![j][i];
+        } else {
+          const symIndex = Math.floor(
+            Math.random() * this.currentSymbols.length
+          );
+          symbolName = this.currentSymbols[symIndex];
+        }
         const texture = this.getSymbolTexture(symbolName, false);
         const symbol = new PIXI.Sprite(texture);
         symbol.name = symbolName;
@@ -360,15 +370,26 @@ export abstract class BaseSlotGame {
   }
 
   protected populateReels(symbolSet: string[]): void {
+    const useTestPlate =
+      this.gameSettings.testPlateOpen &&
+      this.gameSettings.testPlate &&
+      this.gameSettings.testPlate.length > 0;
+
     for (let c = 0; c < this.cols; c++) {
       for (let r = 0; r < this.rows; r++) {
-        const idx = Math.floor(Math.random() * symbolSet.length);
+        let symbolName: string;
+        if (useTestPlate && this.gameSettings.testPlate![r]?.[c]) {
+          symbolName = this.gameSettings.testPlate![r][c];
+        } else {
+          const idx = Math.floor(Math.random() * symbolSet.length);
+          symbolName = symbolSet[idx];
+        }
         const sym = this.reels[c].children[r * this.childPerCell] as any;
         const border = this.hasBorder
           ? (this.reels[c].children[r * this.childPerCell + 1] as any)
           : null;
-        sym.texture = this.getSymbolTexture(symbolSet[idx], false);
-        sym.name = symbolSet[idx];
+        sym.texture = this.getSymbolTexture(symbolName, false);
+        sym.name = symbolName;
         sym.y = r * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
         sym.scale.set(this.blockScale);
         if (border) {
