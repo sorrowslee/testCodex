@@ -369,34 +369,43 @@ export abstract class BaseSlotGame {
     return btn;
   }
 
-  protected populateReels(symbolSet: string[]): void {
+  /**
+   * Populate a single reel with final symbols.
+   * This mirrors populateReels but only updates one column so it can be used
+   * when each reel stops.
+   */
+  protected populateReel(col: number, symbolSet: string[]): void {
     const useTestPlate =
       this.gameSettings.testPlateOpen &&
       this.gameSettings.testPlate &&
       this.gameSettings.testPlate.length > 0;
 
-    for (let c = 0; c < this.cols; c++) {
-      for (let r = 0; r < this.rows; r++) {
-        let symbolName: string;
-        if (useTestPlate && this.gameSettings.testPlate![r]?.[c]) {
-          symbolName = this.gameSettings.testPlate![r][c];
-        } else {
-          const idx = Math.floor(Math.random() * symbolSet.length);
-          symbolName = symbolSet[idx];
-        }
-        const sym = this.reels[c].children[r * this.childPerCell] as any;
-        const border = this.hasBorder
-          ? (this.reels[c].children[r * this.childPerCell + 1] as any)
-          : null;
-        sym.texture = this.getSymbolTexture(symbolName, false);
-        sym.name = symbolName;
-        sym.y = r * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
-        sym.scale.set(this.blockScale);
-        if (border) {
-          border.y = sym.y;
-          border.scale.set(this.blockScale);
-        }
+    for (let r = 0; r < this.rows; r++) {
+      let symbolName: string;
+      if (useTestPlate && this.gameSettings.testPlate![r]?.[col]) {
+        symbolName = this.gameSettings.testPlate![r][col];
+      } else {
+        const idx = Math.floor(Math.random() * symbolSet.length);
+        symbolName = symbolSet[idx];
       }
+      const sym = this.reels[col].children[r * this.childPerCell] as any;
+      const border = this.hasBorder
+        ? (this.reels[col].children[r * this.childPerCell + 1] as any)
+        : null;
+      sym.texture = this.getSymbolTexture(symbolName, false);
+      sym.name = symbolName;
+      sym.y = r * (this.cellHeight + this.rowSpacing) + this.cellHeight / 2;
+      sym.scale.set(this.blockScale);
+      if (border) {
+        border.y = sym.y;
+        border.scale.set(this.blockScale);
+      }
+    }
+  }
+
+  protected populateReels(symbolSet: string[]): void {
+    for (let c = 0; c < this.cols; c++) {
+      this.populateReel(c, symbolSet);
     }
   }
 
@@ -677,6 +686,9 @@ export abstract class BaseSlotGame {
             this.unregisterTicker(ticker);
             this.alignReel(reel);
 
+            // set final symbols for this reel when it stops
+            this.populateReel(idx, this.currentSymbols);
+
             // restore symbols when braking animation begins
             if (this.useTextureBlur) {
               reel.children.forEach((c: any, i: number) => {
@@ -691,7 +703,6 @@ export abstract class BaseSlotGame {
 
             const finish = () => {
               if (idx === this.cols - 1) {
-                this.populateReels(this.currentSymbols);
                 const wins = this.findLines();
                 if (wins.length > 0) {
                   this.showWin(wins, () => {
