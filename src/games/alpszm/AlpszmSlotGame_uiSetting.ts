@@ -48,4 +48,13 @@ export const AlpszmSlotGameUISetting = {
     offsetX: 82,
     offsetY: 40,
   },
+  /**
+   * Offset and scale for the containers used to play line animations.
+   * These values are relative to the reel container position and scale.
+   */
+  effectLayer: {
+    xOffset: 0,
+    yOffset: 0,
+    scale: 1,
+  },
 };
