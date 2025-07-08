@@ -52,6 +52,10 @@ export interface GameRuleSettings {
   reelWidth?: number;
   /** Custom reel container height */
   reelHeight?: number;
+  /** Use predefined plate for testing */
+  testPlateOpen?: boolean;
+  /** Predefined symbols organized by rows */
+  testPlate?: string[][];
 }
 
 function createGameConfig(
@@ -110,7 +114,9 @@ export const DefaultGameSettings: GameRuleSettings = {
   rowSpacing: 0,
   blockScale: 1,
   mapShip: false,
-  singleBackground: false
+  singleBackground: false,
+  testPlateOpen: false,
+  testPlate: []
 };
 
 
@@ -123,5 +129,7 @@ export const AlpszmGameSettings: GameRuleSettings = {
   colSpacing: -15,
   rowSpacing: 32,
   blockScale: 1.2,
-  reelY: 236
+  reelY: 236,
+  testPlateOpen: false,
+  testPlate: []
 };
