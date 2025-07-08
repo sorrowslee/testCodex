@@ -691,6 +691,7 @@ export abstract class BaseSlotGame {
 
             const finish = () => {
               if (idx === this.cols - 1) {
+                this.populateReels(this.currentSymbols);
                 const wins = this.findLines();
                 if (wins.length > 0) {
                   this.showWin(wins, () => {
