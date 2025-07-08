@@ -131,5 +131,7 @@ export const AlpszmGameSettings: GameRuleSettings = {
   blockScale: 1.2,
   reelY: 236,
   testPlateOpen: false,
-  testPlate: []
+  testPlate: [["alpszm_T", "alpszm_K", "alpszm_T", "alpszm_SA", "alpszm_W1"],
+["alpszm_A", "alpszm_W1", "alpszm_A", "alpszm_J", "alpszm_T"],
+["alpszm_T", "alpszm_K", "alpszm_T", "alpszm_W1", "alpszm_J"]]
 };
