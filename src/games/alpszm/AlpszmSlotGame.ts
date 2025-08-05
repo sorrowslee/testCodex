@@ -604,7 +604,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
     const gained = uniqueCells.size * this.gameSettings.scorePerBlock;
     if (gained > 0) {
       this.score += gained;
-      const anim = new PixiDragonBones('alpszm', 'alpszm_b', 'Anim_Score');
+      const anim = new PixiDragonBones('alpszm', 'alpszm_b', 'Anim_W_Few');
       const show = new ShowScore(this.app, 'alpszm');
       show.show(gained, anim);
     }
