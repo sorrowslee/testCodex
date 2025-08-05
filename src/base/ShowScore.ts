@@ -25,6 +25,7 @@ export class ShowScore extends PIXI.Container {
 
     anim.x = this.app.screen.width / 2;
     anim.y = this.app.screen.height / 2;
+    // anim.pivot.set(anim.width / 2, anim.height / 2);
     this.addChild(anim);
 
     const numContainer = new PIXI.Container();
@@ -49,13 +50,13 @@ export class ShowScore extends PIXI.Container {
     numContainer.pivot.set(totalWidth / 2, height / 2);
     numContainer.position.set(
       this.app.screen.width / 2,
-      this.app.screen.height / 2
+      this.app.screen.height / 2+ 10
     );
     this.addChild(numContainer);
 
     this.app.stage.addChild(this);
     await anim.play('Anim_Score', false);
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     this.app.stage.removeChild(this);
     anim.release();
     this.destroy({ children: true });
