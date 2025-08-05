@@ -24,8 +24,7 @@ export class ShowScore extends PIXI.Container {
     this.addChild(bg);
 
     anim.x = this.app.screen.width / 2;
-    anim.y = this.app.screen.height / 2;
-    // anim.pivot.set(anim.width / 2, anim.height / 2);
+    anim.y = this.app.screen.height / 2 - 73;
     this.addChild(anim);
 
     const numContainer = new PIXI.Container();
@@ -50,7 +49,7 @@ export class ShowScore extends PIXI.Container {
     numContainer.pivot.set(totalWidth / 2, height / 2);
     numContainer.position.set(
       this.app.screen.width / 2,
-      this.app.screen.height / 2+ 10
+      this.app.screen.height / 2
     );
     this.addChild(numContainer);
 
