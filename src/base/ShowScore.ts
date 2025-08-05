@@ -55,7 +55,7 @@ export class ShowScore extends PIXI.Container {
     this.addChild(numContainer);
 
     this.app.stage.addChild(this);
-    await anim.play('Anim_Score', false);
+    await anim.play('Few', false);
     await new Promise(resolve => setTimeout(resolve, 2000));
     this.app.stage.removeChild(this);
     anim.release();
