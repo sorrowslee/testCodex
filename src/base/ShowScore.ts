@@ -38,18 +38,24 @@ export class ShowScore extends PIXI.Container {
       sprites.push(s);
       totalWidth += s.width;
     });
-    let x = -totalWidth / 2;
+    let x = 0;
+    let height = 0;
     sprites.forEach(s => {
       s.x = x;
       x += s.width;
       numContainer.addChild(s);
+      if (s.height > height) height = s.height;
     });
-    numContainer.x = this.app.screen.width / 2;
-    numContainer.y = this.app.screen.height / 2;
+    numContainer.pivot.set(totalWidth / 2, height / 2);
+    numContainer.position.set(
+      this.app.screen.width / 2,
+      this.app.screen.height / 2
+    );
     this.addChild(numContainer);
 
     this.app.stage.addChild(this);
-    await PixiDragonBones.play(anim, 'Anim_Score', 1);
+    await anim.play('Anim_Score', false);
+    await new Promise(resolve => setTimeout(resolve, 3000));
     this.app.stage.removeChild(this);
     anim.release();
     this.destroy({ children: true });
