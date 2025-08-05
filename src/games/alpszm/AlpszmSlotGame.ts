@@ -8,6 +8,8 @@ import { ResourceManager } from '../../base/ResourceManager';
 import { GameDescription, GameDescriptionConfig } from '../../base/GameDescription';
 import { SlotLineMgr } from '../../base/PixiSlotLineMgr';
 import { Line_Type } from '../../base/PixiSlotLineClass';
+import { ShowScore } from '../../base/ShowScore';
+import { PixiDragonBones } from '../../base/PixiDragonBones';
 
 const SYMBOLS = [
   'alpszm_A',
@@ -602,6 +604,9 @@ export class AlpszmSlotGame extends BaseSlotGame {
     const gained = uniqueCells.size * this.gameSettings.scorePerBlock;
     if (gained > 0) {
       this.score += gained;
+      const anim = new PixiDragonBones('alpszm', 'alpszm_b', 'Anim_Score');
+      const show = new ShowScore(this.app, 'alpszm');
+      show.show(gained, anim);
     }
 
     SlotLineMgr.Set_Winning(plate, winning_list, [], winning_line_index_list);
