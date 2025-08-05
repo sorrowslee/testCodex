@@ -1,0 +1,21 @@
+{
+  "file": "alpszm_free_spin_font.png",
+  "frames": { 
+    "0": {"x":1,"y":1,"w":118,"h":160,"offX":0,"offY":12,"sourceW":118,"sourceH":185},
+    "1": {"x":1,"y":1450,"w":105,"h":158,"offX":6,"offY":12,"sourceW":118,"sourceH":185},
+    "2": {"x":1,"y":972,"w":118,"h":158,"offX":0,"offY":12,"sourceW":118,"sourceH":185},
+    "3": {"x":1,"y":163,"w":118,"h":160,"offX":0,"offY":12,"sourceW":118,"sourceH":185},
+    "4": {"x":1,"y":1132,"w":118,"h":158,"offX":0,"offY":12,"sourceW":118,"sourceH":185},
+    "5": {"x":1,"y":1292,"w":118,"h":156,"offX":0,"offY":15,"sourceW":118,"sourceH":185},
+    "6": {"x":1,"y":325,"w":118,"h":160,"offX":0,"offY":12,"sourceW":118,"sourceH":185},
+    "7": {"x":1,"y":811,"w":118,"h":159,"offX":0,"offY":14,"sourceW":118,"sourceH":185},
+    "8": {"x":1,"y":487,"w":118,"h":160,"offX":0,"offY":12,"sourceW":118,"sourceH":185},
+    "9": {"x":1,"y":649,"w":118,"h":160,"offX":0,"offY":12,"sourceW":118,"sourceH":185}
+  },
+  "meta": {
+    "app": "https://www.codeandweb.com/texturepacker",
+    "exporter": "egret",
+    "sheetsize": "120x1609",
+    "smartupdate": "$TexturePacker:SmartUpdate:048242165d3aa0d87981df850586e01c:23e84e34c6e00c0fcb6df6de1e68b2d2:b3ef8905068759d613228979198b698b$"
+  }
+}

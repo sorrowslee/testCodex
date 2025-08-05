@@ -1,0 +1,23 @@
+{
+  "file": "alpszm_totalscore_font.png",
+  "frames": { 
+    ",": {"x":887,"y":1,"w":41,"h":58,"offX":2,"offY":77,"sourceW":43,"sourceH":137},
+    ".": {"x":887,"y":61,"w":41,"h":40,"offX":2,"offY":77,"sourceW":43,"sourceH":137},
+    "0": {"x":90,"y":1,"w":95,"h":115,"offX":1,"offY":2,"sourceW":98,"sourceH":137},
+    "1": {"x":815,"y":1,"w":70,"h":113,"offX":1,"offY":3,"sourceW":71,"sourceH":137},
+    "2": {"x":1,"y":1,"w":87,"h":116,"offX":5,"offY":1,"sourceW":98,"sourceH":137},
+    "3": {"x":272,"y":1,"w":81,"h":115,"offX":8,"offY":2,"sourceW":98,"sourceH":137},
+    "4": {"x":715,"y":1,"w":98,"h":113,"offX":0,"offY":3,"sourceW":98,"sourceH":137},
+    "5": {"x":187,"y":1,"w":83,"h":115,"offX":7,"offY":2,"sourceW":98,"sourceH":137},
+    "6": {"x":447,"y":1,"w":89,"h":114,"offX":4,"offY":3,"sourceW":98,"sourceH":137},
+    "7": {"x":538,"y":1,"w":87,"h":114,"offX":5,"offY":2,"sourceW":98,"sourceH":137},
+    "8": {"x":627,"y":1,"w":86,"h":114,"offX":6,"offY":2,"sourceW":98,"sourceH":137},
+    "9": {"x":355,"y":1,"w":90,"h":114,"offX":4,"offY":2,"sourceW":98,"sourceH":137}
+  },
+  "meta": {
+    "app": "https://www.codeandweb.com/texturepacker",
+    "exporter": "egret",
+    "sheetsize": "929x118",
+    "smartupdate": "$TexturePacker:SmartUpdate:b5dfdae8df69a945419cdf362e860483:132a308c7ea17a471c7279611144492c:14c2220f97e1a6d237bc96bece51da72$"
+  }
+}
