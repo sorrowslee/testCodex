@@ -66,11 +66,25 @@ export class PixiDragonBones extends PIXI.Container {
     times: number = 1,
     callback?: () => void
   ): Promise<void> {
-    return new Promise((resolve) => {
-      const display = armature.armatureDisplay;
+    return new Promise(async (resolve) => {
+      let display: any;
+
+      if (armature instanceof PixiDragonBones) {
+        await armature.buildPromise;
+        display = armature.armatureDisplay;
+      } else if (armature && armature.armatureDisplay) {
+        display = armature.armatureDisplay;
+      } else {
+        display = armature;
+      }
+
+      if (!display) {
+        if (callback) callback();
+        resolve();
+        return;
+      }
 
       if (times === 0) {
-        // 無限播放：立即執行 callback 和 resolve
         display.animation.play(animName, 0);
         if (callback) callback();
         resolve();
