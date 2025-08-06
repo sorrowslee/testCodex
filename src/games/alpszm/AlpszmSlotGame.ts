@@ -411,9 +411,13 @@ export class AlpszmSlotGame extends BaseSlotGame {
     intro.y = this.app.screen.height / 2;
     this.app.stage.addChild(intro);
     await PixiDragonBones.play(intro, 'Free', 1);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    intro.release();
-    this.app.stage.removeChild(intro);
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        intro.release();
+        this.app.stage.removeChild(intro);
+        resolve();
+      }, 500);
+    });
 
     if (this.hunter) {
       this.hunter.play();
