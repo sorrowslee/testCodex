@@ -413,7 +413,20 @@ export class AlpszmSlotGame extends BaseSlotGame {
   }
 
 
-  protected startHotSpin() {
+  protected async startHotSpin() {
+    // Disable interactions before playing the intro animation
+    this.button.interactive = false;
+    this.button.alpha = 0.5;
+
+    // Play the Hot Spin intro DragonBones animation once
+    const intro = new PixiDragonBones('alpszm', 'alpszm_b', 'Anim_W_Free');
+    intro.x = this.app.screen.width / 2;
+    intro.y = this.app.screen.height / 2;
+    this.app.stage.addChild(intro);
+    await PixiDragonBones.play(intro, 'Free', 1);
+    intro.release();
+    this.app.stage.removeChild(intro);
+
     if (this.hunter) {
       this.hunter.play();
     }
@@ -421,8 +434,6 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.hotSpinsLeft = 3;
     this.hotSpinText.visible = true;
     this.hotSpinText.text = `Hot Spin!! ${this.hotSpinsLeft}`;
-    this.button.interactive = false;
-    this.button.alpha = 0.5;
     this.currentSymbols = this.hotSymbols;
     this.populateReels(this.currentSymbols);
     this.spin(() => {
