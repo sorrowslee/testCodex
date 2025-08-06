@@ -405,24 +405,25 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.button.interactive = false;
     this.button.alpha = 0.5;
 
+    // Mark hot spin state immediately to prevent other spin triggers
+    this.inHotSpin = true;
+
     // Play the Hot Spin intro DragonBones animation once
     const intro = new PixiDragonBones('alpszm', 'alpszm_b', 'Anim_W_Free');
     intro.x = this.app.screen.width / 2;
     intro.y = this.app.screen.height / 2;
     this.app.stage.addChild(intro);
     await PixiDragonBones.play(intro, 'Free', 1);
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        intro.release();
-        this.app.stage.removeChild(intro);
-        resolve();
-      }, 500);
-    });
+
+    // Pause briefly so players can see the animation before spinning
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
+
+    intro.release();
+    this.app.stage.removeChild(intro);
 
     if (this.hunter) {
       this.hunter.play();
     }
-    this.inHotSpin = true;
     this.hotSpinsLeft = 3;
     this.currentSymbols = this.hotSymbols;
     this.populateReels(this.currentSymbols);
