@@ -87,7 +87,6 @@ export class AlpszmSlotGame extends BaseSlotGame {
     this.useTextureBlur = true;
   }
   private hunter?: PIXI.AnimatedSprite;
-  private hotSpinText!: PIXI.Text;
   private inHotSpin = false;
   private hotSpinsLeft = 0;
   private nextHotSpinScore = this.gameSettings.hotSpinThresholdMultiple;
@@ -206,18 +205,6 @@ export class AlpszmSlotGame extends BaseSlotGame {
       this.hunter.gotoAndStop(0);
       this.app.stage.addChild(this.hunter);
     }
-
-    this.hotSpinText = new PIXI.Text('', {
-      fill: 0xff0000,
-      fontSize: 48,
-      fontWeight: 'bold',
-      stroke: 0x333333,
-      strokeThickness: 6
-    });
-    this.hotSpinText.x = AlpszmSlotGameUISetting.hotSpinText.x;
-    this.hotSpinText.y = AlpszmSlotGameUISetting.hotSpinText.y;
-    this.hotSpinText.visible = false;
-    this.gameContainer.addChild(this.hotSpinText);
 
     this.autoBtn = new PixiDragonBonesButton(
       'alpszm',
@@ -424,6 +411,7 @@ export class AlpszmSlotGame extends BaseSlotGame {
     intro.y = this.app.screen.height / 2;
     this.app.stage.addChild(intro);
     await PixiDragonBones.play(intro, 'Free', 1);
+    await new Promise(resolve => setTimeout(resolve, 500));
     intro.release();
     this.app.stage.removeChild(intro);
 
@@ -432,15 +420,10 @@ export class AlpszmSlotGame extends BaseSlotGame {
     }
     this.inHotSpin = true;
     this.hotSpinsLeft = 3;
-    this.hotSpinText.visible = true;
-    this.hotSpinText.text = `Hot Spin!! ${this.hotSpinsLeft}`;
     this.currentSymbols = this.hotSymbols;
     this.populateReels(this.currentSymbols);
     this.spin(() => {
       this.hotSpinsLeft--;
-      if (this.hotSpinsLeft > 0) {
-        this.hotSpinText.text = `Hot Spin!! ${this.hotSpinsLeft}`;
-      }
       this.checkHotSpin();
     });
   }
@@ -450,8 +433,6 @@ export class AlpszmSlotGame extends BaseSlotGame {
       this.hunter.gotoAndStop(0);
     }
     this.inHotSpin = false;
-    this.hotSpinText.visible = false;
-    this.hotSpinText.text = '';
     this.currentSymbols = this.normalSymbols;
     this.populateReels(this.currentSymbols);
     this.button.interactive = true;
@@ -475,9 +456,6 @@ export class AlpszmSlotGame extends BaseSlotGame {
       if (this.hotSpinsLeft > 0) {
         this.spin(() => {
           this.hotSpinsLeft--;
-          if (this.hotSpinsLeft > 0) {
-            this.hotSpinText.text = `Hot Spin!! ${this.hotSpinsLeft}`;
-          }
           this.checkHotSpin();
         });
       } else {

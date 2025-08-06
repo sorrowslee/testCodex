@@ -4,10 +4,6 @@ export const AlpszmSlotGameUISetting = {
     xOffset: 250,
     yOffset: 190,
   },
-  hotSpinText: {
-    x: 20,
-    y: 20,
-  },
   autoButton: {
     scale: 1.0,
     x: 633,
